@@ -5,7 +5,7 @@ export interface KWARGS {
 
 export class Module {
     protected htmlElement: HTMLElement
-    private displayStyle: string = ""
+    private displayStyle: string = "None"
 
     protected constructor(htmlElement: HTMLElement | null = null) {
         if (htmlElement == null) {
@@ -24,13 +24,13 @@ export class Module {
     }
 
     public hide() {
-        if (this.htmlElement.style.display == "None") return;
+        if (this.htmlElement.style.display == "None") return
         this.displayStyle = this.htmlElement.style.display
         this.htmlElement.style.display = "None"
     }
 
     public show() {
-        if (this.displayStyle == "") return;
+        if (this.displayStyle == "None") return
         this.htmlElement.style.display = this.displayStyle
     }
 

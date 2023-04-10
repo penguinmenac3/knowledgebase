@@ -1,5 +1,6 @@
 import { PageManager } from './framework/pagemanager'
 import { STRINGS, setupLanguage } from './language/default'
+import { Overview } from './views/overview'
 
 import './style.css'
 
@@ -10,7 +11,7 @@ function main() {
   let pageManager = new PageManager(
     "overview",
     {
-      // TODO
+      overview: new Overview()
     }
   )
 }

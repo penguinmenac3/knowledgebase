@@ -18,6 +18,7 @@ export class PageManager {
         for (const page in pages) {
             pages[page].hide()
         }
+        
         this.onOpen()
     }
 

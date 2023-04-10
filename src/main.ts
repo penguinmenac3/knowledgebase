@@ -8,7 +8,7 @@ function main() {
   setupLanguage()
   document.getElementsByTagName("title")[0].innerHTML = STRINGS.APPNAME
 
-  let pageManager = new PageManager(
+  new PageManager(
     "overview",
     {
       overview: new Overview()

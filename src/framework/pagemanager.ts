@@ -12,7 +12,7 @@ export class PageManager {
         private defaultPage: string,
         private pages: Pages,
     ) {
-        window.onhashchange = (ev: HashChangeEvent) => {
+        window.onhashchange = (_: HashChangeEvent) => {
             this.onOpen()
         }
         for (const page in pages) {

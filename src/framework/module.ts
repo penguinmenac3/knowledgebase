@@ -34,7 +34,7 @@ export class Module {
         this.htmlElement.style.display = this.displayStyle
     }
 
-    public update(kwargs: KWARGS) {}
+    public update(_: KWARGS) {}
 
     public select() {
         this.setClass("selected")

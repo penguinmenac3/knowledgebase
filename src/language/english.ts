@@ -10,4 +10,6 @@ export class English {
     public static LOGIN_SUBMIT = "Add Connection"
     public static LOGIN_ERROR_MISSING_INPUTS = "You must provide all fields (session name, api endpoint and api token)."
     public static LOGIN_ERROR_LOGIN_FAILED = "The provided login information is wrong. Is the URL and API token correct?"
+
+    public static OVERVIEW_FILETREE_IS_NULL = "Cannot retrieve list of files. Maybe you have a weak internet connection."
 }

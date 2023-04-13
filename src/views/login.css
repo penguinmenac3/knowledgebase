@@ -31,3 +31,9 @@
 .loginButton:hover {
     background-color: var(--accent-1-active);
 }
+
+.loginDivider {
+    margin-top: 2em;
+    margin-bottom: 2em;
+    width: 100%;
+}

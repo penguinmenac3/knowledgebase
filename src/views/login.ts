@@ -1,20 +1,18 @@
 import { WebFS } from "../WebFS/webfs";
 import { Button } from "../framework/button";
 import { Form, FormInput, FormLabel, FormSubmit } from "../framework/form";
-import { Module } from "../framework/module";
+import { KWARGS, Module } from "../framework/module";
+import { PageManager } from "../framework/pagemanager";
 import { STRINGS } from "../language/default";
 import "./login.css"
 
 export class Login extends Module<HTMLDivElement> {
+    private connections: Module<HTMLDivElement>
+    
     public constructor() {
         super("div")
-        if (localStorage.kb_sessions) {
-            let sessions = JSON.parse(localStorage.kb_sessions)
-            for (const sessionName of sessions) {
-                let button = new Button(sessionName, "loginButton")
-                button.onClick = () => {this.onReuseSession(sessionName)}
-            }
-        }
+        this.connections = new Module("div")
+        this.add(this.connections)
         let addEndpointForm = new Form(
             new FormLabel(STRINGS.LOGIN_SESSION_NAME, "loginLabel"),
             new FormInput("sessionName", "myserver", "text", "loginInput"),
@@ -29,28 +27,59 @@ export class Login extends Module<HTMLDivElement> {
         this.add(addEndpointForm)
     }
 
-    private onReuseSession(sessionName: string) {
-        // TODO
-        console.log("TODO: Use session '" + sessionName + "' to connect to endpoint.")
-
-        // TODO if session invalid by now, remove from button list, show error to user and remain on login site.
-        // TODO if successfull, continue to "overview"
+    public update(_: KWARGS): void {
+        this.connections.htmlElement.innerHTML = ""
+        if (localStorage.kb_sessions) {
+            let sessions: string[] = JSON.parse(localStorage.kb_sessions)
+            if (sessions.length > 0) {
+                this.connections.add(new FormLabel(STRINGS.LOGIN_KNOWN_CONNECTIONS, "loginLabel"))
+            }
+            for (const sessionName of sessions) {
+                let button = new Button(sessionName, "loginButton")
+                button.onClick = () => {this.onReuseSession(sessionName)}
+                this.connections.add(button)
+            }
+            if (sessions.length > 0) {
+                let divider = new Module("hr")
+                divider.setClass("loginDivider")
+                this.connections.add(divider)
+            }
+        }
     }
 
-    private onCreateSession(formData: FormData) {
-        let sessionName = formData.get("sessionName")
-        let apiEndpoint = formData.get("apiEndpoint")
-        let apiToken = formData.get("apiToken")
-        if (sessionName == "" || apiEndpoint == "" || apiToken == "") {
+    private async onReuseSession(sessionName: string) {
+        let webFS = new WebFS(sessionName)
+        if (await webFS.ping()) {
+            WebFS.instance = webFS
+            PageManager.back()
+        } else {
+            alert("Connection refused. Either the server is not available or the connection was not used for too long.")
+        }
+    }
+
+    private async onCreateSession(formData: FormData) {
+        let sessionName = formData.get("sessionName") as string
+        let apiEndpoint = formData.get("apiEndpoint") as string
+        let apiToken = formData.get("apiToken") as string
+        if (sessionName == "" || apiEndpoint == "" || apiToken == "" ||
+            sessionName == null || apiEndpoint == null || apiToken == null) {
             alert(STRINGS.LOGIN_ERROR_MISSING_INPUTS)
             return
         }
-        // let webFS = new WebFS(sessionName)
-        // TODO
-        console.log("TODO: Create session '" + formData.get("sessionName") + "' to connect to endpoint.")
-
-        
-        // TODO if session token invalid, show error to user  and remain on login site.
-        // TODO if successfull, add to session list and continue to "overview"
+        let webFS = new WebFS(sessionName)
+        if (await webFS.login(apiEndpoint, apiToken)) {
+            // if successfull, add to session list, set global api and continue to "overview"
+            let sessions: string[] = []
+            if (localStorage.kb_sessions) {
+                sessions = JSON.parse(localStorage.kb_sessions)
+            }
+            sessions.push(sessionName)
+            localStorage.kb_sessions = JSON.stringify(sessions)
+            WebFS.instance = webFS
+            PageManager.back()
+        } else {
+            // if session token invalid, show error to user  and remain on login site.
+            alert(STRINGS.LOGIN_ERROR_LOGIN_FAILED)
+        } 
     }
 }

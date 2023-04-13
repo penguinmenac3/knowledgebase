@@ -7,7 +7,7 @@ export class Button extends Module<HTMLLinkElement> {
         if (cssClass != "") {
             this.setClass(cssClass)
         }
-        this.htmlElement.onclick = this.onClick.bind(this)
+        this.htmlElement.onclick = () => {this.onClick()}
     }
 
     public onClick() {

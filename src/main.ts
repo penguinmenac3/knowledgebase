@@ -10,7 +10,7 @@ function main() {
   document.getElementsByTagName("title")[0].innerHTML = STRINGS.APPNAME
 
   new PageManager(
-    "login",
+    "overview",
     {
       overview: new Overview(),
       login: new Login(),

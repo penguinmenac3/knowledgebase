@@ -3,24 +3,23 @@ export interface KWARGS {
 }
 
 
-export class Module {
-    protected htmlElement: HTMLElement
+export class Module<T extends HTMLElement> {
+    public parent: Module<HTMLElement> | null = null
+    public htmlElement: T
     private displayStyle: string = "None"
 
-    protected constructor(htmlElement: HTMLElement | null = null) {
-        if (htmlElement == null) {
-            this.htmlElement = document.createElement("div")
-        } else {
-            this.htmlElement = htmlElement
-        }
+    protected constructor(element: string) {
+        this.htmlElement = document.createElement(element) as T
     }
     
-    protected add(module: Module): void {
+    public add(module: Module<HTMLElement>): void {
         this.htmlElement.appendChild(module.htmlElement)
+        module.parent = this
     }
 
-    protected remove(module: Module): void {
+    public remove(module: Module<HTMLElement>): void {
         this.htmlElement.removeChild(module.htmlElement)
+        module.parent = null
     }
 
     public hide() {
@@ -44,13 +43,13 @@ export class Module {
         this.unsetClass("selected")
     }
 
-    protected setClass(className: string) {
+    public setClass(className: string) {
         if (!this.htmlElement.classList.contains(className)) {
             this.htmlElement.classList.add(className)
         }
     }
 
-    protected unsetClass(className: string) {
+    public unsetClass(className: string) {
         if (!this.htmlElement.classList.contains(className)) {
             this.htmlElement.classList.remove(className)
         }

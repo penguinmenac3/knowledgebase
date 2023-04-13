@@ -1,9 +1,8 @@
 import { Module } from "../framework/module";
 
-export class Overview extends Module {
+export class Overview extends Module<HTMLDivElement> {
     public constructor() {
-        super()
-        document.getElementById("app")?.appendChild(this.htmlElement)
+        super("div")
 
         this.htmlElement.innerText = "Hallo Welt!"
     }

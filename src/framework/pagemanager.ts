@@ -1,7 +1,7 @@
 import { KWARGS, Module } from "./module";
 
 export interface Pages{
-    [x: string]: Module
+    [x: string]: Module<HTMLElement>
 }
 
 
@@ -16,6 +16,7 @@ export class PageManager {
             this.onOpen()
         }
         for (const page in pages) {
+            document.getElementById("app")?.appendChild(pages[page].htmlElement)
             pages[page].hide()
         }
         

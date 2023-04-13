@@ -12,6 +12,9 @@ export class PageManager {
         private defaultPage: string,
         private pages: Pages,
     ) {
+        if (location.hash.slice(1) == "") {
+            location.hash = "#page=" + defaultPage;
+        }
         window.onhashchange = (_: HashChangeEvent) => {
             this.onOpen()
         }
@@ -52,11 +55,13 @@ export class PageManager {
     }
 
     public static open(page: string, kwargs: KWARGS) {
-        let kwargs_str = ""
-        for (let key in kwargs) {
-            kwargs_str += "&" + key + "=" + kwargs[key]
-        }
-        location.hash = "#page=" + page + kwargs_str
+        window.setTimeout(() => {
+            let kwargs_str = ""
+            for (let key in kwargs) {
+                kwargs_str += "&" + key + "=" + kwargs[key]
+            }
+            location.hash = "#page=" + page + kwargs_str
+        }, 200)
     }
 
     public static back() {

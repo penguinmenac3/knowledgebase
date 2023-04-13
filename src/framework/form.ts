@@ -22,6 +22,7 @@ export class Form extends Module<HTMLDivElement> {
 
     public onSubmit(formData: FormData) {
         console.log("Form::onSubmit: Not implemented! Must be implemented by subclass.")
+        console.log(formData)
     }
 }
 

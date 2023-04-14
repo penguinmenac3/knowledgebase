@@ -19,7 +19,7 @@ export class Search extends Module<HTMLDivElement> {
     private searchField: FormInput
     private results: Module<HTMLDivElement>
 
-    private currentSearch: string | undefined = undefined
+    //private currentSearch: string | undefined = undefined
     private fileTree: FileTree | null = null
     private updateHashLater: CallLaterButOnlyOnce = new CallLaterButOnlyOnce(1000)
 

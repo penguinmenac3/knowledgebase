@@ -41,7 +41,7 @@ export class FormInput extends Module<HTMLInputElement> {
     }
 
     public value(setval: string | undefined = undefined): string {
-        if (setval) {
+        if (setval !== undefined) {
             this.htmlElement.value = setval
         }
         return this.htmlElement.value

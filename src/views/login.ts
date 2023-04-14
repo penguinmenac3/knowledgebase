@@ -11,6 +11,7 @@ export class Login extends Module<HTMLDivElement> {
     
     public constructor() {
         super("div")
+        this.setClass("loginView")
         this.connections = new Module("div")
         this.add(this.connections)
         let addEndpointForm = new Form(

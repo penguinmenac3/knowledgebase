@@ -35,6 +35,20 @@ export class FormInput extends Module<HTMLInputElement> {
         if (cssClass != "") {
             this.setClass(cssClass)
         }
+        this.htmlElement.oninput = () => {
+            this.onChange(this.htmlElement.value)
+        }
+    }
+
+    public value(setval: string | undefined = undefined): string {
+        if (setval) {
+            this.htmlElement.value = setval
+        }
+        return this.htmlElement.value
+    }
+
+    public onChange(_: string) {
+        //console.log(value)
     }
 }
 

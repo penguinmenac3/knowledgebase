@@ -1,6 +1,6 @@
 import { PageManager } from './framework/pagemanager'
 import { STRINGS, setupLanguage } from './language/default'
-import { Overview } from './views/overview'
+import { Search } from './views/search'
 
 import './style.css'
 import { Login } from './views/login'
@@ -10,9 +10,9 @@ function main() {
   document.getElementsByTagName("title")[0].innerHTML = STRINGS.APPNAME
 
   new PageManager(
-    "overview",
+    "search",
     {
-      overview: new Overview(),
+      search: new Search(),
       login: new Login(),
     }
   )

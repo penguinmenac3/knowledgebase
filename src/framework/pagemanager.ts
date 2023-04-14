@@ -13,7 +13,7 @@ export class PageManager {
         private pages: Pages,
     ) {
         if (location.hash.slice(1) == "") {
-            location.hash = "#page=" + defaultPage;
+            location.hash = "#" + defaultPage;
         }
         window.onhashchange = (_: HashChangeEvent) => {
             this.onOpen()
@@ -32,13 +32,14 @@ export class PageManager {
 
         let hash = location.hash.slice(1)  // remove #
         let parts = hash.split("&")
+        if (parts.length > 0) {
+            page = parts[0]
+            parts = parts.splice(1)
+        }
         for (const part of parts) {
             let tokens = part.split("=")
-            let key = tokens[0]
-            let val = tokens[1]
-            if (key == "page") {
-                page = val
-            }
+            let key = decodeURIComponent(tokens[0])
+            let val = decodeURIComponent(tokens[1])
             kwargs[key] = val
         }
 
@@ -58,9 +59,9 @@ export class PageManager {
         window.setTimeout(() => {
             let kwargs_str = ""
             for (let key in kwargs) {
-                kwargs_str += "&" + key + "=" + kwargs[key]
+                kwargs_str += "&" + encodeURIComponent(key) + "=" + encodeURIComponent(kwargs[key])
             }
-            location.hash = "#page=" + page + kwargs_str
+            location.hash = "#" + encodeURIComponent(page) + kwargs_str
         }, 200)
     }
 

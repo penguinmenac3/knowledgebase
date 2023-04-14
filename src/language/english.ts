@@ -26,4 +26,5 @@ export class English {
     public static SEARCH_FILETREE_IS_NULL = "Cannot retrieve list of files. Maybe you have a weak internet connection."
     public static SEARCH_PLACEHOLDER = "Search (Keyword, Keyword, Keyword)"
     public static SEARCH_LAST_MODIFIED = "modified"
+    public static SEARCH_NUM_RESULTS = "files found"
 }

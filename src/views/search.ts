@@ -20,6 +20,7 @@ export class Search extends Module<HTMLDivElement> {
     private results: Module<HTMLDivElement>
 
     private currentSearch: string | undefined = undefined
+    private fileTree: FileTree | null = null
     private updateHashLater: CallLaterButOnlyOnce = new CallLaterButOnlyOnce(1000)
 
     public constructor() {
@@ -42,30 +43,38 @@ export class Search extends Module<HTMLDivElement> {
             PageManager.open("login", {})
             return
         }
+
+        this.fileTree = await WebFS.instance?.walk(".")
         this.searchField.value(kwargs.q)
         this.updateSearchResults();
     }
 
     private async updateSearchResults() {
         let searchText = this.searchField.value()
-        if (this.currentSearch == searchText) return
-        this.currentSearch = searchText
+        //if (this.currentSearch == searchText) return
+        //this.currentSearch = searchText
 
-        let fileTree = await WebFS.instance?.walk(".")
-        if (fileTree == null) {
+        this.results.htmlElement.innerHTML = "";
+        if (this.fileTree == null) {
             alert(STRINGS.SEARCH_FILETREE_IS_NULL)
             return
         }
 
-        let files = this.flatten(fileTree);
+        let files = this.flatten(this.fileTree);
         files = this.sortFilesByLastModified(files);
         files = this.sortFilesByRelevance(files, searchText);
+        this.showNumResults(files);
         files = files.slice(0, 50); // Only take first 50 results
-
-        this.results.htmlElement.innerHTML = "";
         for (let entry of files) {
             this.results.add(new SearchResult(entry.filepath, humanFriendlyDate(entry.modified)));
         }
+    }
+
+    private showNumResults(files: Entry[]) {
+        let numResults = new Module("div");
+        numResults.htmlElement.innerText = files.length + " " + STRINGS.SEARCH_NUM_RESULTS;
+        numResults.setClass("searchNumResults");
+        this.results.add(numResults);
     }
 
     private sortFilesByRelevance(files: Entry[], searchText: string): Entry[] {

@@ -145,7 +145,8 @@ class SearchResult extends Module<HTMLDivElement> {
         this.htmlElement.appendChild(folderElement)
         
         this.htmlElement.onclick = () => {
-            WebFS.instance?.read(folder + "/" + filename, "_blank")
+            PageManager.open("edit", {folder: folder, filename: filename})
+            //WebFS.instance?.read(folder + "/" + filename, "_blank")
         }
     }
 }

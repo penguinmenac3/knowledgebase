@@ -1,9 +1,10 @@
 import { PageManager } from './webui/pagemanager'
 import { STRINGS, setupLanguage } from './language/default'
 import { Search } from './views/search'
+import { Login } from './views/login'
+import { Edit } from './views/edit'
 
 import './style.css'
-import { Login } from './views/login'
 
 function main() {
   setupLanguage()
@@ -14,6 +15,7 @@ function main() {
     {
       search: new Search(),
       login: new Login(),
+      edit: new Edit(),
     }
   )
 }

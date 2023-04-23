@@ -24,6 +24,7 @@ php -S localhost:8080
 Run the build command, add and commit the dist folder and then push this folger to gh-pages.
 ```bash
 npm run build
+rm dist/favicon.kra
 git add -f dist
 git commit -m "Build gh-pages."
 git push

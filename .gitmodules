@@ -1,4 +1,4 @@
-[submodule "src/webfs"]
+[submodule "src/WebFS"]
 	path = src/webfs
 	url = git@github.com:penguinmenac3/WebFS.git
 [submodule "src/webui"]

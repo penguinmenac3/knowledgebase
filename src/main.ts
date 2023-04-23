@@ -1,4 +1,4 @@
-import { PageManager } from './framework/pagemanager'
+import { PageManager } from './webui/pagemanager'
 import { STRINGS, setupLanguage } from './language/default'
 import { Search } from './views/search'
 

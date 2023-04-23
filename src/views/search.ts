@@ -1,9 +1,9 @@
 import { FileTree, WebFS } from "../webfs/client/webfs";
-import { FormInput } from "../framework/form";
-import { humanFriendlyDate } from "../framework/humanFriendlyDates";
-import { CallLaterButOnlyOnce } from "../framework/lazy";
-import { KWARGS, Module } from "../framework/module";
-import { PageManager } from "../framework/pagemanager";
+import { FormInput } from "../webui/form";
+import { humanFriendlyDate } from "../webui/humanFriendlyDates";
+import { CallLaterButOnlyOnce } from "../webui/lazy";
+import { KWARGS, Module } from "../webui/module";
+import { PageManager } from "../webui/pagemanager";
 import { STRINGS } from "../language/default";
 
 import "./search.css"

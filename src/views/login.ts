@@ -1,8 +1,8 @@
 import { WebFS } from "../webfs/client/webfs";
-import { Button } from "../framework/button";
-import { Form, FormInput, FormLabel, FormSubmit } from "../framework/form";
-import { KWARGS, Module } from "../framework/module";
-import { PageManager } from "../framework/pagemanager";
+import { Button } from "../webui/button";
+import { Form, FormInput, FormLabel, FormSubmit } from "../webui/form";
+import { KWARGS, Module } from "../webui/module";
+import { PageManager } from "../webui/pagemanager";
 import { STRINGS } from "../language/default";
 import "./login.css"
 

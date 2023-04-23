@@ -1,4 +1,4 @@
-import { WebFS } from "../WebFS/client/webfs";
+import { WebFS } from "../webfs/client/webfs";
 import { Button } from "../framework/button";
 import { Form, FormInput, FormLabel, FormSubmit } from "../framework/form";
 import { KWARGS, Module } from "../framework/module";

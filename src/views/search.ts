@@ -1,4 +1,4 @@
-import { FileTree, WebFS } from "../WebFS/client/webfs";
+import { FileTree, WebFS } from "../webfs/client/webfs";
 import { FormInput } from "../framework/form";
 import { humanFriendlyDate } from "../framework/humanFriendlyDates";
 import { CallLaterButOnlyOnce } from "../framework/lazy";

@@ -16,7 +16,7 @@ export class Edit extends Module<HTMLDivElement> {
         this.htmlElement.appendChild(this.iframe)
     }
 
-    public async update(kwargs: KWARGS, changedPage: boolean): Promise<void> {
+    public async update(kwargs: KWARGS, _changedPage: boolean): Promise<void> {
         if (WebFS.instance == null) {
             PageManager.open("login", {})
             return

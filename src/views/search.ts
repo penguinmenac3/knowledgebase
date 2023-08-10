@@ -152,7 +152,7 @@ class SearchResult extends Module<HTMLDivElement> {
             preview.innerHTML = "loading..."
             PreviewCache.getTxtPreview(filepath).then((txt) => {
                 let parts = txt.split("\n")
-                parts = parts.map((val, idx, arr) => {
+                parts = parts.map((val, _idx, _arr) => {
                     if (val.startsWith("#")) {
                         return "<b style='font-size: 1.2em'>" + val + "</b>"
                     }
@@ -216,7 +216,7 @@ class PreviewCache {
         let txt = await WebFS.instance!.readTxt(filepath)
         if (txt != null) {
             let parts = txt.split("\n").slice(0, 13)
-            parts = parts.map((val, idx, arr) => {return val.slice(0, 40)})
+            parts = parts.map((val, _idx, _arr) => {return val.slice(0, 40)})
             txt = parts.join("\n")
             let cache = JSON.parse(localStorage.getItem("kb_preview_cache") || "{}")
             cache[filepath] = txt
@@ -226,7 +226,7 @@ class PreviewCache {
         return "error loading preview"
     }
 
-    public static async getImgPreview(filepath: string): Promise<string> {
+    public static async getImgPreview(_filepath: string): Promise<string> {
         return ""
     }
 }

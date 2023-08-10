@@ -28,7 +28,7 @@ export class Login extends Module<HTMLDivElement> {
         this.add(addEndpointForm)
     }
 
-    public update(_: KWARGS): void {
+    public update(_: KWARGS, changedPage: boolean): void {
         this.connections.htmlElement.innerHTML = ""
         if (localStorage.kb_sessions) {
             let sessions: string[] = JSON.parse(localStorage.kb_sessions)

@@ -21,7 +21,7 @@ export class Search extends Module<HTMLDivElement> {
 
     //private currentSearch: string | undefined = undefined
     private fileTree: FileTree | null = null
-    private updateHashLater: CallLaterButOnlyOnce = new CallLaterButOnlyOnce(1000)
+    private updateHashLater: CallLaterButOnlyOnce = new CallLaterButOnlyOnce(200)
 
     public constructor() {
         super("div")
@@ -38,15 +38,17 @@ export class Search extends Module<HTMLDivElement> {
         this.add(this.results)
     }
 
-    public async update(kwargs: KWARGS): Promise<void> {
+    public async update(kwargs: KWARGS, changedPage: boolean): Promise<void> {
         if (WebFS.instance == null) {
             PageManager.open("login", {})
             return
         }
 
+        if (changedPage) {
         this.fileTree = await WebFS.instance?.walk(".")
         this.searchField.value(kwargs.q)
         this.updateSearchResults();
+    }
     }
 
     private async updateSearchResults() {

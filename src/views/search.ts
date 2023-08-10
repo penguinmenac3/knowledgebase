@@ -45,10 +45,10 @@ export class Search extends Module<HTMLDivElement> {
         }
 
         if (changedPage) {
-        this.fileTree = await WebFS.instance?.walk(".")
-        this.searchField.value(kwargs.q)
-        this.updateSearchResults();
-    }
+            this.fileTree = await WebFS.instance?.walk(".")
+            this.searchField.value(kwargs.q)
+            this.updateSearchResults();
+        }
     }
 
     private async updateSearchResults() {
@@ -130,21 +130,64 @@ class SearchResult extends Module<HTMLDivElement> {
         super("div")
         this.setClass("searchResult")
         let { filename, folder } = splitFilepath(filepath);
+
+        let filename_parts = filename.split(".")
+        let ext = filename_parts[filename_parts.length - 1].toLowerCase()
+        
+        if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "pdf"){
+            let preview = document.createElement("img")
+            preview.classList.add("searchResultPreview")
+            preview.onerror = () => {
+                let previewElement = document.createElement("div")
+                previewElement.innerHTML = "<BR>" + ext.toUpperCase()
+                previewElement.classList.add("searchResultPreview")
+                this.htmlElement.replaceChild(previewElement, this.htmlElement.childNodes[0]);
+            }
+            preview.src = WebFS.instance!.readURL(filepath, true)
+            this.htmlElement.appendChild(preview)
+        } else if (ext == "txt" || ext == "md" || ext == "py" || ext == "csv" || ext == "json") {
+            let preview = document.createElement("div")
+            preview.style.fontSize = "1em"
+            preview.style.textAlign = "left"
+            preview.innerHTML = "loading..."
+            PreviewCache.getTxtPreview(filepath).then((txt) => {
+                let parts = txt.split("\n")
+                parts = parts.map((val, idx, arr) => {
+                    if (val.startsWith("#")) {
+                        return "<b style='font-size: 1.2em'>" + val + "</b>"
+                    }
+                    return val
+                })
+                txt = parts.join("<BR>")
+                preview.innerHTML = txt
+            })
+            preview.classList.add("searchResultPreview")
+            this.htmlElement.appendChild(preview)
+        } else {
+            let preview = document.createElement("div")
+            preview.innerHTML = "<BR>" + ext.toUpperCase()
+            preview.classList.add("searchResultPreview")
+            this.htmlElement.appendChild(preview)
+        }
+
+        let meta = document.createElement("div")
+        meta.classList.add("searchResultMeta")
+        this.htmlElement.appendChild(meta)
         
         let header = document.createElement("div")
         header.innerText = filename
         header.classList.add("searchResultFilename")
-        this.htmlElement.appendChild(header)
+        meta.appendChild(header)
         
         let modifiedElement = document.createElement("div")
         modifiedElement.innerText = STRINGS.SEARCH_LAST_MODIFIED + ": " + modified
         modifiedElement.classList.add("searchResultModified")
-        this.htmlElement.appendChild(modifiedElement)
+        meta.appendChild(modifiedElement)
         
         let folderElement = document.createElement("div")
         folderElement.innerText = folder
         folderElement.classList.add("searchResultFolder")
-        this.htmlElement.appendChild(folderElement)
+        meta.appendChild(folderElement)
         
         this.htmlElement.onclick = () => {
             PageManager.open("edit", {folder: folder, filename: filename})
@@ -161,4 +204,29 @@ function splitFilepath(filepath: string) {
     }
     return { filename, folder };
 }
+class PreviewCache {
+    private constructor() {}
 
+    public static async getTxtPreview(filepath: string): Promise<string> {
+        let cache = JSON.parse(localStorage.getItem("kb_preview_cache") || "{}")
+        if (cache[filepath]) {
+            console.log("cached")
+            return cache[filepath]
+        }
+        let txt = await WebFS.instance!.readTxt(filepath)
+        if (txt != null) {
+            let parts = txt.split("\n").slice(0, 13)
+            parts = parts.map((val, idx, arr) => {return val.slice(0, 40)})
+            txt = parts.join("\n")
+            let cache = JSON.parse(localStorage.getItem("kb_preview_cache") || "{}")
+            cache[filepath] = txt
+            localStorage.setItem("kb_preview_cache", JSON.stringify(cache))
+            return txt
+        }
+        return "error loading preview"
+    }
+
+    public static async getImgPreview(filepath: string): Promise<string> {
+        return ""
+    }
+}

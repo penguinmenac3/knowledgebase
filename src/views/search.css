@@ -20,6 +20,7 @@
     left: 0;
     right: 0;
     overflow-y: scroll;
+    text-align: center;
 }
 
 .searchNumResults {
@@ -31,23 +32,73 @@
 
 .searchResult {
     text-align: left;
-    width: -webkit-fill-available;
-    display: block;
-    font-size: large;
-    margin: 0.3em;
-    padding: 0.6em;
-    text-align: left;
-    border-radius: var(--radius);
+    display: inline-block;
+    text-align: center;
+    border-radius: var(--radius-large);
+    overflow: hidden;
+    position: relative;
+}
+
+@media (max-width: 256px) {
+    .searchResult {
+        width: 95%;
+        margin: 1%;
+        height: 14em;
+    }
+}
+@media (min-width: 256px) and (max-width: 512px) {
+    .searchResult {
+        margin: 1%;
+        width: 45%;
+        height: 14em;
+    }
+}
+@media (min-width: 512px) and (max-width: 768px) {
+    .searchResult {
+        margin: 1%;
+        width: 30%;
+        height: 14em;
+    }
+}
+@media (min-width: 768px) {
+    .searchResult {
+        margin: 0.45em;
+        width: 14em;
+        height: 14em;
+    }
 }
 
 .searchResult:hover {
     background-color: var(--bg-color-hover);
 }
 
+.searchResultPreview {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    font-size: 3em;
+    font-weight: bold;
+    display: inline-block;
+    background-color: var(--font-color);
+    overflow: hidden;
+    white-space: nowrap;
+    color: var(--bg-color);
+}
+
+.searchResultMeta {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    padding: 1%;
+    color: var(--font-color);
+    background-color: var(--bg-color-transparent);
+}
+
 .searchResultFilename {
     font-weight: bold;
-    font-size: 1.1em;
+    font-size: 1em;
     padding-bottom: 0.2em;
+    line-break: anywhere;
 }
 
 .searchResultModified {
@@ -66,4 +117,5 @@
     position: relative;
     color: var(--accent-1-fg);
     background-color: var(--accent-1-bg);
+    line-break: anywhere;
 }

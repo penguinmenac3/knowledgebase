@@ -1,6 +1,7 @@
 :root {
   color-scheme: light dark;
   --bg-color: #333333;
+  --bg-color-transparent: #333333BB;
   --bg-color-hover: #444444;
   --bg-color-2: #555555;
   --font-color: #ffffff;
@@ -33,6 +34,7 @@
 @media (prefers-color-scheme: light) {
   :root {
     --bg-color: #ffffff;
+    --bg-color-transparent: #e3e3e3;
     --bg-color-hover: #d3d3d3;
     --bg-color-2: #f4f4f4;
     --font-color: #333333;

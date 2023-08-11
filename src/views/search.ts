@@ -51,7 +51,7 @@ export class Search extends Module<HTMLDivElement> {
         }
     }
 
-    private async updateSearchResults() {
+    private async updateSearchResults(showMax: number = 50) {
         let searchText = this.searchField.value()
         //if (this.currentSearch == searchText) return
         //this.currentSearch = searchText
@@ -66,9 +66,19 @@ export class Search extends Module<HTMLDivElement> {
         files = this.sortFilesByLastModified(files);
         files = this.sortFilesByRelevance(files, searchText);
         this.showNumResults(files);
-        files = files.slice(0, 50); // Only take first 50 results
+        let numResults = files.length;
+        files = files.slice(0, showMax); // Only take first 50 results
         for (let entry of files) {
             this.results.add(new SearchResult(entry.filepath, humanFriendlyDate(entry.modified)));
+        }
+        if (numResults > showMax) {
+            let showMore = new Module("div");
+            showMore.htmlElement.innerText = STRINGS.SEARCH_MORE_RESULTS;
+            showMore.setClass("searchMoreResults");
+            showMore.htmlElement.onclick = () => {
+                this.updateSearchResults(showMax + 25);
+            }
+            this.results.add(showMore);
         }
     }
 

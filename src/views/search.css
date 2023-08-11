@@ -30,6 +30,18 @@
     padding-bottom: 0.6em;
 }
 
+.searchMoreResults {
+    font-style: italic;
+    display: block;
+    text-align: center;
+    padding: 0.6em;
+    border-radius: var(--radius-large);
+    color: var(--font-color);
+}
+.searchMoreResults:hover {
+    background-color: var(--bg-color-transparent);
+}
+
 .searchResult {
     text-align: left;
     display: inline-block;

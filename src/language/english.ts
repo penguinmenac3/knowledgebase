@@ -28,4 +28,5 @@ export class English {
     public static SEARCH_LAST_MODIFIED = "modified"
     public static SEARCH_CREATED = "created"
     public static SEARCH_NUM_RESULTS = "files found"
+    public static SEARCH_MORE_RESULTS = "Click here to show more results!"
 }

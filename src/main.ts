@@ -1,15 +1,15 @@
 import { PageManager } from './webui/pagemanager'
 import { STRINGS, setupLanguage } from './language/default'
+import { Login, tryReconnectToLastSession } from './views/login'
 import { Search } from './views/search'
-import { Login } from './views/login'
 import { Edit } from './views/edit'
 
 import './style.css'
 
-function main() {
+async function main() {
   setupLanguage()
   document.getElementsByTagName("title")[0].innerHTML = STRINGS.APPNAME
-
+  await tryReconnectToLastSession()
   new PageManager(
     "search",
     {

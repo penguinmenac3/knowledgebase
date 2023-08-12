@@ -20,7 +20,7 @@ export class Login extends Module<HTMLDivElement> {
             new FormInput("apiEndpoint", "https://myserver/webfs/api.php", "url", "loginInput"),
             new FormLabel(STRINGS.LOGIN_API_TOKEN_LABEL, "loginLabel"),
             new FormInput("apiToken", "a4ef9...", "password", "loginInput"),
-            new FormSubmit(STRINGS.LOGIN_SUBMIT, "loginButton")
+            new FormSubmit(STRINGS.LOGIN_SUBMIT, "buttonWide")
         )
         addEndpointForm.setClass("loginForm")
         addEndpointForm.onSubmit = this.onCreateSession.bind(this)
@@ -35,8 +35,8 @@ export class Login extends Module<HTMLDivElement> {
                 this.connections.add(new FormLabel(STRINGS.LOGIN_KNOWN_CONNECTIONS, "loginLabel"))
             }
             for (const sessionName of sessions) {
-                let button = new Button(sessionName, "loginButton")
-                button.onClick = () => {this.onReuseSession(sessionName)}
+                let button = new Button(sessionName, "buttonWide")
+                button.onClick = () => {reuseSession(sessionName)}
                 this.connections.add(button)
             }
             if (sessions.length > 0) {
@@ -44,16 +44,6 @@ export class Login extends Module<HTMLDivElement> {
                 divider.setClass("loginDivider")
                 this.connections.add(divider)
             }
-        }
-    }
-
-    private async onReuseSession(sessionName: string) {
-        let webFS = new WebFS(sessionName)
-        if (await webFS.ping()) {
-            WebFS.instance = webFS
-            PageManager.back()
-        } else {
-            alert("Connection refused. Either the server is not available or the connection was not used for too long.")
         }
     }
 
@@ -81,5 +71,34 @@ export class Login extends Module<HTMLDivElement> {
             // if session token invalid, show error to user  and remain on login site.
             alert(STRINGS.LOGIN_ERROR_LOGIN_FAILED)
         } 
+    }
+}
+
+async function reuseSession(sessionName: string, silent: boolean = false): Promise<void> {
+    console.log("Connecting to: " + sessionName)
+    let webFS = new WebFS(sessionName)
+    if (await webFS.ping()) {
+        WebFS.instance = webFS
+        localStorage.kb_last_session = sessionName
+        if (!silent) {
+            PageManager.back()
+        }
+    } else {
+        if (!silent) {
+            alert("Connection refused. Either the server is not available or the connection was not used for too long.")
+        }
+    }
+}
+
+export async function tryReconnectToLastSession() {
+    if (localStorage.kb_sessions) {
+        let sessions: string[] = JSON.parse(localStorage.kb_sessions)
+        if (sessions.length > 0) {
+            let sessionName = sessions[0]
+            if (localStorage.kb_last_session) {
+                sessionName = localStorage.kb_last_session
+            }
+            await reuseSession(sessionName, true)
+        }
     }
 }

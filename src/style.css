@@ -58,3 +58,17 @@ body {
   overflow-x: hidden;
   overflow-y: hidden;
 }
+
+.buttonWide {
+  width: -webkit-fill-available;
+  display: block;
+  margin-top: 1em;
+  padding: 0.5em;
+  color: var(--accent-1-fg);
+  background-color: var(--accent-1-bg);
+  border-radius: 0.2em;
+}
+
+.buttonWide:hover {
+  background-color: var(--accent-1-bg-hover);
+}

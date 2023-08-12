@@ -29,4 +29,13 @@ export class English {
     public static SEARCH_CREATED = "created"
     public static SEARCH_NUM_RESULTS = "files found"
     public static SEARCH_MORE_RESULTS = "Click here to show more results!"
+
+    public static SETTINGS_TITLE = "Settings"
+    public static SETTINGS_GENERAL = "General"
+    public static SETTINGS_CONNECTION = "Connection"
+    public static SETTINGS_SELECT_SERVER = "Select server"
+    public static SETTINGS_DISPLAY = "Display"
+    public static SETTINGS_SHOW_TXT_PREVIEWS = "Show previews for text documents"
+    public static SETTINGS_SHOW_IMG_PREVIEWS = "Show previews for images"
+    public static SETTINGS_SHOW_PDF_PREVIEWS = "Show previews for PDFs"
 }

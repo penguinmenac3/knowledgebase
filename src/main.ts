@@ -3,6 +3,7 @@ import { STRINGS, setupLanguage } from './language/default'
 import { Login, tryReconnectToLastSession } from './views/login'
 import { Search } from './views/search'
 import { Edit } from './views/edit'
+import { Settings } from './views/settings'
 
 import './style.css'
 
@@ -18,6 +19,7 @@ async function main() {
       edit: new Edit(),
     }
   )
+  new Settings()
 }
 
 main()

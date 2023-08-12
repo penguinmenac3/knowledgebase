@@ -144,7 +144,8 @@ class SearchResult extends Module<HTMLDivElement> {
         let filename_parts = filename.split(".")
         let ext = filename_parts[filename_parts.length - 1].toLowerCase()
         
-        if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "pdf"){
+        if ((localStorage.kb_allow_img_previews == 'true' && (ext == "png" || ext == "jpg" || ext == "jpeg")
+         || (localStorage.kb_allow_pdf_previews == 'true' && ext == "pdf"))) {
             let preview = document.createElement("img")
             preview.classList.add("searchResultPreview")
             preview.onerror = () => {
@@ -155,7 +156,7 @@ class SearchResult extends Module<HTMLDivElement> {
             }
             preview.src = WebFS.instance!.readURL(filepath, true)
             this.htmlElement.appendChild(preview)
-        } else if (ext == "txt" || ext == "md" || ext == "py" || ext == "csv" || ext == "json") {
+        } else if (localStorage.kb_allow_txt_previews == 'true' && (ext == "txt" || ext == "md" || ext == "py" || ext == "csv" || ext == "json")) {
             let preview = document.createElement("div")
             preview.style.fontSize = "1em"
             preview.style.textAlign = "left"

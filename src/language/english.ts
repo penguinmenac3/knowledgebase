@@ -22,12 +22,17 @@ export class English {
     public static LOGIN_SUBMIT = "Add Connection"
     public static LOGIN_ERROR_MISSING_INPUTS = "You must provide all fields (session name, api endpoint and api token)."
     public static LOGIN_ERROR_LOGIN_FAILED = "The provided login information is wrong. Is the URL and API token correct?"
+    
+    public static LOGIN_OFFLINE_MODAL_QUESTION = "Cannot connect to server. Do you want to continue in offline mode? Offline mode might show you outdated files and data."
+    public static LOGIN_OFFLINE_MODAL_CONFIRM = "Continue offline"
+    public static LOGIN_OFFLINE_MODAL_CANCEL = "Return to login"
 
     public static SEARCH_FILETREE_IS_NULL = "Cannot retrieve list of files. Maybe you have a weak internet connection."
     public static SEARCH_PLACEHOLDER = "Search (Keyword, Keyword, Keyword)"
     public static SEARCH_LAST_MODIFIED = "modified"
     public static SEARCH_CREATED = "created"
     public static SEARCH_NUM_RESULTS = "files found"
+    public static SEARCH_OFFLINE = "(<span style='color: red'>offline</span>)"
     public static SEARCH_MORE_RESULTS = "Click here to show more results!"
 
     public static SETTINGS_TITLE = "Settings"

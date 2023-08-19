@@ -4,6 +4,7 @@ import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
 import { STRINGS } from "../language/default";
 import "./login.css"
+import { ConfirmCancelPopup } from "../webui/popup";
 
 export class Login extends Module<HTMLDivElement> {
     private connections: Module<HTMLDivElement>
@@ -84,9 +85,20 @@ async function reuseSession(sessionName: string, silent: boolean = false): Promi
             PageManager.back()
         }
     } else {
-        if (!silent) {
-            alert("Connection refused. Either the server is not available or the connection was not used for too long.")
-        }
+            let modal = new ConfirmCancelPopup(
+                "popupContent", "popupContainer",
+                STRINGS.LOGIN_OFFLINE_MODAL_QUESTION,
+                STRINGS.LOGIN_OFFLINE_MODAL_CONFIRM,
+                STRINGS.LOGIN_OFFLINE_MODAL_CANCEL
+            )
+            modal.onConfirm = () => {
+                WebFS.instance = webFS
+                localStorage.kb_last_session = sessionName
+                if (!silent) {
+                    PageManager.back()
+                }
+            }
+            modal.onCancel = () => {}
     }
 }
 

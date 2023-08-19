@@ -23,6 +23,7 @@ export class Search extends Module<HTMLDivElement> {
 
     //private currentSearch: string | undefined = undefined
     private fileTree: FileTree | null = null
+    private isOffline: boolean = false
     private updateHashLater: CallLaterButOnlyOnce = new CallLaterButOnlyOnce(200)
 
     public constructor() {
@@ -54,6 +55,19 @@ export class Search extends Module<HTMLDivElement> {
 
         if (changedPage) {
             this.fileTree = await WebFS.instance?.walk(".")
+            if (this.fileTree == null) {
+                let sessionName = WebFS.instance.getSessionName()
+                let jsonFiletree = localStorage["kb_filetree_cache_" + sessionName]
+                if (jsonFiletree) {
+                    this.fileTree = JSON.parse(jsonFiletree)
+                }
+                this.isOffline = true
+            } else {
+                let sessionName = WebFS.instance.getSessionName()
+                let jsonFiletree = JSON.stringify(this.fileTree)
+                localStorage["kb_filetree_cache_" + sessionName] = jsonFiletree
+                this.isOffline = false
+            }
             this.searchField.value(kwargs.q)
             this.updateSearchResults();
         }
@@ -92,7 +106,11 @@ export class Search extends Module<HTMLDivElement> {
 
     private showNumResults(files: Entry[]) {
         let numResults = new Module("div");
-        numResults.htmlElement.innerText = files.length + " " + STRINGS.SEARCH_NUM_RESULTS;
+        let offline = ""
+        if (this.isOffline) {
+            offline =  " " + STRINGS.SEARCH_OFFLINE
+        }
+        numResults.htmlElement.innerHTML = files.length + " " + STRINGS.SEARCH_NUM_RESULTS + offline;
         numResults.setClass("searchNumResults");
         this.results.add(numResults);
     }

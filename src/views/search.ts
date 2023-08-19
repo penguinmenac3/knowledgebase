@@ -11,7 +11,8 @@ import "./search.css"
 
 interface Entry {
     filepath: string
-    modified: Date
+    modified: Date | null
+    isFolder: boolean
     score?: number
 }
 
@@ -31,7 +32,7 @@ export class Search extends Module<HTMLDivElement> {
             this.updateSearchResults()
         }
         this.searchField.onChangeDone = (value: string) => {
-                PageManager.open("search", {q: value})
+            PageManager.open("search", {q: value})
         }
         this.add(this.searchField)
         this.results = new Module("div")
@@ -89,7 +90,12 @@ export class Search extends Module<HTMLDivElement> {
         let numResults = files.length;
         files = files.slice(0, showMax); // Only take first 50 results
         for (let entry of files) {
-            this.results.add(new SearchResult(entry.filepath, humanFriendlyDate(entry.modified)));
+            this.results.add(new SearchResult(
+                entry.filepath,
+                entry.modified != null ? humanFriendlyDate(entry.modified) : "",
+                entry.isFolder,
+                this.searchField
+            ))
         }
         if (numResults > showMax) {
             let showMore = new Module("div");
@@ -117,33 +123,50 @@ export class Search extends Module<HTMLDivElement> {
         let keywords = searchText.toLowerCase().split(",").map((x: string) => x.trim());
         let results: Entry[] = [];
         for (let entry of files) {
-            let { filename, folder } = splitFilepath(entry.filepath);
+            let { filename, folder } = splitFilepath(entry.filepath)
+            filename = filename.toLowerCase()
+            folder = folder.toLowerCase()
             var score = 0;
             for (let keyword of keywords) {
                 if (keyword == "") {
                     score = 1;
                     continue;
                 }
-                let isFolder = keyword.startsWith("!");
-                if (filename.toLowerCase().includes(keyword)) {
+                let isFolder = keyword.startsWith("/");
+                let foldername = keyword.substring(1)
+                if (foldername == "") foldername = "."
+                if (!isFolder && filename.includes(keyword)) {
                     score += 100;
+                    if (entry.isFolder) score += 10;
                 }
-                if (!isFolder && folder.toLowerCase().includes(keyword)) {
-                    score += 1;
+                if (isFolder && entry.isFolder && filename.includes(foldername)) {
+                    if (entry.filepath.toLowerCase() != foldername) {
+                        score += 125;
+                        if (filename == foldername) score += 25
+                    }
                 }
-                if (isFolder && folder.toLowerCase().startsWith(keyword.substring(1))) {
+                if (isFolder && folder == foldername) {
                     score += 100;
+                    if (entry.isFolder) score += 10;
                 }
             }
             if (score > 0) {
-                results.push({filepath: entry.filepath, modified: entry.modified, score: score});
+                results.push({
+                    filepath: entry.filepath, modified: entry.modified,
+                    isFolder: entry.isFolder, score: score
+                });
             }
         }
         return results.sort((a: Entry, b: Entry) => b.score! - a.score!);
     }
 
     private sortFilesByLastModified(files: Entry[]): Entry[] {
-        return files.sort((a: Entry, b: Entry) => b.modified.toISOString().localeCompare(a.modified.toISOString()));
+        return files.sort((a: Entry, b: Entry) => {
+            // Things which do not have a modified date should be put at the end.
+            if (a.modified == null) return 1
+            if (b.modified == null) return -1
+            return b.modified.toISOString().localeCompare(a.modified.toISOString())
+        });
     }
 
     private flatten(fileTree: FileTree, pathPrefix: string = "", out: Entry[] = []): Entry[] {
@@ -151,8 +174,17 @@ export class Search extends Module<HTMLDivElement> {
             const value = fileTree[filename];
             if (!(typeof value === 'string')) {
                 out = this.flatten(value as FileTree, pathPrefix + filename + "/", out)
+                out.push({
+                    filepath: pathPrefix + filename,
+                    modified: null,
+                    isFolder: true
+                })
             } else {
-                out.push({filepath: pathPrefix + filename, modified: new Date(value as string)})
+                out.push({
+                    filepath: pathPrefix + filename,
+                    modified: new Date(value as string),
+                    isFolder: false
+                })
             }
         }
         return out
@@ -160,12 +192,13 @@ export class Search extends Module<HTMLDivElement> {
 }
 
 class SearchResult extends Module<HTMLDivElement> {
-    constructor(filepath: string, modified: string) {
+    constructor(filepath: string, modified: string, isFolder: boolean, searchField: FormInput) {
         super("div")
         this.setClass("searchResult")
         let { filename, folder } = splitFilepath(filepath);
 
         let filename_parts = filename.split(".")
+        if (isFolder) filename_parts.push("DIR")
         let ext = filename_parts[filename_parts.length - 1].toLowerCase()
         
         if ((localStorage.kb_allow_img_previews == 'true' && (ext == "png" || ext == "jpg" || ext == "jpeg")
@@ -214,10 +247,12 @@ class SearchResult extends Module<HTMLDivElement> {
         header.classList.add("searchResultFilename")
         meta.appendChild(header)
         
-        let modifiedElement = document.createElement("div")
-        modifiedElement.innerText = STRINGS.SEARCH_LAST_MODIFIED + ": " + modified
-        modifiedElement.classList.add("searchResultModified")
-        meta.appendChild(modifiedElement)
+        if (modified != "") {
+            let modifiedElement = document.createElement("div")
+            modifiedElement.innerText = STRINGS.SEARCH_LAST_MODIFIED + ": " + modified
+            modifiedElement.classList.add("searchResultModified")
+            meta.appendChild(modifiedElement)
+        }
         
         let folderElement = document.createElement("div")
         folderElement.innerText = folder
@@ -225,8 +260,14 @@ class SearchResult extends Module<HTMLDivElement> {
         meta.appendChild(folderElement)
         
         this.htmlElement.onclick = () => {
-            PageManager.open("edit", {folder: folder, filename: filename})
-            //WebFS.instance?.read(folder + "/" + filename, "_blank")
+            if (isFolder) {
+                searchField.htmlElement.value = "/" + filepath
+                searchField.onChange(searchField.htmlElement.value)
+                searchField.onChangeDone(searchField.htmlElement.value)
+            } else {
+                PageManager.open("edit", {folder: folder, filename: filename})
+                //WebFS.instance?.read(folder + "/" + filename, "_blank")
+            }
         }
     }
 }
@@ -245,7 +286,6 @@ class PreviewCache {
     public static async getTxtPreview(filepath: string): Promise<string> {
         let cache = JSON.parse(localStorage.getItem("kb_preview_cache") || "{}")
         if (cache[filepath]) {
-            console.log("cached")
             return cache[filepath]
         }
         let txt = await WebFS.instance!.readTxt(filepath)

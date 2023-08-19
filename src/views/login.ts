@@ -85,20 +85,25 @@ async function reuseSession(sessionName: string, silent: boolean = false): Promi
             PageManager.back()
         }
     } else {
-            let modal = new ConfirmCancelPopup(
-                "popupContent", "popupContainer",
-                STRINGS.LOGIN_OFFLINE_MODAL_QUESTION,
-                STRINGS.LOGIN_OFFLINE_MODAL_CONFIRM,
-                STRINGS.LOGIN_OFFLINE_MODAL_CANCEL
-            )
+        let modal = new ConfirmCancelPopup(
+            "popupContent", "popupContainer",
+            STRINGS.LOGIN_OFFLINE_MODAL_QUESTION,
+            STRINGS.LOGIN_OFFLINE_MODAL_CONFIRM,
+            STRINGS.LOGIN_OFFLINE_MODAL_CANCEL
+        )
+        return new Promise(resolve => {
             modal.onConfirm = () => {
                 WebFS.instance = webFS
                 localStorage.kb_last_session = sessionName
                 if (!silent) {
                     PageManager.back()
                 }
+                resolve()
             }
-            modal.onCancel = () => {}
+            modal.onCancel = () => {
+                resolve()
+            }
+        })
     }
 }
 

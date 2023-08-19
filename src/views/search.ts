@@ -1,7 +1,6 @@
 import { FileTree, WebFS } from "../webfs/client/webfs";
 import { Button, FormCheckbox, FormInput } from "../webui/form";
 import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";
-import { CallLaterButOnlyOnce } from "../webui/utils/lazy";
 import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
 import { ExitablePopup } from "../webui/popup";
@@ -24,16 +23,15 @@ export class Search extends Module<HTMLDivElement> {
     //private currentSearch: string | undefined = undefined
     private fileTree: FileTree | null = null
     private isOffline: boolean = false
-    private updateHashLater: CallLaterButOnlyOnce = new CallLaterButOnlyOnce(200)
 
     public constructor() {
         super("div")
         this.searchField = new FormInput("search", STRINGS.SEARCH_PLACEHOLDER, "search", "searchInput")
-        this.searchField.onChange = (value: string) => {
+        this.searchField.onChange = (_value: string) => {
             this.updateSearchResults()
-            this.updateHashLater.defer(() => {
+        }
+        this.searchField.onChangeDone = (value: string) => {
                 PageManager.open("search", {q: value})
-            })
         }
         this.add(this.searchField)
         this.results = new Module("div")
@@ -68,9 +66,9 @@ export class Search extends Module<HTMLDivElement> {
                 localStorage["kb_filetree_cache_" + sessionName] = jsonFiletree
                 this.isOffline = false
             }
-            this.searchField.value(kwargs.q)
-            this.updateSearchResults();
         }
+        this.searchField.value(kwargs.q)
+        this.updateSearchResults();
     }
 
     private async updateSearchResults(showMax: number = 50) {

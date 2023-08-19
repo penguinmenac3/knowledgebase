@@ -1,10 +1,12 @@
 import { FileTree, WebFS } from "../webfs/client/webfs";
-import { FormInput } from "../webui/form";
+import { Button, FormCheckbox, FormInput } from "../webui/form";
 import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";
 import { CallLaterButOnlyOnce } from "../webui/utils/lazy";
 import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
+import { ExitablePopup } from "../webui/popup";
 import { STRINGS } from "../language/default";
+import { bars } from "../webui/icons/icons";
 
 import "./search.css"
 
@@ -36,6 +38,12 @@ export class Search extends Module<HTMLDivElement> {
         this.results = new Module("div")
         this.results.setClass("searchResults")
         this.add(this.results)
+
+        let settingsBtn = new Button(bars, "settingsOpen")
+        settingsBtn.onClick = () => {
+            new SettingsPopup()
+        }
+        this.add(settingsBtn)
     }
 
     public async update(kwargs: KWARGS, changedPage: boolean): Promise<void> {
@@ -240,4 +248,52 @@ class PreviewCache {
     public static async getImgPreview(_filepath: string): Promise<string> {
         return ""
     }
+}
+
+export class SettingsPopup extends ExitablePopup {
+    public constructor() {
+        super("settingsOverlayContent", "settingsOverlay", "settingsExit")
+        this.add(new Module("div", STRINGS.SETTINGS_TITLE, "settingsTitle"))
+        
+        this.add(new Module("div", STRINGS.SETTINGS_GENERAL, "settingsSubtitle"))
+
+        this.add(new Module("div", STRINGS.SETTINGS_DISPLAY, "settingsSubtitle"))
+        let showTxtPreviews = new FormCheckbox(
+            "showTxtPreviews",
+            STRINGS.SETTINGS_SHOW_TXT_PREVIEWS,
+            "settingsCheckbox",
+            localStorage.kb_allow_txt_previews == 'true')
+            showTxtPreviews.onChange = (state: boolean) => {
+            localStorage.kb_allow_txt_previews = state
+        }
+        this.add(showTxtPreviews)
+        let showImgPreviews = new FormCheckbox(
+            "showImgPreviews",
+            STRINGS.SETTINGS_SHOW_IMG_PREVIEWS,
+            "settingsCheckbox",
+            localStorage.kb_allow_img_previews == 'true')
+        showImgPreviews.onChange = (state: boolean) => {
+            localStorage.kb_allow_img_previews = state
+        }
+        this.add(showImgPreviews)
+        let showPDFPreviews = new FormCheckbox(
+            "showPDFPreviews",
+            STRINGS.SETTINGS_SHOW_PDF_PREVIEWS,
+            "settingsCheckbox",
+            localStorage.kb_allow_pdf_previews == 'true')
+        showPDFPreviews.onChange = (state: boolean) => {
+            localStorage.kb_allow_pdf_previews = state
+        }
+        this.add(showPDFPreviews)
+
+        this.add(new Module("div", STRINGS.SETTINGS_CONNECTION, "settingsSubtitle"))
+        let loginButton = new Button(STRINGS.SETTINGS_SELECT_SERVER, "buttonWide")
+        loginButton.onClick = () => {
+            this.dispose()
+            PageManager.open("login", {})
+        }
+        this.add(loginButton)
+    }
+
+    public update(): void {}
 }

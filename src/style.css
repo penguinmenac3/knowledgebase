@@ -72,3 +72,45 @@ body {
 .buttonWide:hover {
   background-color: var(--accent-1-bg-hover);
 }
+
+
+.popupContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000000BB;
+  z-index: 100;
+}
+
+.popupContent {
+  position: absolute;
+  text-align: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0.5em;
+  padding: 0.5em;
+  border-radius: var(--radius);
+  background-color: var(--bg-color);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.popupContent a{
+  width: 30%;
+  display: inline-block;
+  margin-top: 1em;
+  margin-right: 1em;
+  margin-left: 1em;
+  padding: 0.5em;
+  color: var(--accent-1-fg);
+  background-color: var(--accent-1-bg);
+  border-radius: 0.2em;
+}
+
+.popupContent a:hover {
+  background-color: var(--accent-1-bg-hover);
+}

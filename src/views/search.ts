@@ -94,7 +94,8 @@ export class Search extends Module<HTMLDivElement> {
 
         let settingsBtn = new Button(bars, "settingsOpen")
         settingsBtn.onClick = () => {
-            new SettingsPopup()
+            let settingsPopup = new SettingsPopup()
+            settingsPopup.onExit = this.updateSearchResults.bind(this)
                     }
         this.add(settingsBtn)
     }

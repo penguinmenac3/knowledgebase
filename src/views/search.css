@@ -10,13 +10,39 @@
     background-color: var(--bg-color);
 }
 
+.searchBottomNavbar {
+    width: -webkit-fill-available;
+    display: block;
+    position: absolute;
+    height: 3em;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.searchBottomNavbarIcon {
+    display: inline-block;
+    font-size: 1.8em;
+    padding-left: 0.2em;
+    padding-top: 0.2em;
+    padding-bottom: 0em;
+    padding-right: 0.2em;
+    margin: 0.1em;
+    border-radius: var(--radius);
+}
+
+.searchBottomNavbarIcon:hover {
+    background-color: var(--bg-color-hover);
+}
+
 .searchResults {
     width: -webkit-fill-available;
     display: block;
     padding: 0.5em;
     position: absolute;
     top: 3.5em;
-    bottom: 0;
+    bottom: 3em;
     left: 0;
     right: 0;
     overflow-y: scroll;

@@ -1,3 +1,4 @@
+import "./search.css"
 import { FileTree, WebFS } from "../webfs/client/webfs";
 import { Button, FormCheckbox, FormInput } from "../webui/form";
 import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";
@@ -6,8 +7,7 @@ import { PageManager } from "../webui/pagemanager";
 import { ExitablePopup } from "../webui/popup";
 import { STRINGS } from "../language/default";
 import { bars } from "../webui/icons/icons";
-
-import "./search.css"
+import { iconFlag, iconFlagOutline, iconFolder, iconHouse, iconStar, iconStarOutline } from "../icons";
 
 interface Entry {
     filepath: string
@@ -24,6 +24,8 @@ export class Search extends Module<HTMLDivElement> {
     //private currentSearch: string | undefined = undefined
     private fileTree: FileTree | null = null
     private isOffline: boolean = false
+    private favouritesOnly: boolean = false
+    private todoOnly: boolean = false
 
     public constructor() {
         super("div")
@@ -38,6 +40,43 @@ export class Search extends Module<HTMLDivElement> {
         this.results = new Module("div")
         this.results.setClass("searchResults")
         this.add(this.results)
+
+        let navBar = new Module("div", "", "searchBottomNavbar")
+        let normal = new Button(iconHouse, "searchBottomNavbarIcon")
+        normal.onClick = () => {
+            this.searchField.htmlElement.value = ""
+            this.searchField.onChangeDone("")
+        }
+        navBar.add(normal)
+        let folders = new Button(iconFolder, "searchBottomNavbarIcon")
+        folders.onClick = () => {
+            this.searchField.htmlElement.value = "/"
+            this.searchField.onChangeDone("/")
+        }
+        navBar.add(folders)
+        let favourites = new Button(iconStarOutline, "searchBottomNavbarIcon")
+        favourites.onClick = () => {
+            this.favouritesOnly = !this.favouritesOnly
+            if (this.favouritesOnly) {
+                favourites.htmlElement.innerHTML = iconStar
+            } else {
+                favourites.htmlElement.innerHTML = iconStarOutline
+            }
+            this.updateSearchResults()
+        }
+        navBar.add(favourites)
+        let todos = new Button(iconFlagOutline, "searchBottomNavbarIcon")
+        todos.onClick = () => {
+            this.todoOnly = !this.todoOnly
+            if (this.todoOnly) {
+                todos.htmlElement.innerHTML = iconFlag
+            } else {
+                todos.htmlElement.innerHTML = iconFlagOutline
+            }
+            this.updateSearchResults()
+        }
+        navBar.add(todos)
+        this.add(navBar)
 
         let settingsBtn = new Button(bars, "settingsOpen")
         settingsBtn.onClick = () => {
@@ -86,6 +125,12 @@ export class Search extends Module<HTMLDivElement> {
         let files = this.flatten(this.fileTree);
         files = this.sortFilesByLastModified(files);
         files = this.sortFilesByRelevance(files, searchText);
+        files = files.filter((entry: Entry) => {
+            let filename = splitFilepath(entry.filepath).filename
+            if (this.favouritesOnly && !filename.includes(".fav")) return false
+            if (this.todoOnly && !filename.includes(".todo")) return false
+            return true
+        })
         this.showNumResults(files);
         let numResults = files.length;
         files = files.slice(0, showMax); // Only take first 50 results
@@ -129,7 +174,7 @@ export class Search extends Module<HTMLDivElement> {
             var score = 0;
             for (let keyword of keywords) {
                 if (keyword == "") {
-                    score = 1;
+                    score += 1;
                     continue;
                 }
                 let isFolder = keyword.startsWith("/");
@@ -151,6 +196,12 @@ export class Search extends Module<HTMLDivElement> {
                 }
             }
             if (score > 0) {
+                if (filename.includes(".fav")) {
+                    score += 3
+                }
+                if (filename.includes(".todo")) {
+                    score += 4
+                }
                 results.push({
                     filepath: entry.filepath, modified: entry.modified,
                     isFolder: entry.isFolder, score: score

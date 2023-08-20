@@ -46,13 +46,13 @@ export class Search extends Module<HTMLDivElement> {
         normal.onClick = () => {
             this.searchField.htmlElement.value = ""
             this.searchField.onChangeDone("")
-        }
+                    }
         navBar.add(normal)
         let folders = new Button(iconFolder, "searchBottomNavbarIcon")
         folders.onClick = () => {
             this.searchField.htmlElement.value = "/"
             this.searchField.onChangeDone("/")
-        }
+                    }
         navBar.add(folders)
         let favourites = new Button(iconStarOutline, "searchBottomNavbarIcon")
         favourites.onClick = () => {
@@ -63,7 +63,7 @@ export class Search extends Module<HTMLDivElement> {
                 favourites.htmlElement.innerHTML = iconStarOutline
             }
             this.updateSearchResults()
-        }
+                    }
         navBar.add(favourites)
         let todos = new Button(iconFlagOutline, "searchBottomNavbarIcon")
         todos.onClick = () => {
@@ -74,14 +74,14 @@ export class Search extends Module<HTMLDivElement> {
                 todos.htmlElement.innerHTML = iconFlagOutline
             }
             this.updateSearchResults()
-        }
+                    }
         navBar.add(todos)
         this.add(navBar)
 
         let settingsBtn = new Button(bars, "settingsOpen")
         settingsBtn.onClick = () => {
             new SettingsPopup()
-        }
+                    }
         this.add(settingsBtn)
     }
 
@@ -139,7 +139,8 @@ export class Search extends Module<HTMLDivElement> {
                 entry.filepath,
                 entry.modified != null ? humanFriendlyDate(entry.modified) : "",
                 entry.isFolder,
-                this.searchField
+                this.searchField,
+                () => {this.update({q: this.searchField.value()}, true)}
             ))
         }
         if (numResults > showMax) {
@@ -243,7 +244,7 @@ export class Search extends Module<HTMLDivElement> {
 }
 
 class SearchResult extends Module<HTMLDivElement> {
-    constructor(filepath: string, modified: string, isFolder: boolean, searchField: FormInput) {
+    constructor(filepath: string, modified: string, isFolder: boolean, searchField: FormInput, triggerFullUpdate: CallableFunction) {
         super("div")
         this.setClass("searchResult")
         let { filename, folder } = splitFilepath(filepath);
@@ -294,7 +295,7 @@ class SearchResult extends Module<HTMLDivElement> {
         this.htmlElement.appendChild(meta)
         
         let header = document.createElement("div")
-        header.innerText = filename
+        header.innerText = filename.replace(".todo", "").replace(".fav", "")
         header.classList.add("searchResultFilename")
         meta.appendChild(header)
         
@@ -319,6 +320,41 @@ class SearchResult extends Module<HTMLDivElement> {
                 PageManager.open("edit", {folder: folder, filename: filename})
                 //WebFS.instance?.read(folder + "/" + filename, "_blank")
             }
+        }
+
+        if (!isFolder) {
+            let buttonContainer = new Module("div", "", "searchResultFlagButtonContainer")
+            let isFav = filename.includes(".fav")
+            let favButton = new Button(isFav ? iconStar : iconStarOutline, "searchResultFlagButton")
+            if (isFav) favButton.setClass("searchResultFlagButtonActive")
+            favButton.onClick = async () => {
+                if (WebFS.instance == null) return
+                if (isFav) {
+                    await WebFS.instance.mv(filepath, filepath.replace(".fav", ""))
+                } else {
+                    let parts = filepath.split(".")
+                    parts.splice(parts.length - 1, 0, "fav")
+                    await WebFS.instance.mv(filepath, parts.join("."))
+                }
+                triggerFullUpdate()
+            }
+            buttonContainer.add(favButton)
+            let isTodo = filename.includes(".todo")
+            let todoButton = new Button(isTodo ? iconFlag : iconFlagOutline, "searchResultFlagButton")
+            if (isTodo) todoButton.setClass("searchResultFlagButtonActive")
+            todoButton.onClick = async () => {
+                if (WebFS.instance == null) return
+                if (isTodo) {
+                    await WebFS.instance.mv(filepath, filepath.replace(".todo", ""))
+                } else {
+                    let parts = filepath.split(".")
+                    parts.splice(parts.length - 1, 0, "todo")
+                    await WebFS.instance.mv(filepath, parts.join("."))
+                }
+                triggerFullUpdate()
+            }
+            buttonContainer.add(todoButton)
+            this.add(buttonContainer)
         }
     }
 }
@@ -398,7 +434,7 @@ export class SettingsPopup extends ExitablePopup {
         loginButton.onClick = () => {
             this.dispose()
             PageManager.open("login", {})
-        }
+                    }
         this.add(loginButton)
     }
 

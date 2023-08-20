@@ -158,6 +158,34 @@
     line-break: anywhere;
 }
 
+.searchResultFlagButtonContainer {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.searchResultFlagButton {
+    display: block;
+    width: 1.2em;
+    height: 1.2em;
+    padding-top: 0.2em;
+    padding-left: 0.1em;
+    padding-bottom: 0em;
+    padding-right: 0.1em;
+    margin: 0.2em;
+    font-size: 1.5em;
+    border-radius: var(--radius-round);
+    background-color: var(--bg-color-transparent);
+}
+
+.searchResultFlagButton:hover {
+    background-color: var(--bg-color-hover);
+}
+
+.searchResultFlagButtonActive {
+    fill: var(--accent-1-bg);
+}
+
 /* Search settings */
 .settingsOpen {
     position: absolute;

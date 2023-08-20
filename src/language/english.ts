@@ -43,4 +43,11 @@ export class English {
     public static SETTINGS_SHOW_TXT_PREVIEWS = "Show previews for text documents"
     public static SETTINGS_SHOW_IMG_PREVIEWS = "Show previews for images"
     public static SETTINGS_SHOW_PDF_PREVIEWS = "Show previews for PDFs"
+
+    public static UPLOAD_TITLE = "Upload File"
+    public static UPLOAD_FOLDERNAME = "Foldername"
+    public static UPLOAD_FILENAME = "Filename"
+    public static UPLOAD_FILE = "File"
+    public static UPLOAD_SEND = "Upload"
+    public static UPLOAD_FAILED = "Upload failed. Reasons could be: The file already exists, the folder is invalid or the server is currently unreachable."
 }

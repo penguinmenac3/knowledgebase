@@ -10,6 +10,24 @@
     background-color: var(--bg-color);
 }
 
+.searchUploadButton {
+    position: absolute;
+    bottom: 1.75em;
+    right: 0.25em;
+    padding-left: 0.55em;
+    padding-top: 0.45em;
+    padding-right: 0.55em;
+    padding-bottom: 0.25em;
+    font-size: 2em;
+    fill: var(--accent-1-fg);
+    background-color: var(--accent-1-bg);
+    border-radius: var(--radius-round);
+}
+
+.searchUploadButton:hover {
+    background-color: var(--accent-1-bg-hover);
+}
+
 .searchBottomNavbar {
     width: -webkit-fill-available;
     display: block;
@@ -203,62 +221,6 @@
     background-color: var(--bg-color-hover);
 }
 
-.settingsExit {
-    position: absolute;
-    left: 0.8em;
-    top: 0.8em;
-    display: block;
-    width: 1em;
-    height: 1em;
-    padding: 0.5em;
-    border-radius: var(--radius);
-    z-index: 101;
-}
-
-.settingsExit:hover {
-    background-color: var(--bg-color-hover);
-}
-
-.settingsOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #000000BB;
-    z-index: 100;
-}
-
-.settingsOverlayContent {
-    position: absolute;
-    text-align: center;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: 0.5em;
-    padding: 0.5em;
-    border-radius: var(--radius);
-    background-color: var(--bg-color);
-    overflow-x: hidden;
-    overflow-y: auto;
-}
-
-.settingsTitle {
-    display: block;
-    padding-top: 0.1em;
-    padding-bottom: 0.1em;
-    font-size: xx-large;
-    font-weight: bold;
-}
-
-.settingsSubtitle {
-    display: block;
-    padding-top: 1em;
-    font-size: large;
-    font-weight: bold;
-}
-
 .settingsCheckbox {
     margin-top: 0.2em;
     padding-bottom: -0.2em;
@@ -271,4 +233,52 @@
 .settingsCheckbox input {
     width: 1.5em;
     height: 1.5em;
+}
+
+.upload label {
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 0.2em;
+    text-align: left;
+    font-size: large;
+    font-weight: bold;
+}
+
+.upload input {
+    font-size: large;
+    width: -webkit-fill-available;
+    padding: 0.45em;
+    border: 2px solid var(--font-color);
+    border-radius: var(--radius);
+    color: var(--font-color);
+    background-color: var(--bg-color);
+}
+
+.upload .fileInput {
+    font-size: large;
+    width: -webkit-fill-available;
+    padding: 0.45em;
+    padding-top: 4em;
+    padding-bottom: 4em;
+    border: 2px solid var(--font-color);
+    border-radius: var(--radius);
+    color: var(--font-color);
+    background-color: var(--bg-color);
+}
+.upload .fileInput:hover {
+    font-size: large;
+    width: -webkit-fill-available;
+    padding: 0.45em;
+    padding-top: 4em;
+    padding-bottom: 4em;
+    border: 2px solid var(--font-color);
+    border-radius: var(--radius);
+    color: var(--font-color);
+    background-color: var(--bg-color-hover);
+}
+
+.upload .fileInput::file-selector-button {
+    background-color: inherit;
+    border: 0px solid;
+    font-weight: bold;
 }

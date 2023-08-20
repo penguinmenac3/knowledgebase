@@ -115,3 +115,59 @@ body {
 .popupContent a:hover {
   background-color: var(--accent-1-bg-hover);
 }
+
+.fullscreenPopupExitBtn {
+  position: absolute;
+  left: 0.8em;
+  top: 0.8em;
+  display: block;
+  width: 1em;
+  height: 1em;
+  padding: 0.5em;
+  border-radius: var(--radius);
+  z-index: 101;
+}
+
+.fullscreenPopupExitBtn:hover {
+  background-color: var(--bg-color-hover);
+}
+
+.fullscreenPopupContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000000BB;
+  z-index: 100;
+}
+
+.fullscreenPopupContent {
+  position: absolute;
+  text-align: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0.8em;
+  padding: 0.8em;
+  border-radius: var(--radius);
+  background-color: var(--bg-color);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.popupTitle {
+  display: block;
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+  font-size: xx-large;
+  font-weight: bold;
+}
+
+.popupSubtitle {
+  display: block;
+  padding-top: 1em;
+  font-size: large;
+  font-weight: bold;
+}

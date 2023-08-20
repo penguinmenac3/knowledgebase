@@ -1,13 +1,13 @@
 import "./search.css"
 import { FileTree, WebFS } from "../webfs/client/webfs";
-import { Button, FormCheckbox, FormInput } from "../webui/form";
+import { Button, FormCheckbox, FormInput, FormLabel } from "../webui/form";
 import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";
 import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
 import { ExitablePopup } from "../webui/popup";
 import { STRINGS } from "../language/default";
 import { bars } from "../webui/icons/icons";
-import { iconFlag, iconFlagOutline, iconFolder, iconHouse, iconStar, iconStarOutline } from "../icons";
+import { iconFlag, iconFlagOutline, iconFolder, iconHouse, iconStar, iconStarOutline, iconUpload } from "../icons";
 
 interface Entry {
     filepath: string
@@ -77,12 +77,30 @@ export class Search extends Module<HTMLDivElement> {
                     }
         navBar.add(todos)
         this.add(navBar)
+        
+        let upload = new Button(iconUpload, "searchUploadButton")
+        upload.onClick = () => {
+            let currentFolder = "/"
+            let keywords = this.searchField.value().split(",").map((x: string) => x.trim());
+            for (let keyword of keywords) {
+                if (keyword.startsWith("/")) {
+                    currentFolder = keyword
+                    break
+                }
+            }
+            new UploadPopup(currentFolder, "", this.triggerFullUpdate.bind(this))
+        }
+        this.add(upload)
 
         let settingsBtn = new Button(bars, "settingsOpen")
         settingsBtn.onClick = () => {
             new SettingsPopup()
                     }
         this.add(settingsBtn)
+    }
+
+    private triggerFullUpdate() {
+        this.update({q: this.searchField.value()}, true)
     }
 
     public async update(kwargs: KWARGS, changedPage: boolean): Promise<void> {
@@ -140,7 +158,7 @@ export class Search extends Module<HTMLDivElement> {
                 entry.modified != null ? humanFriendlyDate(entry.modified) : "",
                 entry.isFolder,
                 this.searchField,
-                () => {this.update({q: this.searchField.value()}, true)}
+                this.triggerFullUpdate.bind(this)
             ))
         }
         if (numResults > showMax) {
@@ -395,12 +413,12 @@ class PreviewCache {
 
 export class SettingsPopup extends ExitablePopup {
     public constructor() {
-        super("settingsOverlayContent", "settingsOverlay", "settingsExit")
-        this.add(new Module("div", STRINGS.SETTINGS_TITLE, "settingsTitle"))
+        super("fullscreenPopupContent", "fullscreenPopupContainer", "fullscreenPopupExitBtn")
+        this.add(new Module("div", STRINGS.SETTINGS_TITLE, "popupTitle"))
         
-        this.add(new Module("div", STRINGS.SETTINGS_GENERAL, "settingsSubtitle"))
+        this.add(new Module("div", STRINGS.SETTINGS_GENERAL, "popupSubtitle"))
 
-        this.add(new Module("div", STRINGS.SETTINGS_DISPLAY, "settingsSubtitle"))
+        this.add(new Module("div", STRINGS.SETTINGS_DISPLAY, "popupSubtitle"))
         let showTxtPreviews = new FormCheckbox(
             "showTxtPreviews",
             STRINGS.SETTINGS_SHOW_TXT_PREVIEWS,
@@ -429,13 +447,61 @@ export class SettingsPopup extends ExitablePopup {
         }
         this.add(showPDFPreviews)
 
-        this.add(new Module("div", STRINGS.SETTINGS_CONNECTION, "settingsSubtitle"))
+        this.add(new Module("div", STRINGS.SETTINGS_CONNECTION, "popupSubtitle"))
         let loginButton = new Button(STRINGS.SETTINGS_SELECT_SERVER, "buttonWide")
         loginButton.onClick = () => {
             this.dispose()
             PageManager.open("login", {})
                     }
         this.add(loginButton)
+    }
+
+    public update(): void {}
+}
+
+export class UploadPopup extends ExitablePopup {
+    public constructor(currentFolder: string, currentFile: string, triggerFullUpdate: CallableFunction) {
+        super("fullscreenPopupContent", "fullscreenPopupContainer", "fullscreenPopupExitBtn")
+        this.setClass("upload")
+        this.add(new Module("div", STRINGS.UPLOAD_TITLE, "popupTitle"))
+        this.add(new FormLabel(STRINGS.UPLOAD_FOLDERNAME))
+        let folderInput = new FormInput("foldername", currentFolder, "text")
+        folderInput.value(currentFolder)
+        this.add(folderInput)
+        this.add(new FormLabel(STRINGS.UPLOAD_FILENAME))
+        let filenameInput = new FormInput("filename", currentFile, "text")
+        filenameInput.value(currentFile)
+        this.add(filenameInput)
+        this.add(new FormLabel(STRINGS.UPLOAD_FILE))
+        let fileInput = new FormInput("file", "", "file", "fileInput")
+        fileInput.onChangeDone = (value: string) => {
+            if (filenameInput.value() == "") {
+                let parts = value.replaceAll("\\", "/").split("/")
+                filenameInput.value(parts[parts.length - 1])
+            }
+        }
+        this.add(fileInput)
+        let sendBtn = new Button(STRINGS.UPLOAD_SEND, "buttonWide")
+        sendBtn.onClick = async () => {
+            if (WebFS.instance == null) return
+            sendBtn.htmlElement.disabled = true
+            let file = fileInput.htmlElement.files![0]
+            let folder = folderInput.value()
+            if (folder.endsWith("/")) {
+                folder = folder.slice(0, folder.length - 1)
+            }
+            let filename = filenameInput.value()
+            let path = folder + "/" + filename
+            let result = await WebFS.instance.putFile(path, file, "")
+            sendBtn.htmlElement.disabled = false
+            if (result) {
+                this.dispose()
+                triggerFullUpdate()
+            } else {
+                alert(STRINGS.UPLOAD_FAILED)
+            }
+        }
+        this.add(sendBtn)
     }
 
     public update(): void {}

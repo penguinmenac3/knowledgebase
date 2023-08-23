@@ -2,7 +2,7 @@ import { PageManager } from './webui/pagemanager'
 import { STRINGS, setupLanguage } from './language/default'
 import { Login, tryReconnectToLastSession } from './views/login'
 import { Search } from './views/search'
-import { Edit } from './views/edit'
+import { Edit } from './views/edit/edit'
 
 import './style.css'
 

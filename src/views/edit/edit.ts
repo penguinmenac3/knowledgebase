@@ -1,8 +1,10 @@
-import { WebFS } from "../webfs/client/webfs";
-import { KWARGS, Module } from "../webui/module";
-import { PageManager } from "../webui/pagemanager";
+import { STRINGS } from "../../language/default";
+import { WebFS } from "../../webfs/client/webfs";
+import { KWARGS, Module } from "../../webui/module";
+import { PageManager } from "../../webui/pagemanager";
 
 import "./edit.css"
+import { md_to_html } from "./markdown_renderer";
 
 
 export class Edit extends Module<HTMLDivElement> {
@@ -39,6 +41,23 @@ export class Edit extends Module<HTMLDivElement> {
             }
             container.add(img)
             this.add(container)
+        } else if (ext == "txt" || ext == "md" || ext == "py" || ext == "csv" || ext == "json") {
+            let md5 = await WebFS.instance!.md5(filepath)
+            let text = await WebFS.instance!.readTxt(filepath)
+            if (text == null) {
+                alert(STRINGS.EDIT_READ_FILE_ERROR)
+                // TODO show error
+                return
+            }
+            let textRendering = new Module<HTMLDivElement>("div", "", "editTextOutput")
+            let formattedText = ""
+            if (ext == "md") {
+                formattedText = md_to_html(text)
+            } else {
+                formattedText = text.replaceAll("\n", "<BR>")
+            }
+            textRendering.htmlElement.innerHTML = formattedText
+            this.add(textRendering)
         } else {
             let iframe = new Module<HTMLIFrameElement>("iframe", "", "editIFrame")
             iframe.htmlElement.name = "editIFrame"

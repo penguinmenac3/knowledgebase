@@ -27,3 +27,24 @@
 .editImageView {
     background-color: black;
 }
+
+.editTextOutput {
+    overflow: auto;
+    width: 96%;
+    height: 100%;
+    padding-left: 2%;
+    padding-right: 2%;
+}
+
+.editTextOutput img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.markdownNoteElement {
+    display: inline-block;
+    padding: 0.3em;
+    margin: 0.2em;
+    background-color: var(--bg-color-hover);
+    border-left: 4px solid var(--accent-1-bg);
+}

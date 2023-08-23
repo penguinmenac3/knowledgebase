@@ -51,4 +51,6 @@ export class English {
     public static UPLOAD_FILE = "File"
     public static UPLOAD_SEND = "Upload"
     public static UPLOAD_FAILED = "Upload failed. Reasons could be: The file already exists, the folder is invalid or the server is currently unreachable."
+
+    public static EDIT_READ_FILE_ERROR = "Cannot read file. Maybe your internet connection is too weak."
 }

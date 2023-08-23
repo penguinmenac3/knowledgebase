@@ -30,3 +30,21 @@
     margin-bottom: 2em;
     width: 100%;
 }
+
+.loginKnownConnectionButton {
+    display: inline-flex;
+    height: 10em;
+    width: 10em;
+    overflow: hidden;
+    line-break: normal;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border-radius: var(--radius-large);
+    color: var(--accent-1-fg);
+    background-color: var(--accent-1-bg);
+}
+
+.loginKnownConnectionButton:hover {
+    background-color: var(--accent-1-bg-hover);
+}

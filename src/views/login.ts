@@ -36,7 +36,7 @@ export class Login extends Module<HTMLDivElement> {
                 this.connections.add(new FormLabel(STRINGS.LOGIN_KNOWN_CONNECTIONS, "loginLabel"))
             }
             for (const sessionName of sessions) {
-                let button = new Button(sessionName, "buttonWide")
+                let button = new Button(sessionName, "loginKnownConnectionButton")
                 button.onClick = () => {reuseSession(sessionName)}
                 this.connections.add(button)
             }

@@ -272,7 +272,7 @@ class SearchResult extends Module<HTMLDivElement> {
         if (isFolder) filename_parts.push("DIR")
         let ext = filename_parts[filename_parts.length - 1].toLowerCase()
         
-        if ((localStorage.kb_allow_img_previews == 'true' && (ext == "png" || ext == "jpg" || ext == "jpeg")
+        if ((localStorage.kb_allow_img_previews == 'true' && (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "tiff" || ext == "tif")
          || (localStorage.kb_allow_pdf_previews == 'true' && ext == "pdf"))) {
             let preview = document.createElement("img")
             preview.classList.add("searchResultPreview")
@@ -282,7 +282,7 @@ class SearchResult extends Module<HTMLDivElement> {
                 previewElement.classList.add("searchResultPreview")
                 this.htmlElement.replaceChild(previewElement, this.htmlElement.childNodes[0]);
             }
-            preview.src = WebFS.instance!.readURL(filepath, true)
+            preview.src = WebFS.instance!.readURL(filepath, 256)
             this.htmlElement.appendChild(preview)
         } else if (localStorage.kb_allow_txt_previews == 'true' && (ext == "txt" || ext == "md" || ext == "py" || ext == "csv" || ext == "json")) {
             let preview = document.createElement("div")
@@ -345,7 +345,6 @@ class SearchResult extends Module<HTMLDivElement> {
             let buttonContainer = new Module("div", "", "searchResultFlagButtonContainer")
             let isFav = filename.includes(".fav")
             let favButton = new Button(isFav ? iconStar : iconStarOutline, "searchResultFlagButton")
-            if (isFav) favButton.setClass("searchResultFlagButtonActive")
             favButton.onClick = async () => {
                 if (WebFS.instance == null) return
                 if (isFav) {
@@ -360,7 +359,6 @@ class SearchResult extends Module<HTMLDivElement> {
             buttonContainer.add(favButton)
             let isTodo = filename.includes(".todo")
             let todoButton = new Button(isTodo ? iconFlag : iconFlagOutline, "searchResultFlagButton")
-            if (isTodo) todoButton.setClass("searchResultFlagButtonActive")
             todoButton.onClick = async () => {
                 if (WebFS.instance == null) return
                 if (isTodo) {

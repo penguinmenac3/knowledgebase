@@ -93,6 +93,7 @@
     border-radius: var(--radius-large);
     overflow: hidden;
     position: relative;
+    background-color: var(--bg-color-2);
 }
 
 @media (max-width: 256px) {
@@ -135,10 +136,9 @@
     font-size: 3em;
     font-weight: bold;
     display: inline-block;
-    background-color: var(--font-color);
     overflow: hidden;
     white-space: nowrap;
-    color: var(--bg-color);
+    color: var(--font-color);
 }
 
 .searchResultMeta {
@@ -198,10 +198,6 @@
 
 .searchResultFlagButton:hover {
     background-color: var(--bg-color-hover);
-}
-
-.searchResultFlagButtonActive {
-    fill: var(--accent-1-bg);
 }
 
 /* Search settings */

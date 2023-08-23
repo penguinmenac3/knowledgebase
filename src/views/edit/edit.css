@@ -36,15 +36,26 @@
     padding-right: 2%;
 }
 
+.editTextOutput h1 {
+    border-bottom: 1px solid var(--font-color);
+}
+
+.editTextOutput h2 {
+    border-bottom: 1px solid var(--bg-color-hover);
+}
+
 .editTextOutput img {
     max-width: 100%;
     max-height: 100%;
+    border-radius: var(--radius-large);
 }
 
-.markdownNoteElement {
+.editTextOutput blockquote {
     display: inline-block;
-    padding: 0.3em;
+    padding-left: 1em;
+    padding-right: 1em;
     margin: 0.2em;
     background-color: var(--bg-color-hover);
     border-left: 4px solid var(--accent-1-bg);
+    border-radius: var(--radius);
 }

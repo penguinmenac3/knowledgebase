@@ -1,13 +1,15 @@
+import { Converter } from "showdown";
 import { STRINGS } from "../../language/default";
 import { WebFS } from "../../webfs/client/webfs";
 import { KWARGS, Module } from "../../webui/module";
 import { PageManager } from "../../webui/pagemanager";
 
 import "./edit.css"
-import { md_to_html } from "./markdown_renderer";
 
 
 export class Edit extends Module<HTMLDivElement> {
+    private mdConverter: Converter = new Converter()
+
     public constructor() {
         super("div", "", "editPage")
     }
@@ -52,7 +54,7 @@ export class Edit extends Module<HTMLDivElement> {
             let textRendering = new Module<HTMLDivElement>("div", "", "editTextOutput")
             let formattedText = ""
             if (ext == "md") {
-                formattedText = md_to_html(text)
+                formattedText = this.mdConverter.makeHtml(text)
             } else {
                 formattedText = text.replaceAll("\n", "<BR>")
             }

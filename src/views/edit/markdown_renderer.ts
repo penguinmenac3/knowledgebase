@@ -4,7 +4,6 @@ export function md_to_html(md: string) {
     let lastLine = ""
     let lastIndents = [0]
     let logicalIndent = 0
-    let lastLogicalIndent = 0
     let state = []
     for (let line of lines) {
         let origLine = line

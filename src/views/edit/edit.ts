@@ -42,7 +42,7 @@ export class Edit extends Module<HTMLDivElement> {
             container.add(img)
             this.add(container)
         } else if (ext == "txt" || ext == "md" || ext == "py" || ext == "csv" || ext == "json") {
-            let md5 = await WebFS.instance!.md5(filepath)
+            //let md5 = await WebFS.instance!.md5(filepath)
             let text = await WebFS.instance!.readTxt(filepath)
             if (text == null) {
                 alert(STRINGS.EDIT_READ_FILE_ERROR)

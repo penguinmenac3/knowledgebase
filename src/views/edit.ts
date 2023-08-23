@@ -6,14 +6,8 @@ import "./edit.css"
 
 
 export class Edit extends Module<HTMLDivElement> {
-    private iframe: HTMLIFrameElement
-
     public constructor() {
-        super("div")
-        this.iframe = document.createElement("iframe")
-        this.iframe.name = "editFrame"
-        this.iframe.classList.add("editFrame")
-        this.htmlElement.appendChild(this.iframe)
+        super("div", "", "editPage")
     }
 
     public async update(kwargs: KWARGS, _changedPage: boolean): Promise<void> {
@@ -21,11 +15,39 @@ export class Edit extends Module<HTMLDivElement> {
             PageManager.open("login", {})
             return
         }
-        WebFS.instance?.read(kwargs.folder + "/" + kwargs.filename, "editFrame")
+        this.htmlElement.innerHTML = ""
+        let filepath = kwargs.folder + "/" + kwargs.filename
+        
+        let filename_parts = kwargs.filename.split(".")
+        let ext = filename_parts[filename_parts.length - 1].toLowerCase()
+        
+        if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "tiff" || ext == "tif") {
+            let container = new Module<HTMLDivElement>("div", "", "editImageBackground")
+            let img = new Module<HTMLImageElement>("img", "", "editImageView")
+            let preview = (ext == "tiff" || ext == "tif") ? -1 : 0
+            img.htmlElement.src = WebFS.instance!.readURL(filepath, preview)
+            img.htmlElement.onload = () => {
+                let w = img.htmlElement.width
+                let h = img.htmlElement.height
+                let W = window.innerWidth
+                let H = window.innerHeight
+                let ws = w/W
+                let wh = h/H
+                let s = ws > wh ? ws : wh
+                img.htmlElement.width = w / s
+                img.htmlElement.height = h / s
+            }
+            container.add(img)
+            this.add(container)
+        } else {
+            let iframe = new Module<HTMLIFrameElement>("iframe", "", "editIFrame")
+            iframe.htmlElement.name = "editIFrame"
+            this.add(iframe)
+            WebFS.instance?.read(filepath, "editIFrame")
+        }
     }
 
     public hide(): void {
-        this.iframe.src = "about:blank"
         super.hide()
     }
 }

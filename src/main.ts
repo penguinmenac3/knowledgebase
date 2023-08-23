@@ -9,7 +9,9 @@ import './style.css'
 async function main() {
   setupLanguage()
   document.getElementsByTagName("title")[0].innerHTML = STRINGS.APPNAME
-  await tryReconnectToLastSession()
+  if (localStorage.kb_autologin == 'true') {
+    await tryReconnectToLastSession()
+  }
   new PageManager(
     "search",
     {

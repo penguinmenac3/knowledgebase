@@ -43,6 +43,7 @@ export class English {
     public static SETTINGS_SHOW_TXT_PREVIEWS = "Show previews for text documents"
     public static SETTINGS_SHOW_IMG_PREVIEWS = "Show previews for images"
     public static SETTINGS_SHOW_PDF_PREVIEWS = "Show previews for PDFs"
+    public static SETTINGS_AUTOLOGIN = "Autoconnect to last server"
 
     public static UPLOAD_TITLE = "Upload File"
     public static UPLOAD_FOLDERNAME = "Foldername"

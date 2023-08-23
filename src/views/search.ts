@@ -455,6 +455,15 @@ export class SettingsPopup extends ExitablePopup {
             PageManager.open("login", {})
                     }
         this.add(loginButton)
+        let autoLogin = new FormCheckbox(
+            "autoLogin",
+            STRINGS.SETTINGS_AUTOLOGIN,
+            "settingsCheckbox",
+            localStorage.kb_autologin == 'true')
+            autoLogin.onChange = (state: boolean) => {
+            localStorage.kb_autologin = state
+        }
+        this.add(autoLogin)
     }
 
     public update(): void {}

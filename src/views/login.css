@@ -35,6 +35,7 @@
     display: inline-flex;
     height: 10em;
     width: 10em;
+    margin: 0.25em;
     overflow: hidden;
     line-break: normal;
     align-items: center;

@@ -55,4 +55,7 @@ export class English {
     public static EDIT_READ_FILE_ERROR = "Cannot read file. Maybe your internet connection is too weak."
     public static EDIT_SAVE_FILE_ERROR = "Cannot save file. It was either changed on the server or you have too weak internet."
     public static EDIT_READ_MD5_ERROR = "Cannot read md5 of file. Maye there was an error saving or your internet is weak."
+    public static EDIT_EXIT_WITHOUT_SAVE_QUESTION = "You did not save your changes. Do you want to exit anyways or continue editing?"
+    public static EDIT_EXIT_WITHOUT_SAVE_EXIT = "Exit (Discard Changes)"
+    public static EDIT_EXIT_WITHOUT_SAVE_CONTINUE_EDITING = "Continue Editing"
 }

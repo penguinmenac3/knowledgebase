@@ -7,6 +7,7 @@ import { PageManager } from "../../webui/pagemanager";
 import "./edit.css"
 import { Button } from "../../webui/form";
 import { iconArrowLeft, iconEdit, iconImage, iconSave } from "../../icons";
+import { ConfirmCancelPopup } from "../../webui/popup";
 
 
 export class Edit extends Module<HTMLDivElement> {
@@ -50,7 +51,6 @@ export class Edit extends Module<HTMLDivElement> {
             let navbar = new Module("div", "", "editNavbar")
             let back = new Button(iconArrowLeft, "editNavbarButton")
             back.setClass("left")
-            // TODO
             navbar.add(back)
             let title = new Module("div", kwargs.filename, "editNavbarTitle")
             navbar.add(title)
@@ -69,6 +69,7 @@ export class Edit extends Module<HTMLDivElement> {
                 // TODO show error
                 return
             }
+            text = text.replaceAll("\r\n", "\n")
             let textRendering = new Module<HTMLDivElement>("div", "", "editTextOutput")
             this.renderText(ext, text, textRendering);
             this.add(textRendering)
@@ -78,7 +79,7 @@ export class Edit extends Module<HTMLDivElement> {
             textEditor.htmlElement.style.resize = "none"
             textEditor.hide()
             textEditor.htmlElement.oninput = () => {
-                if (textEditor.htmlElement.value == text) {
+                if (textEditor.htmlElement.value.replaceAll("\r\n", "\n") == text) {
                     save.hide()
                 } else {
                     save.show()
@@ -86,11 +87,15 @@ export class Edit extends Module<HTMLDivElement> {
             }
             this.add(textEditor)
             save.onClick = async () => {
-                let isSaved = await WebFS.instance!.putTxt(filepath, textEditor.htmlElement.value, md5!)
+                let newText = textEditor.htmlElement.value.replaceAll("\r\n", "\n")
+                let isSaved = await WebFS.instance!.putTxt(filepath, newText, md5!)
                 if (!isSaved) {
                     alert(STRINGS.EDIT_SAVE_FILE_ERROR)
                 } else {
-                    save.hide()
+                    text = newText
+                    if (textEditor.htmlElement.value.replaceAll("\r\n", "\n") == text) {
+                        save.hide()
+                    }
                     let newMD5 = await WebFS.instance!.md5(filepath)
                     if (newMD5 == null) {
                         alert(STRINGS.EDIT_READ_MD5_ERROR)
@@ -110,6 +115,24 @@ export class Edit extends Module<HTMLDivElement> {
                     this.renderText(ext, textEditor.htmlElement.value, textRendering)
                     textRendering.show()
                     textEditor.hide()
+                }
+            }
+            back.onClick = () => {
+                if (textEditor.htmlElement.value.replaceAll("\r\n", "\n") == text) {
+                    history.back()
+                } else {
+                    let popup = new ConfirmCancelPopup(
+                        "popupContent", "popupContainer",
+                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_QUESTION,
+                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_EXIT,
+                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_CONTINUE_EDITING
+                    )
+                    popup.onConfirm = () => {
+                        history.back()
+                    }
+                    popup.onCancel = () => {
+                        popup.dispose()
+                    }
                 }
             }
         } else {

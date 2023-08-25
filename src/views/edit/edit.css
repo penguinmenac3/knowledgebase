@@ -30,10 +30,28 @@
 
 .editTextOutput {
     overflow: auto;
-    width: 96%;
-    height: 100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 3em;
+    bottom: 0;
     padding-left: 2%;
     padding-right: 2%;
+    padding-bottom: 1em;
+}
+
+.editTextOutputEdit {
+    overflow: auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 3.6em;
+    bottom: 0;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 2%;
+    padding-right: 2%;
+    border: 0px solid;
 }
 
 .editTextOutput h1 {
@@ -69,4 +87,34 @@
     overflow-x: auto;
     background-color: var(--bg-color-hover);
     border-radius: var(--radius);
+}
+
+.editNavbar {
+    height: 2.5em;
+    background-color: var(--accent-1-bg);
+    color: var(--accent-1-fg);
+    fill: var(--accent-1-fg);
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.editNavbar a {
+    display: inline-block;
+    font-size: 1.5em;
+    margin-top: 0.1em;
+    margin-left: 0.1em;
+    margin-right: 0.1em;
+    padding-top: 0.2em;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+    border-radius: var(--radius);
+}
+
+.editNavbar a:hover {
+    background-color: var(--accent-1-bg-hover);
+}
+
+.editNavbar div {
+    display: inline-block;
+    padding-top: 0.6em;
 }

@@ -60,6 +60,14 @@ body {
   overflow-y: hidden;
 }
 
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
 .buttonWide {
   width: -webkit-fill-available;
   display: block;

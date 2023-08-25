@@ -53,4 +53,6 @@ export class English {
     public static UPLOAD_FAILED = "Upload failed. Reasons could be: The file already exists, the folder is invalid or the server is currently unreachable."
 
     public static EDIT_READ_FILE_ERROR = "Cannot read file. Maybe your internet connection is too weak."
+    public static EDIT_SAVE_FILE_ERROR = "Cannot save file. It was either changed on the server or you have too weak internet."
+    public static EDIT_READ_MD5_ERROR = "Cannot read md5 of file. Maye there was an error saving or your internet is weak."
 }

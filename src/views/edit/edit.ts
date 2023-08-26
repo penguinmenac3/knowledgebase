@@ -5,8 +5,8 @@ import { KWARGS, Module } from "../../webui/module";
 import { PageManager } from "../../webui/pagemanager";
 
 import "./edit.css"
-import { Button } from "../../webui/form";
-import { iconArrowLeft, iconEdit, iconImage, iconSave } from "../../icons";
+import { Button, FormInput } from "../../webui/form";
+import { iconArrowLeft, iconEdit, iconImage, iconSave, iconUpload } from "../../icons";
 import { ConfirmCancelPopup } from "../../webui/popup";
 
 
@@ -135,11 +135,56 @@ export class Edit extends Module<HTMLDivElement> {
                     }
                 }
             }
-        } else {
+        } else if (ext == "pdf") {
             let iframe = new Module<HTMLIFrameElement>("iframe", "", "editIFrame")
             iframe.htmlElement.name = "editIFrame"
             this.add(iframe)
             WebFS.instance?.read(filepath, "editIFrame")
+        } else {
+            let md5 = await WebFS.instance!.md5(filepath)
+            if (md5 == null) {
+                alert(STRINGS.EDIT_READ_FILE_ERROR)
+                return
+            }
+            let navbar = new Module("div", "", "editNavbar")
+            let back = new Button(iconArrowLeft, "editNavbarButton")
+            back.setClass("left")
+            navbar.add(back)
+            let title = new Module("div", kwargs.filename, "editNavbarTitle")
+            navbar.add(title)
+            this.add(navbar)
+            let content = new Module("div", "", "editUnsupportedDocument")
+            let downloadHeading = new Module("div", STRINGS.EDIT_DOWNLOAD_HEADING, "editHeading")
+            content.add(downloadHeading)
+            let downloadBtn = new Button(STRINGS.EDIT_DOWNLOAD_BTN, "buttonWide")
+            downloadBtn.htmlElement.href = WebFS.instance!.readURL(filepath)
+            console.log(kwargs.filename)
+            content.add(downloadBtn)
+            let openLocally = new Button(STRINGS.EDIT_OPEN_NATIVELY, "buttonWide")
+            if (downloadBtn.htmlElement.href.includes("localhost")) {
+                openLocally.htmlElement.href = downloadBtn.htmlElement.href.replace("read", "open")
+                content.add(openLocally)
+            }
+            let uploadHeading = new Module("div", STRINGS.EDIT_UPLOAD_HEADING, "editHeading")
+            content.add(uploadHeading)
+            let uploadInput = new FormInput("editUploadFile", "", "file", "editUploadFile")
+            content.add(uploadInput)
+            let upload = new Button(iconUpload, "buttonWide")
+            upload.onClick = async () => {
+                if (WebFS.instance == null) return
+                upload.htmlElement.disabled = true
+                let file = uploadInput.htmlElement.files![0]
+                let result = await WebFS.instance.putFile(filepath, file, md5!)
+                upload.htmlElement.disabled = false
+                if (result) {
+                    uploadInput.value("")
+                    md5 = await WebFS.instance!.md5(filepath)
+                } else {
+                    alert(STRINGS.UPLOAD_FAILED)
+                }
+            }
+            content.add(upload)
+            this.add(content)
         }
     }
 

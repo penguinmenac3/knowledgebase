@@ -118,3 +118,54 @@
     display: inline-block;
     padding-top: 0.6em;
 }
+
+.editUnsupportedDocument {
+    overflow: auto;
+    position: absolute;
+    align-items: center;
+    text-align: center;
+    left: 0;
+    right: 0;
+    top: 3em;
+    bottom: 0;
+    padding-left: 2%;
+    padding-right: 2%;
+    padding-bottom: 1em;
+}
+.editUnsupportedDocument a {
+    text-decoration: none;
+}
+
+.editHeading {
+    font-size: x-large;
+    font-weight: bold;
+    margin-top: 1.5em;
+}
+
+.editUnsupportedDocument a {
+    display: block;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+.editUploadFile {
+    margin-top: 1em;
+    font-size: large;
+    width: -webkit-fill-available;
+    padding: 0.45em;
+    padding-top: 2em;
+    padding-bottom: 2em;
+    border: 2px solid var(--font-color);
+    border-radius: var(--radius);
+    color: var(--font-color);
+    background-color: var(--bg-color);
+}
+.editUploadFile:hover {
+    background-color: var(--bg-color-hover);
+}
+
+.editUploadFile::file-selector-button {
+    background-color: inherit;
+    border: 0px solid;
+    font-weight: bold;
+}

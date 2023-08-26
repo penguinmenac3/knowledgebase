@@ -58,4 +58,9 @@ export class English {
     public static EDIT_EXIT_WITHOUT_SAVE_QUESTION = "You did not save your changes. Do you want to exit anyways or continue editing?"
     public static EDIT_EXIT_WITHOUT_SAVE_EXIT = "Exit (Discard Changes)"
     public static EDIT_EXIT_WITHOUT_SAVE_CONTINUE_EDITING = "Continue Editing"
+    public static EDIT_DOWNLOAD_HEADING = "Access File"
+    public static EDIT_DOWNLOAD_BTN = "Open (Here)"
+    public static EDIT_OPEN_NATIVELY = "Open (Native)"
+    public static EDIT_UPLOAD_HEADING = "Update File"
+    public static EDIT_UPLOAD_BTN = "Upload"
 }

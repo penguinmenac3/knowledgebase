@@ -115,8 +115,14 @@
 }
 
 .editNavbar div {
-    display: inline-block;
-    padding-top: 0.6em;
+    position: absolute;
+    left: 4.5em;
+    right: 4.5em;
+    height: 2.5em;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .editUnsupportedDocument {

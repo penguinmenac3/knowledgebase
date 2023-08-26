@@ -28,7 +28,29 @@ export class Edit extends Module<HTMLDivElement> {
         let filename_parts = kwargs.filename.split(".")
         let ext = filename_parts[filename_parts.length - 1].toLowerCase()
         
+        let md5 = await WebFS.instance!.md5(filepath)
+        if (md5 == null) {
+            alert(STRINGS.EDIT_READ_FILE_ERROR)
+            return
+        }
+
         if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "tiff" || ext == "tif") {
+            let navbar = new Module("div", "", "editNavbar")
+            let back = new Button(iconArrowLeft, "editNavbarButton")
+            back.onClick = () => {
+                history.back()
+            }
+            back.setClass("left")
+            navbar.add(back)
+            let uploadBtn = new Button(iconUpload, "editNavbarButton")
+            uploadBtn.setClass("right")
+            uploadBtn.onClick = () => {
+                alert("Not yet implemented!")
+            }
+            navbar.add(uploadBtn)
+            let title = new Module("div", kwargs.filename, "editNavbarTitle")
+            navbar.add(title)
+            this.add(navbar)
             let container = new Module<HTMLDivElement>("div", "", "editImageBackground")
             let img = new Module<HTMLImageElement>("img", "", "editImageView")
             let preview = (ext == "tiff" || ext == "tif") ? -1 : 0
@@ -62,7 +84,6 @@ export class Edit extends Module<HTMLDivElement> {
             save.hide()
             navbar.add(save)
             this.add(navbar)
-            let md5 = await WebFS.instance!.md5(filepath)
             let text = await WebFS.instance!.readTxt(filepath)
             if (text == null || md5 == null) {
                 alert(STRINGS.EDIT_READ_FILE_ERROR)
@@ -141,13 +162,11 @@ export class Edit extends Module<HTMLDivElement> {
             this.add(iframe)
             WebFS.instance?.read(filepath, "editIFrame")
         } else {
-            let md5 = await WebFS.instance!.md5(filepath)
-            if (md5 == null) {
-                alert(STRINGS.EDIT_READ_FILE_ERROR)
-                return
-            }
             let navbar = new Module("div", "", "editNavbar")
             let back = new Button(iconArrowLeft, "editNavbarButton")
+            back.onClick = () => {
+                history.back()
+            }
             back.setClass("left")
             navbar.add(back)
             let title = new Module("div", kwargs.filename, "editNavbarTitle")

@@ -443,7 +443,7 @@ class PreviewCache {
 
 export class SettingsPopup extends ExitablePopup {
     public constructor() {
-        super("fullscreenPopupContent", "fullscreenPopupContainer", "fullscreenPopupExitBtn")
+        super("popupContent-fullscreen", "popupContainer", "popupExitBtn")
         this.add(new Module("div", STRINGS.SETTINGS_TITLE, "popupTitle"))
         
         this.add(new Module("div", STRINGS.SETTINGS_GENERAL, "popupSubtitle"))
@@ -501,7 +501,7 @@ export class SettingsPopup extends ExitablePopup {
 
 export class UploadPopup extends ExitablePopup {
     public constructor(currentFolder: string, currentFile: string, triggerFullUpdate: CallableFunction) {
-        super("fullscreenPopupContent", "fullscreenPopupContainer", "fullscreenPopupExitBtn")
+        super("popupContent-fullscreen", "popupContainer", "popupExitBtn")
         this.setClass("upload")
         this.add(new Module("div", STRINGS.UPLOAD_TITLE, "popupTitle"))
         this.add(new FormLabel(STRINGS.UPLOAD_SERVER))
@@ -528,7 +528,7 @@ export class UploadPopup extends ExitablePopup {
             }
         }
         this.add(fileInput)
-        let sendBtn = new Button(STRINGS.UPLOAD_SEND, "buttonWide")
+        let sendBtn = new Button(STRINGS.UPLOAD_SEND)
         sendBtn.onClick = async () => {
             let sessionName = serverInput.value()
             let instance = WebFS.connections.get(sessionName)

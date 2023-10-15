@@ -148,14 +148,14 @@ export class Edit extends Module<HTMLDivElement> {
                     let popup = new ConfirmCancelPopup(
                         "popupContent", "popupContainer",
                         STRINGS.EDIT_EXIT_WITHOUT_SAVE_QUESTION,
+                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_CONTINUE_EDITING,
                         STRINGS.EDIT_EXIT_WITHOUT_SAVE_EXIT,
-                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_CONTINUE_EDITING
                     )
                     popup.onConfirm = () => {
-                        history.back()
+                        popup.dispose()
                     }
                     popup.onCancel = () => {
-                        popup.dispose()
+                        history.back()
                     }
                 }
             }

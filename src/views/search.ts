@@ -344,6 +344,11 @@ class SearchResult extends Module<HTMLDivElement> {
         header.classList.add("searchResultFilename")
         meta.appendChild(header)
         
+        let server = document.createElement("div")
+        server.innerText = sessionName
+        server.classList.add("searchResultServer")
+        meta.appendChild(server)
+
         if (modified != "") {
             let modifiedElement = document.createElement("div")
             modifiedElement.innerText = STRINGS.SEARCH_LAST_MODIFIED + ": " + modified

@@ -372,6 +372,11 @@ class SearchResult extends Module<HTMLDivElement> {
             }
         }
 
+        
+        let hover = document.createElement("div")
+        hover.classList.add("searchResultHover")
+        this.htmlElement.appendChild(hover)
+
         if (!isFolder) {
             let buttonContainer = new Module("div", "", "searchResultFlagButtonContainer")
             let isFav = filename.includes(".fav")
@@ -528,7 +533,7 @@ export class UploadPopup extends ExitablePopup {
             }
         }
         this.add(fileInput)
-        let sendBtn = new Button(STRINGS.UPLOAD_SEND)
+        let sendBtn = new Button(STRINGS.UPLOAD_SEND, "buttonWide")
         sendBtn.onClick = async () => {
             let sessionName = serverInput.value()
             let instance = WebFS.connections.get(sessionName)

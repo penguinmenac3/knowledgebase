@@ -4,10 +4,10 @@
     padding: 0.45em;
     padding-left: 2.1em;
     margin: 0.5em;
-    border: 2px solid var(--font-color);
+    border: 2px solid var(--color-base-c);
     border-radius: var(--radius);
-    color: var(--font-color);
-    background-color: var(--bg-color);
+    color: var(--color-base-c);
+    background-color: var(--color-base);
 }
 
 .searchUploadButton {
@@ -19,13 +19,13 @@
     padding-right: 0.55em;
     padding-bottom: 0.25em;
     font-size: 2em;
-    fill: var(--accent-1-fg);
-    background-color: var(--accent-1-bg);
+    fill: var(--color-brand-c);
+    background-color: var(--color-brand);
     border-radius: var(--radius-round);
 }
 
 .searchUploadButton:hover {
-    background-color: var(--accent-1-bg-hover);
+    background-color: var(--color-brand-hover);
 }
 
 .searchBottomNavbar {
@@ -51,7 +51,7 @@
 }
 
 .searchBottomNavbarIcon:hover {
-    background-color: var(--bg-color-hover);
+    background-color: var(--color-base-hover);
 }
 
 .searchResults {
@@ -80,10 +80,10 @@
     text-align: center;
     padding: 0.6em;
     border-radius: var(--radius-large);
-    color: var(--font-color);
+    color: var(--color-base-c);
 }
 .searchMoreResults:hover {
-    background-color: var(--bg-color-transparent);
+    background-color: var(--color-base-transparent);
 }
 
 .searchResult {
@@ -93,7 +93,19 @@
     border-radius: var(--radius-large);
     overflow: hidden;
     position: relative;
-    background-color: var(--bg-color-2);
+    background-color: var(--color-base-hover);
+}
+
+.searchResultHover {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.searchResultHover:hover {
+    background-color: var(--color-base-transparent-2);
 }
 
 @media (max-width: 256px) {
@@ -125,10 +137,6 @@
     }
 }
 
-.searchResult:hover {
-    background-color: var(--bg-color-hover);
-}
-
 .searchResultPreview {
     overflow: hidden;
     width: 100%;
@@ -138,7 +146,7 @@
     display: inline-block;
     overflow: hidden;
     white-space: nowrap;
-    color: var(--font-color);
+    color: var(--color-base-c);
 }
 
 .searchResultMeta {
@@ -146,8 +154,8 @@
     position: absolute;
     bottom: 0;
     padding: 1%;
-    color: var(--font-color);
-    background-color: var(--bg-color-transparent);
+    color: var(--color-base-c);
+    background-color: var(--color-base-transparent);
 }
 
 .searchResultFilename {
@@ -176,8 +184,8 @@
     margin-bottom: 0.2em;
     display: inline-block;
     position: relative;
-    color: var(--accent-1-fg);
-    background-color: var(--accent-1-bg);
+    color: var(--color-brand-c);
+    background-color: var(--color-brand);
     line-break: anywhere;
 }
 
@@ -198,11 +206,11 @@
     margin: 0.2em;
     font-size: 1.5em;
     border-radius: var(--radius-round);
-    background-color: var(--bg-color-transparent);
+    background-color: var(--color-base-transparent);
 }
 
 .searchResultFlagButton:hover {
-    background-color: var(--bg-color-hover);
+    background-color: var(--color-base);
 }
 
 /* Search settings */
@@ -219,7 +227,7 @@
 }
 
 .settingsOpen:hover {
-    background-color: var(--bg-color-hover);
+    background-color: var(--color-base-hover);
 }
 
 .settingsCheckbox {
@@ -250,10 +258,15 @@
     font-size: large;
     width: -webkit-fill-available;
     padding: 0.45em;
-    border: 2px solid var(--font-color);
+    border: 2px solid var(--color-base-c);
     border-radius: var(--radius);
-    color: var(--font-color);
-    background-color: var(--bg-color);
+    color: var(--color-base-c);
+    background-color: var(--color-base);
+}
+
+.upload select:hover,
+.upload input:hover {
+    background-color: var(--color-base-hover);
 }
 
 .upload .fileInput {
@@ -262,21 +275,13 @@
     padding: 0.45em;
     padding-top: 4em;
     padding-bottom: 4em;
-    border: 2px solid var(--font-color);
+    border: 2px solid var(--color-base-c);
     border-radius: var(--radius);
-    color: var(--font-color);
-    background-color: var(--bg-color);
+    color: var(--color-base-c);
+    background-color: var(--color-base);
 }
 .upload .fileInput:hover {
-    font-size: large;
-    width: -webkit-fill-available;
-    padding: 0.45em;
-    padding-top: 4em;
-    padding-bottom: 4em;
-    border: 2px solid var(--font-color);
-    border-radius: var(--radius);
-    color: var(--font-color);
-    background-color: var(--bg-color-hover);
+    background-color: var(--color-base-hover);
 }
 
 .upload .fileInput::file-selector-button {

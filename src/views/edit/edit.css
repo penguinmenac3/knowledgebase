@@ -4,7 +4,8 @@
 }
 
 .editIFrame {
-    background-color: var(--bg-color);
+    background-color: var(--color-base);
+    color: var(--color-base-c);
     top: 0;
     left: 0;
     right: 0;
@@ -55,11 +56,11 @@
 }
 
 .editTextOutput h1 {
-    border-bottom: 1px solid var(--font-color);
+    border-bottom: 1px solid var(--color-base-c);
 }
 
 .editTextOutput h2 {
-    border-bottom: 1px solid var(--bg-color-hover);
+    border-bottom: 1px solid var(--color-base-hover);
 }
 
 .editTextOutput img {
@@ -75,8 +76,8 @@
     padding-top: 0.2em;
     padding-bottom: 0.2em;
     margin: 0.2em;
-    background-color: var(--bg-color-hover);
-    border-left: 4px solid var(--accent-1-bg);
+    background-color: var(--color-base-hover);
+    border-left: 4px solid var(--color-brand);
     border-radius: var(--radius);
 }
 
@@ -85,15 +86,15 @@
     padding: 1em;
     margin: 0.2em;
     overflow-x: auto;
-    background-color: var(--bg-color-hover);
+    background-color: var(--color-base-hover);
     border-radius: var(--radius);
 }
 
 .editNavbar {
     height: 2.5em;
-    background-color: var(--accent-1-bg);
-    color: var(--accent-1-fg);
-    fill: var(--accent-1-fg);
+    background-color: var(--color-brand);
+    color: var(--color-brand-c);
+    fill: var(--color-brand-c);
     font-size: 1.2em;
     text-align: center;
 }
@@ -111,7 +112,7 @@
 }
 
 .editNavbar a:hover {
-    background-color: var(--accent-1-bg-hover);
+    background-color: var(--color-brand-hover);
 }
 
 .editNavbar div {
@@ -161,13 +162,13 @@
     padding: 0.45em;
     padding-top: 2em;
     padding-bottom: 2em;
-    border: 2px solid var(--font-color);
+    border: 2px solid var(--color-base-c);
     border-radius: var(--radius);
-    color: var(--font-color);
-    background-color: var(--bg-color);
+    color: var(--color-base-c);
+    background-color: var(--color-base);
 }
 .editUploadFile:hover {
-    background-color: var(--bg-color-hover);
+    background-color: var(--color-base-hover);
 }
 
 .editUploadFile::file-selector-button {

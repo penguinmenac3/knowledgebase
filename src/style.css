@@ -1,54 +1,3 @@
-:root {
-  color-scheme: light dark;
-  --bg-color: #333333;
-  --bg-color-transparent: #333333BB;
-  --bg-color-hover: #444444;
-  --bg-color-2: #555555;
-  --font-color: #ffffff;
-  --font-color-hover: #d3d3d3;
-  --font-color-highlight: #f8c24c;
-  --font-color-highlight-hover: #ffd477;
-  --accent-1-bg: #162850;
-  --accent-1-fg: #f5f5f5;
-  --accent-1-bg-selected: #4a5e85;
-  --accent-1-fg-selected: #ffffff;
-  --accent-1-bg-hover: #2d4477;
-  --accent-1-fg-hover: #ffffff;
-  --danger-2-bg: #862626;
-  --accent-2-fg: #f5f5f5;
-  --danger-2-bg-selected: #ff3333;
-  --accent-2-fg-selected: #ffffff;
-  --danger-2-bg-hover: #ff3333;
-  --accent-2-fg-hover: #ffffff;
-  --invisible: #ff00bb;
-  --debug: #e100ff;
-  --scrollbarBG: #162850;
-  --thumbBG: #4a5e85;
-  --radius: 0.3em;
-  --radius-large: 0.5em;
-  --radius-round: 9999em;
-  color: var(--font-color);
-  background-color: var(--bg-color);
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg-color: #ffffff;
-    --bg-color-transparent: #ffffffBB;
-    --bg-color-hover: #d3d3d3;
-    --bg-color-2: #f4f4f4;
-    --font-color: #333333;
-    --font-color-hover: #444444;
-    color: var(--font-color);
-    background-color: var(--bg-color);
-  }
-}
-
-body {
-  margin: 0;
-  fill: var(--font-color);
-}
-
 #app {
   margin: 0;
   position: absolute;
@@ -73,13 +22,13 @@ body {
   display: block;
   margin-top: 1em;
   padding: 0.5em;
-  color: var(--accent-1-fg);
-  background-color: var(--accent-1-bg);
+  color: var(--color-brand-c);
+  background-color: var(--color-brand);
   border-radius: 0.2em;
 }
 
 .buttonWide:hover {
-  background-color: var(--accent-1-bg-hover);
+  background-color: var(--color-brand-hover);
 }
 
 .buttonNarrow {
@@ -87,11 +36,11 @@ body {
   display: inline-block;
   margin-top: 1em;
   padding: 0.5em;
-  color: var(--accent-1-fg);
-  background-color: var(--accent-1-bg);
+  color: var(--color-brand-c);
+  background-color: var(--color-brand);
   border-radius: 0.2em;
 }
 
 .buttonNarrow:hover {
-  background-color: var(--accent-1-bg-hover);
+  background-color: var(--color-brand-hover);
 }

@@ -5,8 +5,9 @@ import { KWARGS, Module } from "../../webui/module";
 import { PageManager } from "../../webui/pagemanager";
 
 import "./edit.css"
+import { iconArrowLeft } from "../../webui/icons/icons";
 import { Button, FormInput } from "../../webui/form";
-import { iconArrowLeft, iconEdit, iconImage, iconSave, iconUpload } from "../../icons";
+import { iconEdit, iconImage, iconSave, iconUpload } from "../../icons";
 import { ConfirmCancelPopup } from "../../webui/popup";
 
 

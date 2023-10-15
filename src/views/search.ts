@@ -6,7 +6,7 @@ import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
 import { ExitablePopup } from "../webui/popup";
 import { STRINGS } from "../language/default";
-import { bars } from "../webui/icons/icons";
+import { iconBars } from "../webui/icons/icons";
 import { iconFlag, iconFlagOutline, iconFolder, iconHouse, iconStar, iconStarOutline, iconUpload } from "../icons";
 
 interface Entry {
@@ -92,7 +92,7 @@ export class Search extends Module<HTMLDivElement> {
         }
         this.add(upload)
 
-        let settingsBtn = new Button(bars, "settingsOpen")
+        let settingsBtn = new Button(iconBars, "settingsOpen")
         settingsBtn.onClick = () => {
             let settingsPopup = new SettingsPopup()
             settingsPopup.onExit = this.updateSearchResults.bind(this)

@@ -260,7 +260,7 @@ export class Search extends Module<HTMLDivElement> {
 
     private flatten(sessionName: string, fileTree: FileTree, pathPrefix: string = "", out: Entry[] = []): Entry[] {
         for (const filename in fileTree) {
-            const value = fileTree[filename];
+            var value = fileTree[filename];
             if (!(typeof value === 'string')) {
                 out = this.flatten(sessionName, value as FileTree, pathPrefix + filename + "/", out)
                 out.push({
@@ -270,10 +270,13 @@ export class Search extends Module<HTMLDivElement> {
                     isFolder: true
                 })
             } else {
+                if (value.indexOf("GMT") < 0) {
+                    value += " GMT+0000"
+                }
                 out.push({
                     filepath: pathPrefix + filename,
                     sessionName: sessionName,
-                    modified: new Date(value as string),
+                    modified: new Date(value),
                     isFolder: false
                 })
             }
@@ -473,8 +476,9 @@ export class SettingsPopup extends ExitablePopup {
         let loginButton = new Button(STRINGS.SETTINGS_SELECT_SERVER, "buttonWide")
         loginButton.onClick = () => {
             this.dispose()
+            WebFS.connections.clear()
             PageManager.open("login", {})
-                    }
+        }
         this.add(loginButton)
         let autoLogin = new FormCheckbox(
             "autoLogin",

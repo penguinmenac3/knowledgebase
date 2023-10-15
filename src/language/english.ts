@@ -32,7 +32,7 @@ export class English {
     public static SEARCH_LAST_MODIFIED = "modified"
     public static SEARCH_CREATED = "created"
     public static SEARCH_NUM_RESULTS = "files found"
-    public static SEARCH_OFFLINE = "(<span style='color: red'>offline</span>)"
+    public static SEARCH_OFFLINE = ", Offline:"
     public static SEARCH_MORE_RESULTS = "Click here to show more results!"
 
     public static SETTINGS_TITLE = "Settings"
@@ -46,13 +46,14 @@ export class English {
     public static SETTINGS_AUTOLOGIN = "Autoconnect to last server"
 
     public static UPLOAD_TITLE = "Upload File"
+    public static UPLOAD_SERVER = "Server"
     public static UPLOAD_FOLDERNAME = "Foldername"
     public static UPLOAD_FILENAME = "Filename"
     public static UPLOAD_FILE = "File"
     public static UPLOAD_SEND = "Upload"
     public static UPLOAD_FAILED = "Upload failed. Reasons could be: The file already exists, the folder is invalid or the server is currently unreachable."
 
-    public static EDIT_READ_FILE_ERROR = "Cannot read file. Maybe your internet connection is too weak."
+    public static EDIT_READ_FILE_ERROR = "Cannot read file or reach server. Maybe your internet connection is too weak or the server is down."
     public static EDIT_SAVE_FILE_ERROR = "Cannot save file. It was either changed on the server or you have too weak internet."
     public static EDIT_READ_MD5_ERROR = "Cannot read md5 of file. Maye there was an error saving or your internet is weak."
     public static EDIT_EXIT_WITHOUT_SAVE_QUESTION = "You did not save your changes. Do you want to exit anyways or continue editing?"

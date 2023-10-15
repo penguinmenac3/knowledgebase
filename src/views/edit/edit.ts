@@ -19,7 +19,8 @@ export class Edit extends Module<HTMLDivElement> {
     }
 
     public async update(kwargs: KWARGS, _changedPage: boolean): Promise<void> {
-        if (WebFS.instance == null) {
+        let instance = WebFS.connections.get(kwargs.sessionName)
+        if (instance == null) {
             PageManager.open("login", {})
             return
         }
@@ -29,10 +30,10 @@ export class Edit extends Module<HTMLDivElement> {
         let filename_parts = kwargs.filename.split(".")
         let ext = filename_parts[filename_parts.length - 1].toLowerCase()
         
-        let md5 = await WebFS.instance!.md5(filepath)
+        let md5 = await instance.md5(filepath)
         if (md5 == null) {
             alert(STRINGS.EDIT_READ_FILE_ERROR)
-            return
+            PageManager.back()
         }
 
         if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "tiff" || ext == "tif") {
@@ -55,7 +56,7 @@ export class Edit extends Module<HTMLDivElement> {
             let container = new Module<HTMLDivElement>("div", "", "editImageBackground")
             let img = new Module<HTMLImageElement>("img", "", "editImageView")
             let preview = (ext == "tiff" || ext == "tif") ? -1 : 0
-            img.htmlElement.src = WebFS.instance!.readURL(filepath, preview)
+            img.htmlElement.src = instance.readURL(filepath, preview)
             img.htmlElement.onload = () => {
                 let w = img.htmlElement.width
                 let h = img.htmlElement.height
@@ -85,7 +86,7 @@ export class Edit extends Module<HTMLDivElement> {
             save.hide()
             navbar.add(save)
             this.add(navbar)
-            let text = await WebFS.instance!.readTxt(filepath)
+            let text = await instance.readTxt(filepath)
             if (text == null || md5 == null) {
                 alert(STRINGS.EDIT_READ_FILE_ERROR)
                 // TODO show error
@@ -109,8 +110,9 @@ export class Edit extends Module<HTMLDivElement> {
             }
             this.add(textEditor)
             save.onClick = async () => {
+                if (instance == null) return
                 let newText = textEditor.htmlElement.value.replaceAll("\r\n", "\n")
-                let isSaved = await WebFS.instance!.putTxt(filepath, newText, md5!)
+                let isSaved = await instance.putTxt(filepath, newText, md5!)
                 if (!isSaved) {
                     alert(STRINGS.EDIT_SAVE_FILE_ERROR)
                 } else {
@@ -118,7 +120,7 @@ export class Edit extends Module<HTMLDivElement> {
                     if (textEditor.htmlElement.value.replaceAll("\r\n", "\n") == text) {
                         save.hide()
                     }
-                    let newMD5 = await WebFS.instance!.md5(filepath)
+                    let newMD5 = await instance.md5(filepath)
                     if (newMD5 == null) {
                         alert(STRINGS.EDIT_READ_MD5_ERROR)
                         return
@@ -161,7 +163,7 @@ export class Edit extends Module<HTMLDivElement> {
             let iframe = new Module<HTMLIFrameElement>("iframe", "", "editIFrame")
             iframe.htmlElement.name = "editIFrame"
             this.add(iframe)
-            WebFS.instance?.read(filepath, "editIFrame")
+            instance.read(filepath, "editIFrame")
         } else {
             let navbar = new Module("div", "", "editNavbar")
             let back = new Button(iconArrowLeft, "editNavbarButton")
@@ -177,7 +179,7 @@ export class Edit extends Module<HTMLDivElement> {
             let downloadHeading = new Module("div", STRINGS.EDIT_DOWNLOAD_HEADING, "editHeading")
             content.add(downloadHeading)
             let downloadBtn = new Button(STRINGS.EDIT_DOWNLOAD_BTN, "buttonWide")
-            downloadBtn.htmlElement.href = WebFS.instance!.readURL(filepath)
+            downloadBtn.htmlElement.href = instance.readURL(filepath)
             console.log(kwargs.filename)
             content.add(downloadBtn)
             let openLocally = new Button(STRINGS.EDIT_OPEN_NATIVELY, "buttonWide")
@@ -191,14 +193,14 @@ export class Edit extends Module<HTMLDivElement> {
             content.add(uploadInput)
             let upload = new Button(iconUpload, "buttonWide")
             upload.onClick = async () => {
-                if (WebFS.instance == null) return
+                if (instance == null) return
                 upload.htmlElement.disabled = true
                 let file = uploadInput.htmlElement.files![0]
-                let result = await WebFS.instance.putFile(filepath, file, md5!)
+                let result = await instance.putFile(filepath, file, md5!)
                 upload.htmlElement.disabled = false
                 if (result) {
                     uploadInput.value("")
-                    md5 = await WebFS.instance!.md5(filepath)
+                    md5 = await instance.md5(filepath)
                 } else {
                     alert(STRINGS.UPLOAD_FAILED)
                 }

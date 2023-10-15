@@ -1,6 +1,6 @@
 import "./search.css"
 import { FileTree, WebFS } from "../webfs/client/webfs";
-import { Button, FormCheckbox, FormInput, FormLabel } from "../webui/form";
+import { Button, FormCheckbox, FormDropdown, FormInput, FormLabel } from "../webui/form";
 import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";
 import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
@@ -11,6 +11,7 @@ import { iconFlag, iconFlagOutline, iconFolder, iconHouse, iconStar, iconStarOut
 
 interface Entry {
     filepath: string
+    sessionName: string,
     modified: Date | null
     isFolder: boolean
     score?: number
@@ -22,8 +23,8 @@ export class Search extends Module<HTMLDivElement> {
     private results: Module<HTMLDivElement>
 
     //private currentSearch: string | undefined = undefined
-    private fileTree: FileTree | null = null
-    private isOffline: boolean = false
+    private fileTrees: Map<string, FileTree> = new Map<string, FileTree>()
+    private offlineConnections: string[] = []
     private favouritesOnly: boolean = false
     private todoOnly: boolean = false
 
@@ -105,25 +106,31 @@ export class Search extends Module<HTMLDivElement> {
     }
 
     public async update(kwargs: KWARGS, changedPage: boolean): Promise<void> {
-        if (WebFS.instance == null) {
+        if (WebFS.connections.size < 1) {
             PageManager.open("login", {})
             return
         }
 
         if (changedPage) {
-            this.fileTree = await WebFS.instance?.walk(".")
-            if (this.fileTree == null) {
-                let sessionName = WebFS.instance.getSessionName()
-                let jsonFiletree = localStorage["kb_filetree_cache_" + sessionName]
-                if (jsonFiletree) {
-                    this.fileTree = JSON.parse(jsonFiletree)
+            this.offlineConnections = []
+            this.fileTrees.clear()
+            for (let [sessionName, webFS] of WebFS.connections) {
+                console.log("Gathering filetrees for: " + sessionName)
+                let fileTree = await webFS.walk(".")
+                if (fileTree == null) {
+                    console.log("Session offline: " + sessionName)
+                    let jsonFiletree = localStorage["kb_filetree_cache_" + sessionName]
+                    if (jsonFiletree) {
+                        fileTree = JSON.parse(jsonFiletree)
+                    }
+                    this.offlineConnections.push(sessionName)
+                } else {
+                    let jsonFiletree = JSON.stringify(fileTree)
+                    localStorage["kb_filetree_cache_" + sessionName] = jsonFiletree
                 }
-                this.isOffline = true
-            } else {
-                let sessionName = WebFS.instance.getSessionName()
-                let jsonFiletree = JSON.stringify(this.fileTree)
-                localStorage["kb_filetree_cache_" + sessionName] = jsonFiletree
-                this.isOffline = false
+                if (fileTree != null) {
+                    this.fileTrees.set(sessionName, fileTree)
+                }
             }
         }
         this.searchField.value(kwargs.q)
@@ -136,12 +143,18 @@ export class Search extends Module<HTMLDivElement> {
         //this.currentSearch = searchText
 
         this.results.htmlElement.innerHTML = "";
-        if (this.fileTree == null) {
+        let files: Entry[] = []
+        for (let [sessionName, filetree] of this.fileTrees) {
+            let tmp = this.flatten(sessionName, filetree)
+            console.log(sessionName + ": " + tmp.length)
+            files = files.concat(tmp)
+        }
+
+        if (files.length == 0) {
             alert(STRINGS.SEARCH_FILETREE_IS_NULL)
             return
         }
 
-        let files = this.flatten(this.fileTree);
         files = this.sortFilesByLastModified(files);
         files = this.sortFilesByRelevance(files, searchText);
         files = files.filter((entry: Entry) => {
@@ -156,6 +169,7 @@ export class Search extends Module<HTMLDivElement> {
         for (let entry of files) {
             this.results.add(new SearchResult(
                 entry.filepath,
+                entry.sessionName,  
                 entry.modified != null ? humanFriendlyDate(entry.modified) : "",
                 entry.isFolder,
                 this.searchField,
@@ -176,8 +190,11 @@ export class Search extends Module<HTMLDivElement> {
     private showNumResults(files: Entry[]) {
         let numResults = new Module("div");
         let offline = ""
-        if (this.isOffline) {
-            offline =  " " + STRINGS.SEARCH_OFFLINE
+        for (let sessionName of this.offlineConnections) {
+            if (offline == "") {
+                offline =  STRINGS.SEARCH_OFFLINE
+            }
+            offline +=  " " + sessionName
         }
         numResults.htmlElement.innerHTML = files.length + " " + STRINGS.SEARCH_NUM_RESULTS + offline;
         numResults.setClass("searchNumResults");
@@ -223,7 +240,7 @@ export class Search extends Module<HTMLDivElement> {
                     score += 4
                 }
                 results.push({
-                    filepath: entry.filepath, modified: entry.modified,
+                    filepath: entry.filepath, sessionName: entry.sessionName, modified: entry.modified,
                     isFolder: entry.isFolder, score: score
                 });
             }
@@ -240,19 +257,21 @@ export class Search extends Module<HTMLDivElement> {
         });
     }
 
-    private flatten(fileTree: FileTree, pathPrefix: string = "", out: Entry[] = []): Entry[] {
+    private flatten(sessionName: string, fileTree: FileTree, pathPrefix: string = "", out: Entry[] = []): Entry[] {
         for (const filename in fileTree) {
             const value = fileTree[filename];
             if (!(typeof value === 'string')) {
-                out = this.flatten(value as FileTree, pathPrefix + filename + "/", out)
+                out = this.flatten(sessionName, value as FileTree, pathPrefix + filename + "/", out)
                 out.push({
                     filepath: pathPrefix + filename,
+                    sessionName: sessionName,
                     modified: null,
                     isFolder: true
                 })
             } else {
                 out.push({
                     filepath: pathPrefix + filename,
+                    sessionName: sessionName,
                     modified: new Date(value as string),
                     isFolder: false
                 })
@@ -263,9 +282,10 @@ export class Search extends Module<HTMLDivElement> {
 }
 
 class SearchResult extends Module<HTMLDivElement> {
-    constructor(filepath: string, modified: string, isFolder: boolean, searchField: FormInput, triggerFullUpdate: CallableFunction) {
+    constructor(filepath: string, sessionName: string, modified: string, isFolder: boolean, searchField: FormInput, triggerFullUpdate: CallableFunction) {
         super("div")
         this.setClass("searchResult")
+        let instance = WebFS.connections.get(sessionName)
         let { filename, folder } = splitFilepath(filepath);
 
         let filename_parts = filename.split(".")
@@ -282,14 +302,16 @@ class SearchResult extends Module<HTMLDivElement> {
                 previewElement.classList.add("searchResultPreview")
                 this.htmlElement.replaceChild(previewElement, this.htmlElement.childNodes[0]);
             }
-            preview.src = WebFS.instance!.readURL(filepath, 256)
+            if (instance != null) {
+                preview.src = instance.readURL(filepath, 256)
+            }
             this.htmlElement.appendChild(preview)
         } else if (localStorage.kb_allow_txt_previews == 'true' && (ext == "txt" || ext == "md" || ext == "py" || ext == "csv" || ext == "json")) {
             let preview = document.createElement("div")
             preview.style.fontSize = "1em"
             preview.style.textAlign = "left"
             preview.innerHTML = "loading..."
-            PreviewCache.getTxtPreview(filepath).then((txt) => {
+            PreviewCache.getTxtPreview(sessionName, filepath).then((txt) => {
                 let parts = txt.split("\n")
                 parts = parts.map((val, _idx, _arr) => {
                     if (val.startsWith("#")) {
@@ -336,7 +358,7 @@ class SearchResult extends Module<HTMLDivElement> {
                 searchField.onChange(searchField.htmlElement.value)
                 searchField.onChangeDone(searchField.htmlElement.value)
             } else {
-                PageManager.open("edit", {folder: folder, filename: filename})
+                PageManager.open("edit", {sessionName: sessionName, folder: folder, filename: filename})
                 //WebFS.instance?.read(folder + "/" + filename, "_blank")
             }
         }
@@ -346,13 +368,13 @@ class SearchResult extends Module<HTMLDivElement> {
             let isFav = filename.includes(".fav")
             let favButton = new Button(isFav ? iconStar : iconStarOutline, "searchResultFlagButton")
             favButton.onClick = async () => {
-                if (WebFS.instance == null) return
+                if (instance == null) return
                 if (isFav) {
-                    await WebFS.instance.mv(filepath, filepath.replace(".fav", ""))
+                    await instance.mv(filepath, filepath.replace(".fav", ""))
                 } else {
                     let parts = filepath.split(".")
                     parts.splice(parts.length - 1, 0, "fav")
-                    await WebFS.instance.mv(filepath, parts.join("."))
+                    await instance.mv(filepath, parts.join("."))
                 }
                 triggerFullUpdate()
             }
@@ -360,13 +382,13 @@ class SearchResult extends Module<HTMLDivElement> {
             let isTodo = filename.includes(".todo")
             let todoButton = new Button(isTodo ? iconFlag : iconFlagOutline, "searchResultFlagButton")
             todoButton.onClick = async () => {
-                if (WebFS.instance == null) return
+                if (instance == null) return
                 if (isTodo) {
-                    await WebFS.instance.mv(filepath, filepath.replace(".todo", ""))
+                    await instance.mv(filepath, filepath.replace(".todo", ""))
                 } else {
                     let parts = filepath.split(".")
                     parts.splice(parts.length - 1, 0, "todo")
-                    await WebFS.instance.mv(filepath, parts.join("."))
+                    await instance.mv(filepath, parts.join("."))
                 }
                 triggerFullUpdate()
             }
@@ -387,12 +409,12 @@ function splitFilepath(filepath: string) {
 class PreviewCache {
     private constructor() {}
 
-    public static async getTxtPreview(filepath: string): Promise<string> {
+    public static async getTxtPreview(sessionName: string, filepath: string): Promise<string> {
         let cache = JSON.parse(localStorage.getItem("kb_preview_cache") || "{}")
         if (cache[filepath]) {
             return cache[filepath]
         }
-        let txt = await WebFS.instance!.readTxt(filepath)
+        let txt = await WebFS.connections.get(sessionName)?.readTxt(filepath)
         if (txt != null) {
             let parts = txt.split("\n").slice(0, 13)
             parts = parts.map((val, _idx, _arr) => {return val.slice(0, 40)})
@@ -472,6 +494,13 @@ export class UploadPopup extends ExitablePopup {
         super("fullscreenPopupContent", "fullscreenPopupContainer", "fullscreenPopupExitBtn")
         this.setClass("upload")
         this.add(new Module("div", STRINGS.UPLOAD_TITLE, "popupTitle"))
+        this.add(new FormLabel(STRINGS.UPLOAD_SERVER))
+        let sessions: string[] = []
+        for(let sessionName of WebFS.connections.keys()) {
+            sessions.push(sessionName)
+        }
+        let serverInput = new FormDropdown("sessionName", sessions, "")
+        this.add(serverInput)
         this.add(new FormLabel(STRINGS.UPLOAD_FOLDERNAME))
         let folderInput = new FormInput("foldername", currentFolder, "text")
         folderInput.value(currentFolder)
@@ -491,7 +520,9 @@ export class UploadPopup extends ExitablePopup {
         this.add(fileInput)
         let sendBtn = new Button(STRINGS.UPLOAD_SEND, "buttonWide")
         sendBtn.onClick = async () => {
-            if (WebFS.instance == null) return
+            let sessionName = serverInput.value()
+            let instance = WebFS.connections.get(sessionName)
+            if (instance == null) return
             sendBtn.htmlElement.disabled = true
             let file = fileInput.htmlElement.files![0]
             let folder = folderInput.value()
@@ -500,7 +531,7 @@ export class UploadPopup extends ExitablePopup {
             }
             let filename = filenameInput.value()
             let path = folder + "/" + filename
-            let result = await WebFS.instance.putFile(path, file, "")
+            let result = await instance.putFile(path, file, "")
             sendBtn.htmlElement.disabled = false
             if (result) {
                 this.dispose()

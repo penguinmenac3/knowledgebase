@@ -1,6 +1,6 @@
 import { PageManager } from './webui/pagemanager'
 import { STRINGS, setupLanguage } from './language/default'
-import { Login, tryReconnectToLastSession } from './views/login'
+import { Login, reconnectAllSessions } from './views/login'
 import { Search } from './views/search'
 import { Edit } from './views/edit/edit'
 
@@ -10,7 +10,7 @@ async function main() {
   setupLanguage()
   document.getElementsByTagName("title")[0].innerHTML = STRINGS.APPNAME
   if (localStorage.kb_autologin == 'true') {
-    await tryReconnectToLastSession()
+    await reconnectAllSessions()
   }
   new PageManager(
     "search",

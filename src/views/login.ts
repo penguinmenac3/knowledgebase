@@ -66,24 +66,21 @@ export class Login extends Module<HTMLDivElement> {
             }
             sessions.push(sessionName)
             localStorage.kb_sessions = JSON.stringify(sessions)
-            WebFS.instance = webFS
             PageManager.back()
         } else {
             // if session token invalid, show error to user  and remain on login site.
+            WebFS.connections.delete(sessionName)
             alert(STRINGS.LOGIN_ERROR_LOGIN_FAILED)
         } 
     }
 }
 
-async function reuseSession(sessionName: string, silent: boolean = false): Promise<void> {
+async function reuseSession(sessionName: string): Promise<void> {
     console.log("Connecting to: " + sessionName)
     let webFS = new WebFS(sessionName)
     if (await webFS.ping()) {
-        WebFS.instance = webFS
         localStorage.kb_last_session = sessionName
-        if (!silent) {
-            PageManager.back()
-        }
+        PageManager.back()
     } else {
         let modal = new ConfirmCancelPopup(
             "popupContent", "popupContainer",
@@ -93,21 +90,19 @@ async function reuseSession(sessionName: string, silent: boolean = false): Promi
         )
         return new Promise(resolve => {
             modal.onConfirm = () => {
-                WebFS.instance = webFS
                 localStorage.kb_last_session = sessionName
-                if (!silent) {
-                    PageManager.back()
-                }
+                PageManager.back()
                 resolve()
             }
             modal.onCancel = () => {
+                WebFS.connections.delete(sessionName)
                 resolve()
             }
         })
     }
 }
 
-export async function tryReconnectToLastSession() {
+export async function reconnectToLastSession() {
     if (localStorage.kb_sessions) {
         let sessions: string[] = JSON.parse(localStorage.kb_sessions)
         if (sessions.length > 0) {
@@ -115,7 +110,18 @@ export async function tryReconnectToLastSession() {
             if (localStorage.kb_last_session) {
                 sessionName = localStorage.kb_last_session
             }
-            await reuseSession(sessionName, true)
+            new WebFS(sessionName)
+        }
+    }
+}
+
+export async function reconnectAllSessions() {
+    if (localStorage.kb_sessions) {
+        let sessions: string[] = JSON.parse(localStorage.kb_sessions)
+        if (sessions.length > 0) {
+            for(let sessionName of sessions) {
+                new WebFS(sessionName)
+            }
         }
     }
 }

@@ -240,6 +240,7 @@
     font-weight: bold;
 }
 
+.upload select,
 .upload input {
     font-size: large;
     width: -webkit-fill-available;

@@ -1,10 +1,11 @@
 import { PageManager } from './webui/pagemanager'
 import { STRINGS, setupLanguage } from './language/default'
-import { Login, reconnectAllSessions } from './views/login'
+import { Login, reconnectAllSessions } from './webfs/client/login/login'
 import { Search } from './views/search'
 import { Edit } from './views/edit/edit'
 
 import './style.css'
+import './webui/colors.css'
 
 async function main() {
   setupLanguage()

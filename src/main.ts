@@ -10,7 +10,7 @@ async function main() {
   setupLanguage()
   document.getElementsByTagName("title")[0].innerHTML = STRINGS.APPNAME
   if (localStorage.kb_autologin == 'true') {
-    await reconnectAllSessions()
+    reconnectAllSessions()
   }
   new PageManager(
     "search",

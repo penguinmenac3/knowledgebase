@@ -20,6 +20,7 @@ export class English {
     public static LOGIN_API_ENDPOINT_LABEL = "API Endpoint URL"
     public static LOGIN_API_TOKEN_LABEL = "API Token"
     public static LOGIN_SUBMIT = "Add Connection"
+    public static LOGIN_ALL_CONNECTIONS = "All"
     public static LOGIN_ERROR_MISSING_INPUTS = "You must provide all fields (session name, api endpoint and api token)."
     public static LOGIN_ERROR_LOGIN_FAILED = "The provided login information is wrong. Is the URL and API token correct?"
     
@@ -43,7 +44,7 @@ export class English {
     public static SETTINGS_SHOW_TXT_PREVIEWS = "Show previews for text documents"
     public static SETTINGS_SHOW_IMG_PREVIEWS = "Show previews for images"
     public static SETTINGS_SHOW_PDF_PREVIEWS = "Show previews for PDFs"
-    public static SETTINGS_AUTOLOGIN = "Autoconnect to last server"
+    public static SETTINGS_AUTOLOGIN = "Autoconnect to all servers"
 
     public static UPLOAD_TITLE = "Upload File"
     public static UPLOAD_SERVER = "Server"

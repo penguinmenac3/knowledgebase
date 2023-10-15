@@ -35,6 +35,14 @@ export class Login extends Module<HTMLDivElement> {
             if (sessions.length > 0) {
                 this.connections.add(new FormLabel(STRINGS.LOGIN_KNOWN_CONNECTIONS, "loginLabel"))
             }
+            if (sessions.length > 0) {
+                let button = new Button(STRINGS.LOGIN_ALL_CONNECTIONS, "loginKnownConnectionButton")
+                button.onClick = () => {
+                    reconnectAllSessions()
+                    PageManager.back()
+                }
+                this.connections.add(button)
+            }
             for (const sessionName of sessions) {
                 let button = new Button(sessionName, "loginKnownConnectionButton")
                 button.onClick = () => {reuseSession(sessionName)}
@@ -102,7 +110,7 @@ async function reuseSession(sessionName: string): Promise<void> {
     }
 }
 
-export async function reconnectToLastSession() {
+export function reconnectToLastSession() {
     if (localStorage.kb_sessions) {
         let sessions: string[] = JSON.parse(localStorage.kb_sessions)
         if (sessions.length > 0) {
@@ -115,7 +123,7 @@ export async function reconnectToLastSession() {
     }
 }
 
-export async function reconnectAllSessions() {
+export function reconnectAllSessions() {
     if (localStorage.kb_sessions) {
         let sessions: string[] = JSON.parse(localStorage.kb_sessions)
         if (sessions.length > 0) {

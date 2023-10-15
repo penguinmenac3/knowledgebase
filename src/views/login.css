@@ -41,6 +41,7 @@
     align-items: center;
     justify-content: center;
     font-weight: bold;
+    vertical-align: middle;
     border-radius: var(--radius-large);
     color: var(--accent-1-fg);
     background-color: var(--accent-1-bg);

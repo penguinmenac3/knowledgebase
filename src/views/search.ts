@@ -114,6 +114,7 @@ export class Search extends Module<HTMLDivElement> {
         if (changedPage) {
             this.offlineConnections = []
             this.fileTrees.clear()
+            this.results.htmlElement.innerHTML = ""
             for (let [sessionName, webFS] of WebFS.connections) {
                 console.log("Gathering filetrees for: " + sessionName)
                 let fileTree = await webFS.walk(".")

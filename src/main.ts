@@ -15,7 +15,7 @@ async function main() {
     reconnectAllSessions()
   }
   new PageManager(
-    "search",
+    "search&q=/",
     {
       search: new Search(),
       login: new Login(),

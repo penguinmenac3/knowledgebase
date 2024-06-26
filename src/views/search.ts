@@ -6,7 +6,7 @@ import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
 import { ExitablePopup } from "../webui/popup";
 import { STRINGS } from "../language/default";
-import { iconBars } from "../webui/icons/icons";
+import { iconArrowLeft, iconBars } from "../webui/icons/icons";
 import { iconFlag, iconFlagOutline, iconFolder, iconHouse, iconStar, iconStarOutline, iconUpload } from "../icons";
 
 interface Entry {
@@ -43,40 +43,46 @@ export class Search extends Module<HTMLDivElement> {
         this.add(this.results)
 
         let navBar = new Module("div", "", "searchBottomNavbar")
-        let normal = new Button(iconHouse, "searchBottomNavbarIcon")
+        let normal = new NavbarButton("Latest", iconHouse)
         normal.onClick = () => {
             this.searchField.htmlElement.value = ""
             this.searchField.onChangeDone("")
                     }
         navBar.add(normal)
-        let folders = new Button(iconFolder, "searchBottomNavbarIcon")
+        let folders = new NavbarButton("Folders", iconFolder)
         folders.onClick = () => {
             this.searchField.htmlElement.value = "/"
             this.searchField.onChangeDone("/")
                     }
         navBar.add(folders)
-        let favourites = new Button(iconStarOutline, "searchBottomNavbarIcon")
+        let favourites = new NavbarButton("Favourites", iconStarOutline)
         favourites.onClick = () => {
             this.favouritesOnly = !this.favouritesOnly
             if (this.favouritesOnly) {
-                favourites.htmlElement.innerHTML = iconStar
+                favourites.setIcon(iconStar)
             } else {
-                favourites.htmlElement.innerHTML = iconStarOutline
+                favourites.setIcon(iconStarOutline)
             }
             this.updateSearchResults()
                     }
         navBar.add(favourites)
-        let todos = new Button(iconFlagOutline, "searchBottomNavbarIcon")
+        let todos = new NavbarButton("ToDos", iconFlagOutline)
         todos.onClick = () => {
             this.todoOnly = !this.todoOnly
             if (this.todoOnly) {
-                todos.htmlElement.innerHTML = iconFlag
+                todos.setIcon(iconFlag)
             } else {
-                todos.htmlElement.innerHTML = iconFlagOutline
+                todos.setIcon(iconFlagOutline)
             }
             this.updateSearchResults()
                     }
         navBar.add(todos)
+        let settingsBtn = new NavbarButton("Settings", iconBars)
+        settingsBtn.onClick = () => {
+            let settingsPopup = new SettingsPopup()
+            settingsPopup.onExit = this.updateSearchResults.bind(this)
+        }
+        navBar.add(settingsBtn)
         this.add(navBar)
         
         let upload = new Button(iconUpload, "searchUploadButton")
@@ -93,12 +99,14 @@ export class Search extends Module<HTMLDivElement> {
         }
         this.add(upload)
 
-        let settingsBtn = new Button(iconBars, "settingsOpen")
-        settingsBtn.onClick = () => {
-            let settingsPopup = new SettingsPopup()
-            settingsPopup.onExit = this.updateSearchResults.bind(this)
-                    }
-        this.add(settingsBtn)
+        let backBtn = new Button(iconArrowLeft, "settingsOpen")
+        backBtn.onClick = () => {
+            let searchText = this.searchField.value().trim()
+            if (searchText != "" && searchText != "/") {
+                history.back()
+            }
+        }
+        this.add(backBtn)
     }
 
     private triggerFullUpdate() {
@@ -282,6 +290,18 @@ export class Search extends Module<HTMLDivElement> {
             }
         }
         return out
+    }
+}
+
+class NavbarButton extends Button {
+    constructor(text: string, iconSVG: string) {
+        super("", "searchBottomNavbarButton")
+        this.add(new Module<HTMLDivElement>("div", iconSVG, "searchBottomNavbarIcon"))
+        this.add(new Module<HTMLDivElement>("div", text, "searchBottomNavbarText"))
+    }
+
+    public setIcon(iconSVG: string): void {
+        this.htmlElement.children[0].innerHTML = iconSVG
     }
 }
 

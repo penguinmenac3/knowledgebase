@@ -7,7 +7,7 @@ import { PageManager } from "../webui/pagemanager";
 import { ExitablePopup } from "../webui/popup";
 import { STRINGS } from "../language/default";
 import { iconArrowLeft, iconBars } from "../webui/icons/icons";
-import { iconChat, iconFlag, iconFlagOutline, iconFolder, iconGraph, iconStar, iconStarOutline, iconUpload } from "../icons";
+import { iconChat, iconFlag, iconFlagOutline, iconFolder, iconGraph, iconPlus, iconStar, iconStarOutline } from "../icons";
 
 interface Entry {
     filepath: string
@@ -71,7 +71,7 @@ export class Search extends Module<HTMLDivElement> {
         navBar.add(settingsBtn)
         this.add(navBar)
         
-        let upload = new Button(iconUpload, "searchUploadButton")
+        let upload = new Button(iconPlus, "searchUploadButton")
         upload.onClick = () => {
             let currentFolder = "/"
             let keywords = this.searchField.value().split(",").map((x: string) => x.trim());
@@ -524,6 +524,30 @@ export class UploadPopup extends ExitablePopup {
         let filenameInput = new FormInput("filename", currentFile, "text")
         filenameInput.value(currentFile)
         this.add(filenameInput)
+        let emptyFile = new Button(STRINGS.UPLOAD_MARKDOWN, "buttonWide")
+        emptyFile.onClick = async () => {
+            let sessionName = serverInput.value()
+            let instance = WebFS.connections.get(sessionName)
+            if (instance == null) return
+            sendBtn.htmlElement.disabled = true
+            emptyFile.htmlElement.disabled = true
+            let folder = folderInput.value()
+            if (folder.endsWith("/")) {
+                folder = folder.slice(0, folder.length - 1)
+            }
+            let filename = filenameInput.value()
+            let path = folder + "/" + filename
+            let result = await instance.putTxt(path, "", "")
+            sendBtn.htmlElement.disabled = false
+            emptyFile.htmlElement.disabled = false
+            if (result) {
+                this.dispose()
+                triggerFullUpdate()
+            } else {
+                alert(STRINGS.UPLOAD_FAILED)
+            }
+        }
+        this.add(emptyFile)
         this.add(new FormLabel(STRINGS.UPLOAD_FILE))
         let fileInput = new FormInput("file", "", "file", "fileInput")
         fileInput.onChangeDone = (value: string) => {
@@ -539,6 +563,7 @@ export class UploadPopup extends ExitablePopup {
             let instance = WebFS.connections.get(sessionName)
             if (instance == null) return
             sendBtn.htmlElement.disabled = true
+            emptyFile.htmlElement.disabled = true
             let file = fileInput.htmlElement.files![0]
             let folder = folderInput.value()
             if (folder.endsWith("/")) {
@@ -548,6 +573,7 @@ export class UploadPopup extends ExitablePopup {
             let path = folder + "/" + filename
             let result = await instance.putFile(path, file, "")
             sendBtn.htmlElement.disabled = false
+            emptyFile.htmlElement.disabled = false
             if (result) {
                 this.dispose()
                 triggerFullUpdate()

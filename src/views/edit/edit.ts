@@ -1,19 +1,24 @@
-import { Converter } from "showdown";
 import { STRINGS } from "../../language/default";
 import { WebFS } from "../../webfs/client/webfs";
 import { KWARGS, Module } from "../../webui/module";
 import { PageManager } from "../../webui/pagemanager";
+import { MDEdit } from "../../mdedit/mdedit"
 
 import "./edit.css"
-import { iconArrowLeft } from "../../webui/icons/icons";
+import "./md.css"
+import { iconArrowLeft, iconBars } from "../../webui/icons/icons";
 import { Button, FormInput } from "../../webui/form";
 import { iconEdit, iconImage, iconSave, iconUpload } from "../../icons";
 import { ConfirmCancelPopup } from "../../webui/popup";
 
 
-export class Edit extends Module<HTMLDivElement> {
-    private mdConverter: Converter = new Converter()
+const TEXT_FILETYPES = [
+    "txt", "csv", "json", "yaml",
+    "py", "ts", "js", "rs", "c", "h", "hpp", "cpp", "sh", "bat"
+]
 
+
+export class Edit extends Module<HTMLDivElement> {
     public constructor() {
         super("div", "", "editPage")
     }
@@ -70,7 +75,75 @@ export class Edit extends Module<HTMLDivElement> {
             }
             container.add(img)
             this.add(container)
-        } else if (ext == "txt" || ext == "md" || ext == "py" || ext == "csv" || ext == "json") {
+        } else if (ext == "md") {
+            let navbar = new Module("div", "", "editNavbar")
+            let back = new Button(iconArrowLeft, "editNavbarButton")
+            back.setClass("left")
+            navbar.add(back)
+            let title = new Module("div", kwargs.filename, "editNavbarTitle")
+            navbar.add(title)
+            let settings = new Button(iconBars, "editNavbarButton")
+            settings.setClass("right")
+            navbar.add(settings)
+            let save = new Button(iconSave, "editNavbarButton")
+            save.setClass("right")
+            save.hide()
+            navbar.add(save)
+            this.add(navbar)
+            let text = await instance.readTxt(filepath)
+            if (text == null || md5 == null) {
+                alert(STRINGS.EDIT_READ_FILE_ERROR)
+                // TODO show error
+                return
+            }
+            let textEditor = new Module<HTMLDivElement>("div", "", "editTextOutput");
+            let mdEditor = new Module<HTMLDivElement>("div", "", "mdOutput");
+            textEditor.add(mdEditor)
+            this.add(textEditor)
+            let simpleMD = new MDEdit(mdEditor.htmlElement, async (newText: string) => {
+                if (instance == null) return false
+                let isSaved = await instance.putTxt(filepath, newText, md5!)
+                if (!isSaved) {
+                    alert(STRINGS.EDIT_SAVE_FILE_ERROR)
+                } else {
+                    if (simpleMD.isSaved()) {
+                        save.hide()
+                    }
+                    let newMD5 = await instance.md5(filepath)
+                    if (newMD5 == null) {
+                        alert(STRINGS.EDIT_READ_MD5_ERROR)
+                        return false
+                    }
+                    md5 = newMD5
+                }
+                return true
+            })
+            simpleMD.load(text)
+            simpleMD.onDirty = () => {
+                save.show()
+            }
+            save.onClick = async () => {
+                simpleMD.save()
+            }
+            back.onClick = () => {
+                if (simpleMD.isSaved()) {
+                    history.back()
+                } else {
+                    let popup = new ConfirmCancelPopup(
+                        "popupContent", "popupContainer",
+                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_QUESTION,
+                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_CONTINUE_EDITING,
+                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_EXIT,
+                    )
+                    popup.onConfirm = () => {
+                        popup.dispose()
+                    }
+                    popup.onCancel = () => {
+                        history.back()
+                    }
+                }
+            }
+        } else if (TEXT_FILETYPES.includes(ext)) {
             let isEditMode = false
             let navbar = new Module("div", "", "editNavbar")
             let back = new Button(iconArrowLeft, "editNavbarButton")
@@ -94,7 +167,8 @@ export class Edit extends Module<HTMLDivElement> {
             }
             text = text.replaceAll("\r\n", "\n")
             let textRendering = new Module<HTMLDivElement>("div", "", "editTextOutput")
-            this.renderText(ext, text, textRendering);
+            textRendering.htmlElement.innerHTML = text.replaceAll("\n", "<BR>")
+            textRendering.htmlElement.style.paddingTop = "1em"
             this.add(textRendering)
 
             let textEditor = new Module<HTMLTextAreaElement>("textarea", "", "editTextOutputEdit")
@@ -136,7 +210,7 @@ export class Edit extends Module<HTMLDivElement> {
                     textEditor.show()
                 } else {
                     edit.htmlElement.innerHTML = iconEdit
-                    this.renderText(ext, textEditor.htmlElement.value, textRendering)
+                    textRendering.htmlElement.innerHTML = textEditor.htmlElement.value.replaceAll("\n", "<BR>")
                     textRendering.show()
                     textEditor.hide()
                 }
@@ -208,16 +282,6 @@ export class Edit extends Module<HTMLDivElement> {
             content.add(upload)
             this.add(content)
         }
-    }
-
-    private renderText(ext: string, text: string, textRendering: Module<HTMLDivElement>) {
-        let formattedText = "";
-        if (ext == "md") {
-            formattedText = this.mdConverter.makeHtml(text);
-        } else {
-            formattedText = text.replaceAll("\n", "<BR>");
-        }
-        textRendering.htmlElement.innerHTML = formattedText;
     }
 
     public hide(): void {

@@ -7,7 +7,7 @@ import { PageManager } from "../webui/pagemanager";
 import { ExitablePopup } from "../webui/popup";
 import { STRINGS } from "../language/default";
 import { iconArrowLeft, iconBars } from "../webui/icons/icons";
-import { iconFlag, iconFlagOutline, iconFolder, iconHouse, iconStar, iconStarOutline, iconUpload } from "../icons";
+import { iconChat, iconFlag, iconFlagOutline, iconFolder, iconGraph, iconHouse, iconStar, iconStarOutline, iconUpload } from "../icons";
 
 interface Entry {
     filepath: string
@@ -25,8 +25,6 @@ export class Search extends Module<HTMLDivElement> {
     //private currentSearch: string | undefined = undefined
     private fileTrees: Map<string, FileTree> = new Map<string, FileTree>()
     private offlineConnections: string[] = []
-    private favouritesOnly: boolean = false
-    private todoOnly: boolean = false
 
     public constructor() {
         super("div")
@@ -43,40 +41,28 @@ export class Search extends Module<HTMLDivElement> {
         this.add(this.results)
 
         let navBar = new Module("div", "", "searchBottomNavbar")
-        let normal = new NavbarButton("Latest", iconHouse)
-        normal.onClick = () => {
-            this.searchField.htmlElement.value = ""
-            this.searchField.onChangeDone("")
-                    }
-        navBar.add(normal)
+        // let normal = new NavbarButton("Latest", iconHouse)
+        // normal.onClick = () => {
+        //     this.searchField.htmlElement.value = ""
+        //     this.searchField.onChangeDone("")
+        //             }
+        // navBar.add(normal)
         let folders = new NavbarButton("Folders", iconFolder)
         folders.onClick = () => {
             this.searchField.htmlElement.value = "/"
             this.searchField.onChangeDone("/")
-                    }
+        }
         navBar.add(folders)
-        let favourites = new NavbarButton("Favourites", iconStarOutline)
-        favourites.onClick = () => {
-            this.favouritesOnly = !this.favouritesOnly
-            if (this.favouritesOnly) {
-                favourites.setIcon(iconStar)
-            } else {
-                favourites.setIcon(iconStarOutline)
-            }
-            this.updateSearchResults()
-                    }
-        navBar.add(favourites)
-        let todos = new NavbarButton("ToDos", iconFlagOutline)
-        todos.onClick = () => {
-            this.todoOnly = !this.todoOnly
-            if (this.todoOnly) {
-                todos.setIcon(iconFlag)
-            } else {
-                todos.setIcon(iconFlagOutline)
-            }
-            this.updateSearchResults()
-                    }
-        navBar.add(todos)
+        let ai = new NavbarButton("AI", iconChat)
+        ai.onClick = () => {
+            alert("AI-feature is not yet implemented!")
+        }
+        navBar.add(ai)
+        let graph = new NavbarButton("Graph", iconGraph)
+        graph.onClick = () => {
+            alert("Graph View is not yet implemented")
+        }
+        navBar.add(graph)
         let settingsBtn = new NavbarButton("Settings", iconBars)
         settingsBtn.onClick = () => {
             let settingsPopup = new SettingsPopup()
@@ -166,12 +152,6 @@ export class Search extends Module<HTMLDivElement> {
 
         files = this.sortFilesByLastModified(files);
         files = this.sortFilesByRelevance(files, searchText);
-        files = files.filter((entry: Entry) => {
-            let filename = splitFilepath(entry.filepath).filename
-            if (this.favouritesOnly && !filename.includes(".fav")) return false
-            if (this.todoOnly && !filename.includes(".todo")) return false
-            return true
-        })
         this.showNumResults(files);
         let numResults = files.length;
         files = files.slice(0, showMax); // Only take first 50 results

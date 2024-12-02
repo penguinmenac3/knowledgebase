@@ -1,0 +1,155 @@
+  .mdOutput {
+    max-width: 800px;
+    margin: auto;
+    /*margin-top: 1em;
+    margin-bottom: 1em;
+    padding-top: 0em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-bottom: 3em;
+    border-radius: 0.3em;
+    box-shadow: 0 0 20px var(--color-shadow-color);*/
+  }
+  
+  .chunk {
+    border-left: 2px solid var(--color-base);
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+  .chunk:hover {
+    border-left: 2px solid var(--color-brand);
+  }
+  .editorChunk {
+    border-left: 2px solid var(--color-contrast-gray);
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+  .editorChunk:hover {
+    border-left: 2px solid var(--color-brand);
+  }
+  
+  textarea {
+    background-color: var(--color-base);
+    color: var(--color-base-font);
+    border: none;
+    outline: none;
+    resize: none;
+    overflow-x: wrap;
+    overflow-wrap: normal;
+    white-space: normal;
+    width: -webkit-fill-available;
+    height: auto;
+    margin-bottom: 0em;
+    margin-top: 0em;
+    line-height: 1.2em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+  }
+  textarea::-webkit-scrollbar {
+    height: 0.6em;              /* height of horizontal scrollbar*/
+    width: 0.6em;               /* width of vertical scrollbar */
+    border: 1px solid var(--constrast-gray);
+    border-radius: 0.2em;
+  }
+  textarea::-webkit-scrollbar-thumb:horizontal{
+      background: var(--color-brand);
+      border-radius: 0.2em;
+  }
+  
+  img, video {
+    max-width: 100%;
+    border-radius: 0.3em;
+    box-shadow: 0 0 20px var(--color-shadow-color);
+    padding-bottom: 0em;
+    padding-top: 0em;
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+    line-height:1.5em;
+  }
+  p {
+    padding-bottom: 0em;
+    padding-top: 0em;
+    margin-top: 0.2em;
+    margin-bottom: 0.5em;
+    line-height:1.5em;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-brand);
+    padding-bottom: 0em;
+    padding-top: 2em;
+    margin-top: 0em;
+    margin-bottom: 0.5em;
+  }
+  h1:first-child {
+    padding-top: 1.2em;
+  }
+  h1 {
+    border-bottom: 1px solid var(--color-contrast-gray);
+  }
+  h2, h3, h4, h5, h6 {
+    border-bottom: 0px solid var(--color-contrast-gray);
+  }
+  blockquote {
+    border-left: 4px solid var(--color-brand);
+    padding: 0.6em;
+    padding-left: 1em;
+    border-radius: 0.3em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    background-color: var(--color-subtle-gray);
+    box-shadow: 0 0 6px var(--color-shadow-color);
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+  blockquote p {
+    margin-bottom: 0.1em;
+  }
+  pre {
+    max-width: 100%;
+    overflow: auto;
+    background-color: var(--color-subtle-gray);
+    border-radius: 0.3em;
+    padding: 1em;
+    box-shadow: 0 0 6px var(--color-shadow-color);
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+    line-height:1.5em;
+  }
+  table {
+    border-collapse: collapse;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 400px;
+    max-width: 100%;
+    overflow: auto;
+    box-shadow: 0 0 20px var(--color-shadow-color);
+    padding-bottom: 0em;
+    padding-top: 0em;
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+    line-height:1.5em;
+  }
+  thead tr {
+    background-color: var(--color-brand);
+    color: #ffffff;
+    text-align: left;
+  }
+  th,
+  td {
+    padding: 12px 15px;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--color-contrast-gray);
+  }
+  
+  tbody tr:nth-of-type(even) {
+    background-color: var(--color-subtle-gray);
+  }
+  
+  tbody tr:last-of-type {
+    border-bottom: 2px solid var(--color-brand);
+  }
+  
+  a {
+    color: var(--color-brand-font);
+  }

@@ -50,8 +50,9 @@ export class English {
     public static UPLOAD_SERVER = "Server"
     public static UPLOAD_FOLDERNAME = "Foldername"
     public static UPLOAD_FILENAME = "Filename"
-    public static UPLOAD_FILE = "File"
-    public static UPLOAD_SEND = "Upload"
+    public static UPLOAD_FILE = "File (optional)"
+    public static UPLOAD_SEND = "Upload File"
+    public static UPLOAD_MARKDOWN = "Empty File"
     public static UPLOAD_FAILED = "Upload failed. Reasons could be: The file already exists, the folder is invalid or the server is currently unreachable."
 
     public static EDIT_READ_FILE_ERROR = "Cannot read file or reach server. Maybe your internet connection is too weak or the server is down."
@@ -65,4 +66,6 @@ export class English {
     public static EDIT_OPEN_NATIVELY = "Open (Native)"
     public static EDIT_UPLOAD_HEADING = "Update File"
     public static EDIT_UPLOAD_BTN = "Upload"
+
+    public static MD_EMPTY_CELL = "Empty, click to add text!"
 }

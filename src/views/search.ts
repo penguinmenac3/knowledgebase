@@ -7,7 +7,7 @@ import { PageManager } from "../webui/pagemanager";
 import { ExitablePopup } from "../webui/popup";
 import { STRINGS } from "../language/default";
 import { iconArrowLeft, iconBars } from "../webui/icons/icons";
-import { iconChat, iconFlag, iconFlagOutline, iconFolder, iconGraph, iconHouse, iconStar, iconStarOutline, iconUpload } from "../icons";
+import { iconChat, iconFlag, iconFlagOutline, iconFolder, iconGraph, iconStar, iconStarOutline, iconUpload } from "../icons";
 
 interface Entry {
     filepath: string

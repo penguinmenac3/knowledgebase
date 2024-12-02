@@ -48,6 +48,7 @@
     padding-right: 0.2em;
     margin: 0.1em;
     border-radius: var(--radius);
+    color: var(--color-base-font);
 }
 
 .searchBottomNavbarButton:hover {

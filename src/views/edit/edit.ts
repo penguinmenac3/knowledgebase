@@ -86,7 +86,7 @@ export class Edit extends Module<HTMLDivElement> {
             settings.setClass("right")
             navbar.add(settings)
             let save = new Button(iconSave, "editNavbarButton")
-            save.setClass("right")
+            save.setClass("left")
             save.hide()
             navbar.add(save)
             this.add(navbar)
@@ -106,7 +106,7 @@ export class Edit extends Module<HTMLDivElement> {
                 if (!isSaved) {
                     alert(STRINGS.EDIT_SAVE_FILE_ERROR)
                 } else {
-                    if (simpleMD.isSaved()) {
+                    if (simpleMD.getText() == newText) {
                         save.hide()
                     }
                     let newMD5 = await instance.md5(filepath)
@@ -155,7 +155,7 @@ export class Edit extends Module<HTMLDivElement> {
             edit.setClass("right")
             navbar.add(edit)
             let save = new Button(iconSave, "editNavbarButton")
-            save.setClass("right")
+            save.setClass("left")
             save.hide()
             navbar.add(save)
             this.add(navbar)

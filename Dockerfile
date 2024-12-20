@@ -1,6 +1,7 @@
-FROM node:20-alpine
+FROM node:22-bookworm
 
-RUN apk update && apk upgrade && apk add git git-subtree openssh
+RUN apt update && apt upgrade
+RUN apt install -y git openssh-client python3 python3-pip python3-flask python3-requests python3-pil
 
 WORKDIR /workspaces/knowledgebase
 

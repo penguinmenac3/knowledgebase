@@ -1,0 +1,157 @@
+# How to communicate
+
+* Please provide concise answers.
+* If a request is complex, instead of providing a wrong answer, tell me what steps need to be taken in order to fulfill the task.
+* If you lack information or context to complete a task, ask for the information. E.g. if details about the current code are missing from the task or the task is vague and lacking specifity.
+* You can assume that I am knowledgable about most programming topics.
+* If you generate code it should try to use few libraries and be fast while maintaining readability.
+
+
+# Project Vision
+
+Knowledgebase is a tool that helps a human interact with its entire knowledgebase. Knowledge is represented by the body of documents. These documents are searchable and viewable with the goal of efficient information retrieval for the human. On the other hand, it shall be easy to add and modify documents, to store knowledge for later use. Additional to the human interacting with the knowledgebase, AI shall be integrated to help the human retrieve knowledge from its knowledgebase. The AI shall chat with the human, and retrieve information from files to form answers. At a later stage the AI might also be able to modify or add information to the knowledgebase for the human.
+
+
+# Overall Architecture
+
+The application consists of two loosely coupled software parts. A frontent called knowledgebase hosted as a static page via github pages; and a backend called webfs which provides access to a filesystem via http requests. The storage required for the AI is handled through webfs, while the model itself is accessed via a separate API like ollama. The idea is, that the frontend can connect to one ore more backends and access the files, leaving the files and meta data about it on the local machine and just connecting from the browser to the API endpoint(s). The AI then only temporarily processes information, but does not need to store data, since that would be stored in the respective WebFS again.
+
+
+# Repository Structure
+
+knowledgebase
+|-- Dockerfile
+|-- LICENSE
+|-- README.md
+|-- index.html
+|-- package-lock.json
+|-- package.json
+|-- public
+|   |-- android-chrome-256x256.png
+|   |-- favicon.ico
+|   |-- favicon.kra
+|   |-- manifest.json
+|   `-- service-worker.js
+|-- src
+|   |-- icons.ts
+|   |-- language
+|   |   |-- default.ts
+|   |   |-- english.ts
+|   |   `-- german.ts
+|   |-- main.ts
+|   |-- mdedit
+|   |   |-- LICENSE
+|   |   |-- README.md
+|   |   `-- mdedit.ts
+|   |-- style.css
+|   |-- views
+|   |   |-- edit
+|   |   |-- search.css
+|   |   `-- search.ts
+|   |-- vite-env.d.ts
+|   |-- webfs
+|   |   |-- LICENSE
+|   |   |-- README.md
+|   |   |-- client
+|   |   `-- server
+|   `-- webui
+|       |-- LICENSE
+|       |-- README.md
+|       |-- colors.css
+|       |-- colors.html
+|       |-- eventbus.ts
+|       |-- form.ts
+|       |-- icons
+|       |-- module.ts
+|       |-- pagemanager.ts
+|       |-- popup.css
+|       |-- popup.ts
+|       `-- utils
+|-- tsconfig.json
+`-- vite.config.js
+
+
+# Dependencies
+
+The project has only very few external dependencies, so that it is unlikely to break due to outside circumstances. Here is a list of the dependencies of the project:
+* vite (build-system)
+* vanilla typescript/html/css (for rendering)
+* marked (typescript)
+* flask (python)
+* ollama (llm-endpoint)
+
+
+# UI Details
+
+The UI pattern is the Master-Detail pattern with a sidepanel for AI.
+* Master: To the left is a file tree panel, which shows the folders and files in a collapsable filetree or the files and folders which match a search request.
+* Detail: In the center is a document view, which shows the currenly opened file and allows to edit it.
+* AI-Sidepanel: On the right is an optional chat panel, which contains a chat with the AI about your knowledge.
+
+On a smartphone the three parts are not visible at the same time, but only one is visible, and the user can switch between them using a small panel at the bottom of the screen.
+
+## Primary Layout
+
+1. Left Panel (File Explorer):
+    - Purpose: Browse, find and select files.
+    - Design Features:
+        * File tree view for navigating folders and files.
+        * Search functionality to quickly find files by name or content.
+        * Contextual menu for file operations (e.g., copy, move, delete).
+        * Option to open a new tab or window for the selected file.
+        * Option to create new files or directories.
+        * Clear selection state to indicate the active file.
+        * Option to collapse or expand the panel to maximize content viewing space.
+2. Middle Panel (File Content Viewer):
+    - Purpose: Display the content of the selected file (e.g., document, code, image).
+    - Design Features:
+        * Large area to focus on file content, ensuring readability.
+        * Toolbar with relevant actions (e.g., edit, download, or version history).
+        * Responsive zooming or scaling for different file types (text, images, etc.).
+3. Right Panel (AI Chat):
+    - Purpose: Enable interaction with the file or entire knowledgebase through AI, such as asking questions, summarizing, or retrieving specific details.
+    - Design Features:
+        * Collapsible Panel: Hidden by default, with a toggle or button (e.g., "Chat with AI").
+        * Chat UI:
+            - Input area at the bottom for user queries.
+            - Scrollable history area for the conversation.
+            - Context indicators, showing the currently loaded file the AI is referencing.
+            - Button to clear the chat history.
+            - Button to export chat history as markdown.
+        * Clear separation of responses (e.g., user queries vs. AI responses).
+
+## Workflow
+
+1. User Interaction with File Explorer:
+    - The user navigates the file tree in the left panel and selects a file.
+    - The content of the selected file immediately loads in the middle panel.
+2. File Content Interaction:
+    - The user views or edits the file in the middle panel.
+    - If the user requires assistance or additional information, they open the right panel for AI interaction.
+3. AI Chat Interaction:
+    - The user toggles the chat panel (e.g., via a "Chat with AI" button).
+    - The AI chat initializes with the context of the currently selected file.
+    - Example queries:
+        * "Summarize this document."
+        * "Find references to X in this file."
+        * "Explain the logic in this code snippet."
+4. Seamless Panel Switching:
+    - On larger screens: All three panels are visible simultaneously, ensuring smooth multitasking.
+    - On smaller screens: The right panel overlays or replaces the middle panel when activated, with a back button to return.
+
+## Responsive Design
+
+* Large Screens (Desktops, Tablets): All three panels visible side by side with right panel collapsible to maximize space for the middle panel.
+* Medium Screens (Laptops): Default to two-panel layout (left + middle), with the right panel accessible via a toggle or sliding drawer.
+* Small Screens (Smartphones): Single-panel view at a time:
+    - Start with the left panel (file explorer).
+    - Navigate to the middle panel (file content) after selecting a file.
+    - Right panel (AI chat) overlays the middle panel when opened.
+
+## Additional Considerations
+
+1. Persistence Across Sessions: Remember panel states (e.g., collapsed or expanded) and the last selected file when reopening the app.
+2. Keyboard Shortcuts: For power users, shortcuts to switch between panels or toggle the AI chat panel.
+3. Error Handling in AI Chat: Display clear error messages if the AI cannot process the file or query (e.g., "File format not supported" or "Unable to answer that question").
+4. Privacy and Context Clarity: Clearly indicate what file and content the AI has access to, ensuring transparency.
+5. Panel Resizing: Allow users to resize panels for better control over screen space allocation.

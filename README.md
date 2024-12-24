@@ -28,6 +28,15 @@ git push
 git subtree push --prefix dist origin gh-pages
 ```
 
+## AI usage
+
+You can use continue extension to interact with the codebase with AI (e.g. qwen2.5-coder).
+For an optimal experience update the `.continuerules` from time to time.
+Especially, updating the filetree using the `tree` command after adding files will help the AI understand the structure of your codebase better. 
+```bash
+tree -L 3 -I 'node_modules|.git|dist'
+```
+
 ## Contribute
 
 1. Clone the repository (with `--recursive`).

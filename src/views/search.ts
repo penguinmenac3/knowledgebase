@@ -1,12 +1,12 @@
 import "./search.css"
 import { FileTree, WebFS } from "../webfs/client/webfs";
-import { Button, FormCheckbox, FormDropdown, FormInput, FormLabel } from "../webui/form";
+import { Button, FormCheckbox, FormDropdown, FormInput, FormLabel } from "../webui/components/form";
 import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";
 import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
-import { ExitablePopup } from "../webui/popup";
+import { ExitablePopup } from "../webui/components/popup";
 import { STRINGS } from "../language/default";
-import { iconArrowLeft, iconBars } from "../webui/icons/icons";
+import { iconArrowLeft, iconBars } from "../webui/icons";
 import { iconChat, iconFlag, iconFlagOutline, iconFolder, iconGraph, iconPlus, iconStar, iconStarOutline } from "../icons";
 
 interface Entry {

@@ -6,10 +6,10 @@ import { MDEdit } from "../../mdedit/mdedit"
 
 import "./edit.css"
 import "./md.css"
-import { iconArrowLeft, iconBars } from "../../webui/icons/icons";
-import { Button, FormInput } from "../../webui/form";
+import { iconArrowLeft, iconBars } from "../../webui/icons";
+import { Button, FormInput } from "../../webui/components/form";
 import { iconEdit, iconImage, iconSave, iconUpload } from "../../icons";
-import { ConfirmCancelPopup } from "../../webui/popup";
+import { ConfirmCancelPopup } from "../../webui/components/popup";
 
 
 const TEXT_FILETYPES = [

@@ -23,6 +23,7 @@
   margin-top: 1em;
   padding: 0.5em;
   color: var(--color-brand-c);
+  fill: var(--color-brand-c);
   background-color: var(--color-brand);
   border-radius: 0.2em;
 }

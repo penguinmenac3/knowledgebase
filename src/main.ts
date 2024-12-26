@@ -1,25 +1,23 @@
 import { PageManager } from './webui/pagemanager'
 import { STRINGS, setupLanguage } from './language/default'
-import { Login, reconnectAllSessions, setPrefix } from './webfs/client/login/login'
+import { reconnectAllSessions, setPrefix } from './webfs/client/login/login'
 import { Search } from './views/search'
-import { Edit } from './views/edit/edit'
 
 import './style.css'
 import './webui/colors.css'
+import { MasterDetailView } from './webui/components/master-detail-view'
+import { Edit } from './views/edit/edit'
+import { AIChat } from './views/ai'
 
 async function main() {
   setupLanguage()
   setPrefix("kb")
   document.getElementsByTagName("title")[0].innerHTML = STRINGS.APPNAME
-  if (localStorage.kb_autologin == 'true') {
-    reconnectAllSessions()
-  }
+  reconnectAllSessions()
   new PageManager(
-    "search&q=/",
+    "main&search=%2F&view=",
     {
-      search: new Search(),
-      login: new Login(),
-      edit: new Edit(),
+      main: new MasterDetailView(new Search(), new Edit(), new AIChat()),
     }
   )
 }

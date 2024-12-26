@@ -27,76 +27,43 @@ export class Search extends Module<HTMLDivElement> {
     private offlineConnections: string[] = []
 
     public constructor() {
-        super("div")
+        super("div", "", "search")
         this.searchField = new FormInput("search", STRINGS.SEARCH_PLACEHOLDER, "search", "searchInput")
         this.searchField.onChange = (_value: string) => {
             this.updateSearchResults()
         }
         this.searchField.onChangeDone = (value: string) => {
-            PageManager.open("search", {q: value})
+            PageManager.update({search: value})
         }
         this.add(this.searchField)
         this.results = new Module("div")
         this.results.setClass("searchResults")
         this.add(this.results)
+        
+        // let upload = new Button(iconPlus, "searchUploadButton")
+        // upload.onClick = () => {
+        //     let currentFolder = "/"
+        //     let keywords = this.searchField.value().split(",").map((x: string) => x.trim());
+        //     for (let keyword of keywords) {
+        //         if (keyword.startsWith("/")) {
+        //             currentFolder = keyword
+        //             break
+        //         }
+        //     }
+        //     new UploadPopup(currentFolder, "", this.triggerFullUpdate.bind(this))
+        // }
+        // this.add(upload)
 
-        let navBar = new Module("div", "", "searchBottomNavbar")
-        // let normal = new NavbarButton("Latest", iconHouse)
-        // normal.onClick = () => {
-        //     this.searchField.htmlElement.value = ""
-        //     this.searchField.onChangeDone("")
-        //             }
-        // navBar.add(normal)
-        let folders = new NavbarButton("Folders", iconFolder)
-        folders.onClick = () => {
-            this.searchField.htmlElement.value = "/"
-            this.searchField.onChangeDone("/")
-        }
-        navBar.add(folders)
-        let ai = new NavbarButton("AI", iconChat)
-        ai.onClick = () => {
-            alert("AI-feature is not yet implemented!")
-        }
-        navBar.add(ai)
-        let graph = new NavbarButton("Graph", iconGraph)
-        graph.onClick = () => {
-            alert("Graph View is not yet implemented")
-        }
-        navBar.add(graph)
-        let settingsBtn = new NavbarButton("Settings", iconBars)
+        let settingsBtn = new Button(iconBars, "settingsOpen")
         settingsBtn.onClick = () => {
             let settingsPopup = new SettingsPopup()
             settingsPopup.onExit = this.updateSearchResults.bind(this)
         }
-        navBar.add(settingsBtn)
-        this.add(navBar)
-        
-        let upload = new Button(iconPlus, "searchUploadButton")
-        upload.onClick = () => {
-            let currentFolder = "/"
-            let keywords = this.searchField.value().split(",").map((x: string) => x.trim());
-            for (let keyword of keywords) {
-                if (keyword.startsWith("/")) {
-                    currentFolder = keyword
-                    break
-                }
-            }
-            new UploadPopup(currentFolder, "", this.triggerFullUpdate.bind(this))
-        }
-        this.add(upload)
-
-        let backBtn = new Button(iconArrowLeft, "settingsOpen")
-        backBtn.onClick = () => {
-            let searchText = this.searchField.value().trim()
-            if (searchText != "" && searchText != "/") {
-                history.back()
-            }
-        }
-        this.add(backBtn)
+        this.add(settingsBtn)
     }
 
     private triggerFullUpdate() {
-        this.update({q: this.searchField.value()}, true)
+        this.update({search: this.searchField.value()}, true)
     }
 
     public async update(kwargs: KWARGS, changedPage: boolean): Promise<void> {
@@ -128,7 +95,7 @@ export class Search extends Module<HTMLDivElement> {
                 }
             }
         }
-        this.searchField.value(kwargs.q)
+        this.searchField.value(kwargs.search)
         this.updateSearchResults();
     }
 
@@ -150,9 +117,12 @@ export class Search extends Module<HTMLDivElement> {
             return
         }
 
-        files = this.sortFilesByLastModified(files);
-        files = this.sortFilesByRelevance(files, searchText);
-        this.showNumResults(files);
+        files = this.sortFilesByFolderAndName(files);
+        if (searchText != "") {
+            files = this.sortFilesByLastModified(files);
+            files = this.sortFilesByRelevance(files, searchText);
+            this.showNumResults(files);
+        }
         let numResults = files.length;
         files = files.slice(0, showMax); // Only take first 50 results
         for (let entry of files) {
@@ -245,6 +215,15 @@ export class Search extends Module<HTMLDivElement> {
             return b.modified.toISOString().localeCompare(a.modified.toISOString())
         });
     }
+    
+    private sortFilesByFolderAndName(files: Entry[]): Entry[] {
+        return files.sort((a: Entry, b: Entry) => {
+            // Things which do not have a modified date should be put at the end.
+            if (a.filepath == null) return 1
+            if (b.filepath == null) return -1
+            return a.filepath.localeCompare(b.filepath)
+        });
+    }
 
     private flatten(sessionName: string, fileTree: FileTree, pathPrefix: string = "", out: Entry[] = []): Entry[] {
         for (const filename in fileTree) {
@@ -289,77 +268,12 @@ class SearchResult extends Module<HTMLDivElement> {
     constructor(filepath: string, sessionName: string, modified: string, isFolder: boolean, searchField: FormInput, triggerFullUpdate: CallableFunction) {
         super("div")
         this.setClass("searchResult")
-        let instance = WebFS.connections.get(sessionName)
         let { filename, folder } = splitFilepath(filepath);
 
         let filename_parts = filename.split(".")
         if (isFolder) filename_parts.push("DIR")
-        let ext = filename_parts[filename_parts.length - 1].toLowerCase()
-        
-        if ((localStorage.kb_allow_img_previews == 'true' && (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "tiff" || ext == "tif")
-         || (localStorage.kb_allow_pdf_previews == 'true' && ext == "pdf"))) {
-            let preview = document.createElement("img")
-            preview.classList.add("searchResultPreview")
-            preview.onerror = () => {
-                let previewElement = document.createElement("div")
-                previewElement.innerHTML = "<BR>" + ext.toUpperCase()
-                previewElement.classList.add("searchResultPreview")
-                this.htmlElement.replaceChild(previewElement, this.htmlElement.childNodes[0]);
-            }
-            if (instance != null) {
-                preview.src = instance.readURL(filepath, 256)
-            }
-            this.htmlElement.appendChild(preview)
-        } else if (localStorage.kb_allow_txt_previews == 'true' && (ext == "txt" || ext == "md" || ext == "py" || ext == "csv" || ext == "json")) {
-            let preview = document.createElement("div")
-            preview.style.fontSize = "1em"
-            preview.style.textAlign = "left"
-            preview.innerHTML = "loading..."
-            PreviewCache.getTxtPreview(sessionName, filepath).then((txt) => {
-                let parts = txt.split("\n")
-                parts = parts.map((val, _idx, _arr) => {
-                    if (val.startsWith("#")) {
-                        return "<b style='font-size: 1.2em'>" + val + "</b>"
-                    }
-                    return val
-                })
-                txt = parts.join("<BR>")
-                preview.innerHTML = txt
-            })
-            preview.classList.add("searchResultPreview")
-            this.htmlElement.appendChild(preview)
-        } else {
-            let preview = document.createElement("div")
-            preview.innerHTML = "<BR>" + ext.toUpperCase()
-            preview.classList.add("searchResultPreview")
-            this.htmlElement.appendChild(preview)
-        }
 
-        let meta = document.createElement("div")
-        meta.classList.add("searchResultMeta")
-        this.htmlElement.appendChild(meta)
-        
-        let header = document.createElement("div")
-        header.innerText = filename.replace(".todo", "").replace(".fav", "")
-        header.classList.add("searchResultFilename")
-        meta.appendChild(header)
-        
-        let server = document.createElement("div")
-        server.innerText = sessionName
-        server.classList.add("searchResultServer")
-        meta.appendChild(server)
-
-        if (modified != "") {
-            let modifiedElement = document.createElement("div")
-            modifiedElement.innerText = STRINGS.SEARCH_LAST_MODIFIED + ": " + modified
-            modifiedElement.classList.add("searchResultModified")
-            meta.appendChild(modifiedElement)
-        }
-        
-        let folderElement = document.createElement("div")
-        folderElement.innerText = folder
-        folderElement.classList.add("searchResultFolder")
-        meta.appendChild(folderElement)
+        this.htmlElement.innerHTML = filepath
         
         this.htmlElement.onclick = () => {
             if (isFolder) {
@@ -367,47 +281,9 @@ class SearchResult extends Module<HTMLDivElement> {
                 searchField.onChange(searchField.htmlElement.value)
                 searchField.onChangeDone(searchField.htmlElement.value)
             } else {
-                PageManager.open("edit", {sessionName: sessionName, folder: folder, filename: filename})
-                //WebFS.instance?.read(folder + "/" + filename, "_blank")
+                let uri = sessionName + ":" + folder + "/" + filename
+                PageManager.update({view: uri})
             }
-        }
-
-        
-        let hover = document.createElement("div")
-        hover.classList.add("searchResultHover")
-        this.htmlElement.appendChild(hover)
-
-        if (!isFolder) {
-            let buttonContainer = new Module("div", "", "searchResultFlagButtonContainer")
-            let isFav = filename.includes(".fav")
-            let favButton = new Button(isFav ? iconStar : iconStarOutline, "searchResultFlagButton")
-            favButton.onClick = async () => {
-                if (instance == null) return
-                if (isFav) {
-                    await instance.mv(filepath, filepath.replace(".fav", ""))
-                } else {
-                    let parts = filepath.split(".")
-                    parts.splice(parts.length - 1, 0, "fav")
-                    await instance.mv(filepath, parts.join("."))
-                }
-                triggerFullUpdate()
-            }
-            buttonContainer.add(favButton)
-            let isTodo = filename.includes(".todo")
-            let todoButton = new Button(isTodo ? iconFlag : iconFlagOutline, "searchResultFlagButton")
-            todoButton.onClick = async () => {
-                if (instance == null) return
-                if (isTodo) {
-                    await instance.mv(filepath, filepath.replace(".todo", ""))
-                } else {
-                    let parts = filepath.split(".")
-                    parts.splice(parts.length - 1, 0, "todo")
-                    await instance.mv(filepath, parts.join("."))
-                }
-                triggerFullUpdate()
-            }
-            buttonContainer.add(todoButton)
-            this.add(buttonContainer)
         }
     }
 }

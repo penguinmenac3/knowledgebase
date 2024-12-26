@@ -6,10 +6,11 @@ import { MDEdit } from "../../mdedit/mdedit"
 
 import "./edit.css"
 import "./md.css"
-import { iconArrowLeft, iconBars } from "../../webui/icons";
+import { iconArrowLeft, iconBars, iconXmark } from "../../webui/icons";
 import { Button, FormInput } from "../../webui/components/form";
 import { iconEdit, iconImage, iconSave, iconUpload } from "../../icons";
 import { ConfirmCancelPopup } from "../../webui/components/popup";
+import { MasterDetailView } from "../../webui/components/master-detail-view";
 
 
 const TEXT_FILETYPES = [
@@ -24,15 +25,23 @@ export class Edit extends Module<HTMLDivElement> {
     }
 
     public async update(kwargs: KWARGS, _changedPage: boolean): Promise<void> {
-        let instance = WebFS.connections.get(kwargs.sessionName)
+        if (kwargs.view == "") {
+            (<MasterDetailView>this.parent!.parent!).setPreferedView("master")
+            this.htmlElement.innerHTML = ""
+            return
+        }
+        (<MasterDetailView>this.parent!.parent!).setPreferedView("detail")
+        let sessionName = kwargs.view.split(":")[0]
+        let filepath = kwargs.view.split(":")[1]
+        let filename = filepath.split("/")[filepath.split("/").length - 1]
+        let instance = WebFS.connections.get(sessionName)
         if (instance == null) {
             PageManager.open("login", {})
             return
         }
         this.htmlElement.innerHTML = ""
-        let filepath = kwargs.folder + "/" + kwargs.filename
         
-        let filename_parts = kwargs.filename.split(".")
+        let filename_parts = filename.split(".")
         let ext = filename_parts[filename_parts.length - 1].toLowerCase()
         
         let md5 = await instance.md5(filepath)
@@ -43,20 +52,20 @@ export class Edit extends Module<HTMLDivElement> {
 
         if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "tiff" || ext == "tif") {
             let navbar = new Module("div", "", "editNavbar")
-            let back = new Button(iconArrowLeft, "editNavbarButton")
+            let back = new Button(iconXmark, "editNavbarButton")
             back.onClick = () => {
-                history.back()
+                PageManager.update({view: ""})
             }
             back.setClass("left")
             navbar.add(back)
+            let title = new Module("div", filename, "editNavbarTitle")
+            navbar.add(title)
             let uploadBtn = new Button(iconUpload, "editNavbarButton")
             uploadBtn.setClass("right")
             uploadBtn.onClick = () => {
                 alert("Not yet implemented!")
             }
             navbar.add(uploadBtn)
-            let title = new Module("div", kwargs.filename, "editNavbarTitle")
-            navbar.add(title)
             this.add(navbar)
             let container = new Module<HTMLDivElement>("div", "", "editImageBackground")
             let img = new Module<HTMLImageElement>("img", "", "editImageView")
@@ -77,18 +86,18 @@ export class Edit extends Module<HTMLDivElement> {
             this.add(container)
         } else if (ext == "md") {
             let navbar = new Module("div", "", "editNavbar")
-            let back = new Button(iconArrowLeft, "editNavbarButton")
+            let back = new Button(iconXmark, "editNavbarButton")
             back.setClass("left")
             navbar.add(back)
-            let title = new Module("div", kwargs.filename, "editNavbarTitle")
-            navbar.add(title)
-            let settings = new Button(iconBars, "editNavbarButton")
-            settings.setClass("right")
-            navbar.add(settings)
             let save = new Button(iconSave, "editNavbarButton")
             save.setClass("left")
             save.hide()
             navbar.add(save)
+            let title = new Module("div", filename, "editNavbarTitle")
+            navbar.add(title)
+            let settings = new Button(iconBars, "editNavbarButton")
+            settings.setClass("right")
+            navbar.add(settings)
             this.add(navbar)
             let text = await instance.readTxt(filepath)
             if (text == null || md5 == null) {
@@ -127,7 +136,7 @@ export class Edit extends Module<HTMLDivElement> {
             }
             back.onClick = () => {
                 if (simpleMD.isSaved()) {
-                    history.back()
+                    PageManager.update({view: ""})
                 } else {
                     let popup = new ConfirmCancelPopup(
                         "popupContent", "popupContainer",
@@ -139,25 +148,25 @@ export class Edit extends Module<HTMLDivElement> {
                         popup.dispose()
                     }
                     popup.onCancel = () => {
-                        history.back()
+                        PageManager.update({view: ""})
                     }
                 }
             }
         } else if (TEXT_FILETYPES.includes(ext)) {
             let isEditMode = false
             let navbar = new Module("div", "", "editNavbar")
-            let back = new Button(iconArrowLeft, "editNavbarButton")
+            let back = new Button(iconXmark, "editNavbarButton")
             back.setClass("left")
             navbar.add(back)
-            let title = new Module("div", kwargs.filename, "editNavbarTitle")
-            navbar.add(title)
-            let edit = new Button(iconEdit, "editNavbarButton")
-            edit.setClass("right")
-            navbar.add(edit)
             let save = new Button(iconSave, "editNavbarButton")
             save.setClass("left")
             save.hide()
             navbar.add(save)
+            let title = new Module("div", filename, "editNavbarTitle")
+            navbar.add(title)
+            let edit = new Button(iconEdit, "editNavbarButton")
+            edit.setClass("right")
+            navbar.add(edit)
             this.add(navbar)
             let text = await instance.readTxt(filepath)
             if (text == null || md5 == null) {
@@ -217,7 +226,7 @@ export class Edit extends Module<HTMLDivElement> {
             }
             back.onClick = () => {
                 if (textEditor.htmlElement.value.replaceAll("\r\n", "\n") == text) {
-                    history.back()
+                    PageManager.update({view: ""})
                 } else {
                     let popup = new ConfirmCancelPopup(
                         "popupContent", "popupContainer",
@@ -229,36 +238,52 @@ export class Edit extends Module<HTMLDivElement> {
                         popup.dispose()
                     }
                     popup.onCancel = () => {
-                        history.back()
+                        PageManager.update({view: ""})
                     }
                 }
             }
         } else if (ext == "pdf") {
+            let navbar = new Module("div", "", "editNavbar")
+            let back = new Button(iconXmark, "editNavbarButton")
+            back.onClick = () => {
+                PageManager.update({view: ""})
+            }
+            back.setClass("left")
+            navbar.add(back)
+            let title = new Module("div", filename, "editNavbarTitle")
+            navbar.add(title)
+            this.add(navbar)
             let iframe = new Module<HTMLIFrameElement>("iframe", "", "editIFrame")
             iframe.htmlElement.name = "editIFrame"
             this.add(iframe)
             instance.read(filepath, "editIFrame")
         } else {
             let navbar = new Module("div", "", "editNavbar")
-            let back = new Button(iconArrowLeft, "editNavbarButton")
+            let back = new Button(iconXmark, "editNavbarButton")
             back.onClick = () => {
-                history.back()
+                PageManager.update({view: ""})
             }
             back.setClass("left")
             navbar.add(back)
-            let title = new Module("div", kwargs.filename, "editNavbarTitle")
+            let title = new Module("div", filename, "editNavbarTitle")
             navbar.add(title)
             this.add(navbar)
             let content = new Module("div", "", "editUnsupportedDocument")
             let downloadHeading = new Module("div", STRINGS.EDIT_DOWNLOAD_HEADING, "editHeading")
             content.add(downloadHeading)
             let downloadBtn = new Button(STRINGS.EDIT_DOWNLOAD_BTN, "buttonWide")
-            downloadBtn.htmlElement.href = instance.readURL(filepath)
-            console.log(kwargs.filename)
+            let openURL = instance.readURL(filepath)
+            downloadBtn.onClick = () => {
+                this.openURLinIFrame(kwargs, filename, openURL);
+            }
+            console.log(filename)
             content.add(downloadBtn)
-            let openLocally = new Button(STRINGS.EDIT_OPEN_NATIVELY, "buttonWide")
-            if (downloadBtn.htmlElement.href.includes("localhost")) {
-                openLocally.htmlElement.href = downloadBtn.htmlElement.href.replace("read", "open")
+            if (downloadBtn.htmlElement.href.includes("localhost") || downloadBtn.htmlElement.href.includes("127.0.0.1")) {
+                let openLocally = new Button(STRINGS.EDIT_OPEN_NATIVELY, "buttonWide")
+                let openLocalURL = downloadBtn.htmlElement.href.replace("read", "open")
+                openLocally.onClick = () => {
+                    this.openURLinIFrame(kwargs, filename, openLocalURL);
+                }
                 content.add(openLocally)
             }
             let uploadHeading = new Module("div", STRINGS.EDIT_UPLOAD_HEADING, "editHeading")
@@ -282,6 +307,24 @@ export class Edit extends Module<HTMLDivElement> {
             content.add(upload)
             this.add(content)
         }
+    }
+
+    private openURLinIFrame(kwargs: KWARGS, filename: string, openURL: string) {
+        this.htmlElement.innerHTML = "";
+        let navbar = new Module("div", "", "editNavbar");
+        let back = new Button(iconArrowLeft, "editNavbarButton");
+        back.onClick = () => {
+            this.update(kwargs, false);
+        };
+        back.setClass("left");
+        navbar.add(back);
+        let title = new Module("div", filename, "editNavbarTitle");
+        navbar.add(title);
+        this.add(navbar);
+        let iframe = new Module<HTMLIFrameElement>("iframe", "", "editIFrame");
+        iframe.htmlElement.name = "editIFrame";
+        iframe.htmlElement.src = openURL;
+        this.add(iframe);
     }
 
     public hide(): void {

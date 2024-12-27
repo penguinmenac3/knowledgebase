@@ -1,5 +1,5 @@
 import "./filetree.css"
-import { FileTree, WebFS } from "../webfs/client/webfs";
+import { FileTree as WebFSFileTree, WebFS } from "../webfs/client/webfs";
 import { Button,  FormInput } from "../webui/components/form";
 import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";
 import { KWARGS, Module } from "../webui/module";
@@ -18,12 +18,12 @@ interface Entry {
 }
 
 
-export class Search extends Module<HTMLDivElement> {
+export class FileTree extends Module<HTMLDivElement> {
     private searchField: FormInput
     private results: Module<HTMLDivElement>
 
     //private currentSearch: string | undefined = undefined
-    private fileTrees: Map<string, FileTree> = new Map<string, FileTree>()
+    private fileTrees: Map<string, WebFSFileTree> = new Map<string, WebFSFileTree>()
     private offlineConnections: string[] = []
 
     public constructor() {
@@ -212,11 +212,11 @@ export class Search extends Module<HTMLDivElement> {
         });
     }
 
-    private flatten(sessionName: string, fileTree: FileTree, pathPrefix: string = "", out: Entry[] = []): Entry[] {
+    private flatten(sessionName: string, fileTree: WebFSFileTree, pathPrefix: string = "", out: Entry[] = []): Entry[] {
         for (const filename in fileTree) {
             var value = fileTree[filename];
             if (!(typeof value === 'string')) {
-                out = this.flatten(sessionName, value as FileTree, pathPrefix + filename + "/", out)
+                out = this.flatten(sessionName, value as WebFSFileTree, pathPrefix + filename + "/", out)
                 out.push({
                     filepath: pathPrefix + filename,
                     sessionName: sessionName,

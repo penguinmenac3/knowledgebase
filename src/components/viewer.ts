@@ -18,7 +18,7 @@ const TEXT_FILETYPES = [
 ]
 
 
-export class Edit extends Module<HTMLDivElement> {
+export class Viewer extends Module<HTMLDivElement> {
     public constructor() {
         super("div", "", "editPage")
     }

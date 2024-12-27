@@ -4,8 +4,8 @@ import { STRINGS, setupLanguage } from './language/default'
 import { reconnectAllSessions, setPrefix } from './webfs/client/login/login'
 import { PageManager } from './webui/pagemanager'
 import { MasterDetailView } from './webui/components/master-detail-view'
-import { Search } from './components/filetree'
-import { Edit } from './components/viewer'
+import { FileTree } from './components/filetree'
+import { Viewer } from './components/viewer'
 import { AIChat } from './components/ai'
 
 
@@ -17,7 +17,7 @@ async function main() {
   new PageManager(
     "main&search=%2F&view=",
     {
-      main: new MasterDetailView(new Search(), new Edit(), new AIChat()),
+      main: new MasterDetailView(new FileTree(), new Viewer(), new AIChat()),
     }
   )
 }

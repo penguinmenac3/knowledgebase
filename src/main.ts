@@ -6,7 +6,6 @@ import { Search } from './components/filetree'
 import { Edit } from './components/viewer'
 import { AIChat } from './components/ai'
 
-import './style.css'
 import './webui/core.css'
 import './webui/colors.css'
 

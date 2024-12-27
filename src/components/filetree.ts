@@ -8,6 +8,8 @@ import { ExitablePopup } from "../webui/components/popup";
 import { STRINGS } from "../language/default";
 import { iconArrowLeft, iconBars } from "../webui/icons";
 import { iconChat, iconFlag, iconFlagOutline, iconFolder, iconGraph, iconPlus, iconStar, iconStarOutline } from "../icons";
+import { SettingsPopup } from "./settings";
+
 
 interface Entry {
     filepath: string
@@ -68,7 +70,8 @@ export class Search extends Module<HTMLDivElement> {
 
     public async update(kwargs: KWARGS, changedPage: boolean): Promise<void> {
         if (WebFS.connections.size < 1) {
-            PageManager.open("login", {})
+            this.fileTrees.clear()
+            this.results.htmlElement.innerHTML = STRINGS.SEARCH_MISSING_CONNECTIONS
             return
         }
 
@@ -101,6 +104,9 @@ export class Search extends Module<HTMLDivElement> {
 
     private async updateSearchResults(showMax: number = 50) {
         let searchText = this.searchField.value()
+        if (searchText == "") {
+            searchText = "/"
+        }
         //if (this.currentSearch == searchText) return
         //this.currentSearch = searchText
 
@@ -273,7 +279,7 @@ class SearchResult extends Module<HTMLDivElement> {
         let filename_parts = filename.split(".")
         if (isFolder) filename_parts.push("DIR")
 
-        this.htmlElement.innerHTML = filepath
+        this.htmlElement.innerHTML = filename
         
         this.htmlElement.onclick = () => {
             if (isFolder) {
@@ -320,64 +326,6 @@ class PreviewCache {
     public static async getImgPreview(_filepath: string): Promise<string> {
         return ""
     }
-}
-
-export class SettingsPopup extends ExitablePopup {
-    public constructor() {
-        super("popupContent-fullscreen", "popupContainer", "popupExitBtn")
-        this.add(new Module("div", STRINGS.SETTINGS_TITLE, "popupTitle"))
-        
-        this.add(new Module("div", STRINGS.SETTINGS_GENERAL, "popupSubtitle"))
-
-        this.add(new Module("div", STRINGS.SETTINGS_DISPLAY, "popupSubtitle"))
-        let showTxtPreviews = new FormCheckbox(
-            "showTxtPreviews",
-            STRINGS.SETTINGS_SHOW_TXT_PREVIEWS,
-            "settingsCheckbox",
-            localStorage.kb_allow_txt_previews == 'true')
-            showTxtPreviews.onChange = (state: boolean) => {
-            localStorage.kb_allow_txt_previews = state
-        }
-        this.add(showTxtPreviews)
-        let showImgPreviews = new FormCheckbox(
-            "showImgPreviews",
-            STRINGS.SETTINGS_SHOW_IMG_PREVIEWS,
-            "settingsCheckbox",
-            localStorage.kb_allow_img_previews == 'true')
-        showImgPreviews.onChange = (state: boolean) => {
-            localStorage.kb_allow_img_previews = state
-        }
-        this.add(showImgPreviews)
-        let showPDFPreviews = new FormCheckbox(
-            "showPDFPreviews",
-            STRINGS.SETTINGS_SHOW_PDF_PREVIEWS,
-            "settingsCheckbox",
-            localStorage.kb_allow_pdf_previews == 'true')
-        showPDFPreviews.onChange = (state: boolean) => {
-            localStorage.kb_allow_pdf_previews = state
-        }
-        this.add(showPDFPreviews)
-
-        this.add(new Module("div", STRINGS.SETTINGS_CONNECTION, "popupSubtitle"))
-        let loginButton = new Button(STRINGS.SETTINGS_SELECT_SERVER, "buttonWide")
-        loginButton.onClick = () => {
-            this.dispose()
-            WebFS.connections.clear()
-            PageManager.open("login", {})
-        }
-        this.add(loginButton)
-        let autoLogin = new FormCheckbox(
-            "autoLogin",
-            STRINGS.SETTINGS_AUTOLOGIN,
-            "settingsCheckbox",
-            localStorage.kb_autologin == 'true')
-            autoLogin.onChange = (state: boolean) => {
-            localStorage.kb_autologin = state
-        }
-        this.add(autoLogin)
-    }
-
-    public update(): void {}
 }
 
 export class UploadPopup extends ExitablePopup {

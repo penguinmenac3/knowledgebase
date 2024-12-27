@@ -28,6 +28,7 @@ export class English {
     public static LOGIN_OFFLINE_MODAL_CONFIRM = "Continue offline"
     public static LOGIN_OFFLINE_MODAL_CANCEL = "Return to login"
 
+    public static SEARCH_MISSING_CONNECTIONS = "Add a connection via settings to start"
     public static SEARCH_FILETREE_IS_NULL = "Cannot retrieve list of files. Maybe you have a weak internet connection."
     public static SEARCH_PLACEHOLDER = "Search (Keyword, Keyword, Keyword)"
     public static SEARCH_LAST_MODIFIED = "modified"
@@ -38,13 +39,9 @@ export class English {
 
     public static SETTINGS_TITLE = "Settings"
     public static SETTINGS_GENERAL = "General"
-    public static SETTINGS_CONNECTION = "Connection"
-    public static SETTINGS_SELECT_SERVER = "Select server"
-    public static SETTINGS_DISPLAY = "Display"
-    public static SETTINGS_SHOW_TXT_PREVIEWS = "Show previews for text documents"
-    public static SETTINGS_SHOW_IMG_PREVIEWS = "Show previews for images"
-    public static SETTINGS_SHOW_PDF_PREVIEWS = "Show previews for PDFs"
-    public static SETTINGS_AUTOLOGIN = "Autoconnect to all servers"
+    public static SETTINGS_LIST_CONNECTIONS = "Connections"
+    public static SETTINGS_ADD_CONNECTION = "Add New Connection"
+    public static SETTINGS_REMOVE_CONNECTION = "delete"
 
     public static UPLOAD_TITLE = "Upload File"
     public static UPLOAD_SERVER = "Server"

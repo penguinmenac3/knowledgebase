@@ -60,20 +60,6 @@
     background-color: var(--color-base-hover);
 }
 
-.settingsCheckbox {
-    margin-top: 0.2em;
-    padding-bottom: -0.2em;
-    margin-bottom: 0.2em;
-    display: block;
-    height: 2em;
-    align-items: center;
-}
-
-.settingsCheckbox input {
-    width: 1.5em;
-    height: 1.5em;
-}
-
 .upload label {
     display: block;
     margin-top: 1em;

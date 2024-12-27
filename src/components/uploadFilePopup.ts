@@ -1,3 +1,4 @@
+import "./uploadFilePopup.css"
 import { WebFS } from "../webfs/client/webfs";
 import { Button, FormDropdown, FormInput, FormLabel } from "../webui/components/form";
 import { Module } from "../webui/module";

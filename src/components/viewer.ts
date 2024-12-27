@@ -45,7 +45,7 @@ export class Viewer extends Module<HTMLDivElement> {
         
         let md5 = await instance.md5(filepath)
         if (md5 == null) {
-            alert(STRINGS.EDIT_READ_FILE_ERROR)
+            alert(STRINGS.VIEWER_READ_FILE_ERROR)
             PageManager.back()
         }
 
@@ -100,7 +100,7 @@ export class Viewer extends Module<HTMLDivElement> {
             this.add(navbar)
             let text = await instance.readTxt(filepath)
             if (text == null || md5 == null) {
-                alert(STRINGS.EDIT_READ_FILE_ERROR)
+                alert(STRINGS.VIEWER_READ_FILE_ERROR)
                 // TODO show error
                 return
             }
@@ -112,14 +112,14 @@ export class Viewer extends Module<HTMLDivElement> {
                 if (instance == null) return false
                 let isSaved = await instance.putTxt(filepath, newText, md5!)
                 if (!isSaved) {
-                    alert(STRINGS.EDIT_SAVE_FILE_ERROR)
+                    alert(STRINGS.VIEWER_SAVE_FILE_ERROR)
                 } else {
                     if (simpleMD.getText() == newText) {
                         save.hide()
                     }
                     let newMD5 = await instance.md5(filepath)
                     if (newMD5 == null) {
-                        alert(STRINGS.EDIT_READ_MD5_ERROR)
+                        alert(STRINGS.VIEWER_READ_MD5_ERROR)
                         return false
                     }
                     md5 = newMD5
@@ -139,9 +139,9 @@ export class Viewer extends Module<HTMLDivElement> {
                 } else {
                     let popup = new ConfirmCancelPopup(
                         "popupContent", "popupContainer",
-                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_QUESTION,
-                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_CONTINUE_EDITING,
-                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_EXIT,
+                        STRINGS.VIEWER_EXIT_WITHOUT_SAVE_QUESTION,
+                        STRINGS.VIEWER_EXIT_WITHOUT_SAVE_CONTINUE_EDITING,
+                        STRINGS.VIEWER_EXIT_WITHOUT_SAVE_EXIT,
                     )
                     popup.onConfirm = () => {
                         popup.dispose()
@@ -169,7 +169,7 @@ export class Viewer extends Module<HTMLDivElement> {
             this.add(navbar)
             let text = await instance.readTxt(filepath)
             if (text == null || md5 == null) {
-                alert(STRINGS.EDIT_READ_FILE_ERROR)
+                alert(STRINGS.VIEWER_READ_FILE_ERROR)
                 // TODO show error
                 return
             }
@@ -196,7 +196,7 @@ export class Viewer extends Module<HTMLDivElement> {
                 let newText = textEditor.htmlElement.value.replaceAll("\r\n", "\n")
                 let isSaved = await instance.putTxt(filepath, newText, md5!)
                 if (!isSaved) {
-                    alert(STRINGS.EDIT_SAVE_FILE_ERROR)
+                    alert(STRINGS.VIEWER_SAVE_FILE_ERROR)
                 } else {
                     text = newText
                     if (textEditor.htmlElement.value.replaceAll("\r\n", "\n") == text) {
@@ -204,7 +204,7 @@ export class Viewer extends Module<HTMLDivElement> {
                     }
                     let newMD5 = await instance.md5(filepath)
                     if (newMD5 == null) {
-                        alert(STRINGS.EDIT_READ_MD5_ERROR)
+                        alert(STRINGS.VIEWER_READ_MD5_ERROR)
                         return
                     }
                     md5 = newMD5
@@ -229,9 +229,9 @@ export class Viewer extends Module<HTMLDivElement> {
                 } else {
                     let popup = new ConfirmCancelPopup(
                         "popupContent", "popupContainer",
-                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_QUESTION,
-                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_CONTINUE_EDITING,
-                        STRINGS.EDIT_EXIT_WITHOUT_SAVE_EXIT,
+                        STRINGS.VIEWER_EXIT_WITHOUT_SAVE_QUESTION,
+                        STRINGS.VIEWER_EXIT_WITHOUT_SAVE_CONTINUE_EDITING,
+                        STRINGS.VIEWER_EXIT_WITHOUT_SAVE_EXIT,
                     )
                     popup.onConfirm = () => {
                         popup.dispose()
@@ -268,9 +268,9 @@ export class Viewer extends Module<HTMLDivElement> {
             navbar.add(title)
             this.add(navbar)
             let content = new Module("div", "", "editUnsupportedDocument")
-            let downloadHeading = new Module("div", STRINGS.EDIT_DOWNLOAD_HEADING, "editHeading")
+            let downloadHeading = new Module("div", STRINGS.VIEWER_DOWNLOAD_HEADING, "editHeading")
             content.add(downloadHeading)
-            let downloadBtn = new Button(STRINGS.EDIT_DOWNLOAD_BTN, "buttonWide")
+            let downloadBtn = new Button(STRINGS.VIEWER_DOWNLOAD_BTN, "buttonWide")
             let openURL = instance.readURL(filepath)
             downloadBtn.onClick = () => {
                 this.openURLinIFrame(kwargs, filename, openURL);
@@ -278,14 +278,14 @@ export class Viewer extends Module<HTMLDivElement> {
             console.log(filename)
             content.add(downloadBtn)
             if (downloadBtn.htmlElement.href.includes("localhost") || downloadBtn.htmlElement.href.includes("127.0.0.1")) {
-                let openLocally = new Button(STRINGS.EDIT_OPEN_NATIVELY, "buttonWide")
+                let openLocally = new Button(STRINGS.VIEWER_OPEN_NATIVELY, "buttonWide")
                 let openLocalURL = downloadBtn.htmlElement.href.replace("read", "open")
                 openLocally.onClick = () => {
                     this.openURLinIFrame(kwargs, filename, openLocalURL);
                 }
                 content.add(openLocally)
             }
-            let uploadHeading = new Module("div", STRINGS.EDIT_UPLOAD_HEADING, "editHeading")
+            let uploadHeading = new Module("div", STRINGS.VIEWER_UPLOAD_HEADING, "editHeading")
             content.add(uploadHeading)
             let uploadInput = new FormInput("editUploadFile", "", "file", "editUploadFile")
             content.add(uploadInput)

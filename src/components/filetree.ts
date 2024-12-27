@@ -27,8 +27,8 @@ export class FileTree extends Module<HTMLDivElement> {
     private offlineConnections: string[] = []
 
     public constructor() {
-        super("div", "", "search")
-        this.searchField = new FormInput("search", STRINGS.SEARCH_PLACEHOLDER, "search", "searchInput")
+        super("div", "", "filetree")
+        this.searchField = new FormInput("search", STRINGS.FILETREE_SEARCH_PLACEHOLDER, "search", "filetreeSearch")
         this.searchField.onChange = (_value: string) => {
             this.updateSearchResults()
         }
@@ -37,10 +37,10 @@ export class FileTree extends Module<HTMLDivElement> {
         }
         this.add(this.searchField)
         this.results = new Module("div")
-        this.results.setClass("searchResults")
+        this.results.setClass("filetreeEntries")
         this.add(this.results)
 
-        let settingsBtn = new Button(iconBars, "settingsOpen")
+        let settingsBtn = new Button(iconBars, "filetreeSettingsButton")
         settingsBtn.onClick = () => {
             let settingsPopup = new SettingsPopup()
             settingsPopup.onExit = this.updateSearchResults.bind(this)
@@ -55,7 +55,7 @@ export class FileTree extends Module<HTMLDivElement> {
     public async update(kwargs: KWARGS, changedPage: boolean): Promise<void> {
         if (WebFS.connections.size < 1) {
             this.fileTrees.clear()
-            this.results.htmlElement.innerHTML = STRINGS.SEARCH_MISSING_CONNECTIONS
+            this.results.htmlElement.innerHTML = STRINGS.FILETREE_MISSING_CONNECTIONS
             return
         }
 
@@ -100,7 +100,7 @@ export class FileTree extends Module<HTMLDivElement> {
         }
 
         if (files.length == 0) {
-            alert(STRINGS.SEARCH_FILETREE_IS_NULL)
+            alert(STRINGS.FILETREE_FILETREE_IS_NULL)
             return
         }
 
@@ -108,7 +108,7 @@ export class FileTree extends Module<HTMLDivElement> {
         if (searchText != "") {
             files = this.sortFilesByLastModified(files);
             files = this.sortFilesByRelevance(files, searchText);
-            this.showNumResults(files);
+            this.showOfflineStatus();
         }
         let numResults = files.length;
         files = files.slice(0, showMax); // Only take first 50 results
@@ -124,8 +124,7 @@ export class FileTree extends Module<HTMLDivElement> {
         }
         if (numResults > showMax) {
             let showMore = new Module("div");
-            showMore.htmlElement.innerText = STRINGS.SEARCH_MORE_RESULTS;
-            showMore.setClass("searchMoreResults");
+            showMore.htmlElement.innerText = STRINGS.FILETREE_MORE_RESULTS;
             showMore.htmlElement.onclick = () => {
                 this.updateSearchResults(showMax + 25);
             }
@@ -133,18 +132,18 @@ export class FileTree extends Module<HTMLDivElement> {
         }
     }
 
-    private showNumResults(files: Entry[]) {
-        let numResults = new Module("div");
+    private showOfflineStatus() {
         let offline = ""
         for (let sessionName of this.offlineConnections) {
             if (offline == "") {
-                offline =  STRINGS.SEARCH_OFFLINE
+                offline =  STRINGS.FILETREE_OFFLINE
             }
             offline +=  " " + sessionName
         }
-        numResults.htmlElement.innerHTML = files.length + " " + STRINGS.SEARCH_NUM_RESULTS + offline;
-        numResults.setClass("searchNumResults");
-        this.results.add(numResults);
+        if (offline != "") {
+            let module = new Module("div", offline, "filetreeOfflineStatus");
+            this.results.add(module);
+        }
     }
 
     private sortFilesByRelevance(files: Entry[], searchText: string): Entry[] {

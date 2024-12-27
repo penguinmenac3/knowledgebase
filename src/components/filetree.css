@@ -1,9 +1,25 @@
-.search {
+.filetree {
     width: 100%;
     height: 100%;
 }
 
-.searchInput {
+.filetreeSettingsButton {
+    position: absolute;
+    left: 0.8em;
+    top: 0.8em;
+    display: block;
+    width: 1em;
+    height: 1em;
+    padding: 0.5em;
+    border-radius: var(--radius);
+    z-index: 1;
+}
+
+.filetreeSettingsButton:hover {
+    background-color: var(--color-base-hover);
+}
+
+.filetreeSearch {
     font-size: large;
     width: -webkit-fill-available;
     padding: 0.45em;
@@ -15,7 +31,7 @@
     background-color: var(--color-base-2);
 }
 
-.searchResults {
+.filetreeEntries {
     width: 100%;
     height: -webkit-fill-available;
     display: block;
@@ -23,7 +39,7 @@
     text-align: center;
 }
 
-.searchNumResults {
+.filetreeOfflineStatus {
     display: block;
     font-style: italic;
     height: 1em;
@@ -42,21 +58,3 @@
 .searchResult:hover {
     background-color: var(--color-base-hover);
 }
-
-/* Search settings */
-.settingsOpen {
-    position: absolute;
-    left: 0.8em;
-    top: 0.8em;
-    display: block;
-    width: 1em;
-    height: 1em;
-    padding: 0.5em;
-    border-radius: var(--radius);
-    z-index: 1;
-}
-
-.settingsOpen:hover {
-    background-color: var(--color-base-hover);
-}
-

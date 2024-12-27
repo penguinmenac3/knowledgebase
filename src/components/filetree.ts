@@ -41,20 +41,6 @@ export class Search extends Module<HTMLDivElement> {
         this.results = new Module("div")
         this.results.setClass("searchResults")
         this.add(this.results)
-        
-        // let upload = new Button(iconPlus, "searchUploadButton")
-        // upload.onClick = () => {
-        //     let currentFolder = "/"
-        //     let keywords = this.searchField.value().split(",").map((x: string) => x.trim());
-        //     for (let keyword of keywords) {
-        //         if (keyword.startsWith("/")) {
-        //             currentFolder = keyword
-        //             break
-        //         }
-        //     }
-        //     new UploadPopup(currentFolder, "", this.triggerFullUpdate.bind(this))
-        // }
-        // this.add(upload)
 
         let settingsBtn = new Button(iconBars, "settingsOpen")
         settingsBtn.onClick = () => {
@@ -258,18 +244,6 @@ export class Search extends Module<HTMLDivElement> {
     }
 }
 
-class NavbarButton extends Button {
-    constructor(text: string, iconSVG: string) {
-        super("", "searchBottomNavbarButton")
-        this.add(new Module<HTMLDivElement>("div", iconSVG, "searchBottomNavbarIcon"))
-        this.add(new Module<HTMLDivElement>("div", text, "searchBottomNavbarText"))
-    }
-
-    public setIcon(iconSVG: string): void {
-        this.htmlElement.children[0].innerHTML = iconSVG
-    }
-}
-
 class SearchResult extends Module<HTMLDivElement> {
     constructor(filepath: string, sessionName: string, modified: string, isFolder: boolean, searchField: FormInput, triggerFullUpdate: CallableFunction) {
         super("div")
@@ -302,111 +276,4 @@ function splitFilepath(filepath: string) {
     }
     return { filename, folder };
 }
-class PreviewCache {
-    private constructor() {}
 
-    public static async getTxtPreview(sessionName: string, filepath: string): Promise<string> {
-        let cache = JSON.parse(localStorage.getItem("kb_preview_cache") || "{}")
-        if (cache[filepath]) {
-            return cache[filepath]
-        }
-        let txt = await WebFS.connections.get(sessionName)?.readTxt(filepath)
-        if (txt != null) {
-            let parts = txt.split("\n").slice(0, 13)
-            parts = parts.map((val, _idx, _arr) => {return val.slice(0, 40)})
-            txt = parts.join("\n")
-            let cache = JSON.parse(localStorage.getItem("kb_preview_cache") || "{}")
-            cache[filepath] = txt
-            localStorage.setItem("kb_preview_cache", JSON.stringify(cache))
-            return txt
-        }
-        return "error loading preview"
-    }
-
-    public static async getImgPreview(_filepath: string): Promise<string> {
-        return ""
-    }
-}
-
-export class UploadPopup extends ExitablePopup {
-    public constructor(currentFolder: string, currentFile: string, triggerFullUpdate: CallableFunction) {
-        super("popupContent-fullscreen", "popupContainer", "popupExitBtn")
-        this.setClass("upload")
-        this.add(new Module("div", STRINGS.UPLOAD_TITLE, "popupTitle"))
-        this.add(new FormLabel(STRINGS.UPLOAD_SERVER))
-        let sessions: string[] = []
-        for(let sessionName of WebFS.connections.keys()) {
-            sessions.push(sessionName)
-        }
-        let serverInput = new FormDropdown("sessionName", sessions, "")
-        this.add(serverInput)
-        this.add(new FormLabel(STRINGS.UPLOAD_FOLDERNAME))
-        let folderInput = new FormInput("foldername", currentFolder, "text")
-        folderInput.value(currentFolder)
-        this.add(folderInput)
-        this.add(new FormLabel(STRINGS.UPLOAD_FILENAME))
-        let filenameInput = new FormInput("filename", currentFile, "text")
-        filenameInput.value(currentFile)
-        this.add(filenameInput)
-        let emptyFile = new Button(STRINGS.UPLOAD_MARKDOWN, "buttonWide")
-        emptyFile.onClick = async () => {
-            let sessionName = serverInput.value()
-            let instance = WebFS.connections.get(sessionName)
-            if (instance == null) return
-            sendBtn.htmlElement.disabled = true
-            emptyFile.htmlElement.disabled = true
-            let folder = folderInput.value()
-            if (folder.endsWith("/")) {
-                folder = folder.slice(0, folder.length - 1)
-            }
-            let filename = filenameInput.value()
-            let path = folder + "/" + filename
-            let result = await instance.putTxt(path, "", "")
-            sendBtn.htmlElement.disabled = false
-            emptyFile.htmlElement.disabled = false
-            if (result) {
-                this.dispose()
-                triggerFullUpdate()
-            } else {
-                alert(STRINGS.UPLOAD_FAILED)
-            }
-        }
-        this.add(emptyFile)
-        this.add(new FormLabel(STRINGS.UPLOAD_FILE))
-        let fileInput = new FormInput("file", "", "file", "fileInput")
-        fileInput.onChangeDone = (value: string) => {
-            if (filenameInput.value() == "") {
-                let parts = value.replaceAll("\\", "/").split("/")
-                filenameInput.value(parts[parts.length - 1])
-            }
-        }
-        this.add(fileInput)
-        let sendBtn = new Button(STRINGS.UPLOAD_SEND, "buttonWide")
-        sendBtn.onClick = async () => {
-            let sessionName = serverInput.value()
-            let instance = WebFS.connections.get(sessionName)
-            if (instance == null) return
-            sendBtn.htmlElement.disabled = true
-            emptyFile.htmlElement.disabled = true
-            let file = fileInput.htmlElement.files![0]
-            let folder = folderInput.value()
-            if (folder.endsWith("/")) {
-                folder = folder.slice(0, folder.length - 1)
-            }
-            let filename = filenameInput.value()
-            let path = folder + "/" + filename
-            let result = await instance.putFile(path, file, "")
-            sendBtn.htmlElement.disabled = false
-            emptyFile.htmlElement.disabled = false
-            if (result) {
-                this.dispose()
-                triggerFullUpdate()
-            } else {
-                alert(STRINGS.UPLOAD_FAILED)
-            }
-        }
-        this.add(sendBtn)
-    }
-
-    public update(): void {}
-}

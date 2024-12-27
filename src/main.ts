@@ -1,13 +1,14 @@
-import { PageManager } from './webui/pagemanager'
 import { STRINGS, setupLanguage } from './language/default'
 import { reconnectAllSessions, setPrefix } from './webfs/client/login/login'
-import { Search } from './views/search'
+import { PageManager } from './webui/pagemanager'
+import { MasterDetailView } from './webui/components/master-detail-view'
+import { Search } from './components/filetree'
+import { Edit } from './components/viewer'
+import { AIChat } from './components/ai'
 
 import './style.css'
+import './webui/core.css'
 import './webui/colors.css'
-import { MasterDetailView } from './webui/components/master-detail-view'
-import { Edit } from './views/edit/edit'
-import { AIChat } from './views/ai'
 
 async function main() {
   setupLanguage()

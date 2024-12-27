@@ -1,16 +1,16 @@
-import { STRINGS } from "../../language/default";
-import { WebFS } from "../../webfs/client/webfs";
-import { KWARGS, Module } from "../../webui/module";
-import { PageManager } from "../../webui/pagemanager";
-import { MDEdit } from "../../mdedit/mdedit"
+import { STRINGS } from "../language/default";
+import { WebFS } from "../webfs/client/webfs";
+import { KWARGS, Module } from "../webui/module";
+import { PageManager } from "../webui/pagemanager";
+import { MDEdit } from "../mdedit/mdedit"
 
-import "./edit.css"
+import "./viewer.css"
 import "./md.css"
-import { iconArrowLeft, iconBars, iconXmark } from "../../webui/icons";
-import { Button, FormInput } from "../../webui/components/form";
-import { iconEdit, iconImage, iconSave, iconUpload } from "../../icons";
-import { ConfirmCancelPopup } from "../../webui/components/popup";
-import { MasterDetailView } from "../../webui/components/master-detail-view";
+import { iconArrowLeft, iconBars, iconXmark } from "../webui/icons";
+import { Button, FormInput } from "../webui/components/form";
+import { iconEdit, iconImage, iconSave, iconUpload } from "../icons";
+import { ConfirmCancelPopup } from "../webui/components/popup";
+import { MasterDetailView } from "../webui/components/master-detail-view";
 
 
 const TEXT_FILETYPES = [

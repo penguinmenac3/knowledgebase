@@ -1,4 +1,4 @@
-import "./search.css"
+import "./filetree.css"
 import { FileTree, WebFS } from "../webfs/client/webfs";
 import { Button, FormCheckbox, FormDropdown, FormInput, FormLabel } from "../webui/components/form";
 import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";

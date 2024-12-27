@@ -30,11 +30,15 @@ export class SettingsPopup extends ExitablePopup {
             let deleteBtn = new Button(STRINGS.SETTINGS_REMOVE_CONNECTION)
             deleteBtn.setClass("buttonBad")
             deleteBtn.onClick = () => {
-                let sessions = JSON.parse(localStorage.kb_sessions) as string[]
-                sessions = sessions.filter(session => session !== sessionName)
-                localStorage.kb_sessions = JSON.stringify(sessions)
-                session.removeSession()
-                location.reload()
+                let confirmCancelPopup = new ConfirmCancelPopup("popupContent", "popupContainer", STRINGS.SETTINGS_REMOVE_CONNECTION_QUESTION, STRINGS.SETTINGS_REMOVE_CONNECTION_CONFIRM, STRINGS.SETTINGS_REMOVE_CONNECTION_CANCEL)
+                confirmCancelPopup.onConfirm = () => {
+                    let sessions = JSON.parse(localStorage.kb_sessions) as string[]
+                    sessions = sessions.filter(session => session !== sessionName)
+                    localStorage.kb_sessions = JSON.stringify(sessions)
+                    session.removeSession()
+                    location.reload()
+                }
+                confirmCancelPopup.show()
             }
             let serverName = new Module("div", "", "popupServer")
             serverName.addHtml("div", sessionName, "settingsServerName")

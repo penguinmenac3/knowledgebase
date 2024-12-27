@@ -42,6 +42,9 @@ export class English {
     public static SETTINGS_LIST_CONNECTIONS = "Connections"
     public static SETTINGS_ADD_CONNECTION = "Add New Connection"
     public static SETTINGS_REMOVE_CONNECTION = "delete"
+    public static SETTINGS_REMOVE_CONNECTION_QUESTION = "Are you sure you want to delete this connection?"
+    public static SETTINGS_REMOVE_CONNECTION_CONFIRM = "Yes, delete this connection."
+    public static SETTINGS_REMOVE_CONNECTION_CANCEL = "No, keep this connection."
 
     public static UPLOAD_TITLE = "Upload File"
     public static UPLOAD_SERVER = "Server"

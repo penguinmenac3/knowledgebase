@@ -1,5 +1,5 @@
-import { Module } from "../webui/module";
 import "./ai.css"
+import { Module } from "../webui/module";
 
 export class AIChat extends Module<HTMLDivElement> {
     public constructor() {

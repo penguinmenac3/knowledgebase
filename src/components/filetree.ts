@@ -1,13 +1,11 @@
 import "./filetree.css"
 import { FileTree, WebFS } from "../webfs/client/webfs";
-import { Button, FormCheckbox, FormDropdown, FormInput, FormLabel } from "../webui/components/form";
+import { Button,  FormInput } from "../webui/components/form";
 import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";
 import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
-import { ExitablePopup } from "../webui/components/popup";
 import { STRINGS } from "../language/default";
-import { iconArrowLeft, iconBars } from "../webui/icons";
-import { iconChat, iconFlag, iconFlagOutline, iconFolder, iconGraph, iconPlus, iconStar, iconStarOutline } from "../icons";
+import { iconBars } from "../webui/icons";
 import { SettingsPopup } from "./settings";
 
 
@@ -93,9 +91,6 @@ export class Search extends Module<HTMLDivElement> {
         if (searchText == "") {
             searchText = "/"
         }
-        //if (this.currentSearch == searchText) return
-        //this.currentSearch = searchText
-
         this.results.htmlElement.innerHTML = "";
         let files: Entry[] = []
         for (let [sessionName, filetree] of this.fileTrees) {
@@ -245,7 +240,7 @@ export class Search extends Module<HTMLDivElement> {
 }
 
 class SearchResult extends Module<HTMLDivElement> {
-    constructor(filepath: string, sessionName: string, modified: string, isFolder: boolean, searchField: FormInput, triggerFullUpdate: CallableFunction) {
+    constructor(filepath: string, sessionName: string, _modified: string, isFolder: boolean, searchField: FormInput, _triggerFullUpdate: CallableFunction) {
         super("div")
         this.setClass("searchResult")
         let { filename, folder } = splitFilepath(filepath);

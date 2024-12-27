@@ -1,3 +1,5 @@
+import './webui/core.css'
+import './webui/colors.css'
 import { STRINGS, setupLanguage } from './language/default'
 import { reconnectAllSessions, setPrefix } from './webfs/client/login/login'
 import { PageManager } from './webui/pagemanager'
@@ -6,8 +8,6 @@ import { Search } from './components/filetree'
 import { Edit } from './components/viewer'
 import { AIChat } from './components/ai'
 
-import './webui/core.css'
-import './webui/colors.css'
 
 async function main() {
   setupLanguage()

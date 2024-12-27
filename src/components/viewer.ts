@@ -1,11 +1,10 @@
+import "./viewer.css"
+import "./viewer-md.css"
 import { STRINGS } from "../language/default";
 import { WebFS } from "../webfs/client/webfs";
 import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
 import { MDEdit } from "../mdedit/mdedit"
-
-import "./viewer.css"
-import "./viewer-md.css"
 import { iconArrowLeft, iconBars, iconXmark } from "../webui/icons";
 import { Button, FormInput } from "../webui/components/form";
 import { iconEdit, iconImage, iconSave, iconUpload } from "../icons";

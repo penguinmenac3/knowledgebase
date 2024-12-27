@@ -12,7 +12,7 @@
     border: 2px solid var(--color-base-c);
     border-radius: var(--radius);
     color: var(--color-base-c);
-    background-color: var(--color-base-hover);
+    background-color: var(--color-base-2);
 }
 
 .searchResults {
@@ -40,7 +40,7 @@
 }
 
 .searchResult:hover {
-    background-color: var(--color-base);
+    background-color: var(--color-base-hover);
 }
 
 /* Search settings */

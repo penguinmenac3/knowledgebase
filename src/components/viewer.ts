@@ -5,7 +5,7 @@ import { PageManager } from "../webui/pagemanager";
 import { MDEdit } from "../mdedit/mdedit"
 
 import "./viewer.css"
-import "./md.css"
+import "./viewer-md.css"
 import { iconArrowLeft, iconBars, iconXmark } from "../webui/icons";
 import { Button, FormInput } from "../webui/components/form";
 import { iconEdit, iconImage, iconSave, iconUpload } from "../icons";

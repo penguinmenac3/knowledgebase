@@ -60,9 +60,7 @@ export class Viewer extends Module<HTMLDivElement> {
     }
 
     public async update(kwargs: KWARGS, _changedPage: boolean): Promise<void> {
-        console.log(this.openDocument, kwargs.view)
         if (kwargs.view == this.openDocument) {
-            console.log("Viewer already open")
             return
         } else {
             if (this.isDirty) {
@@ -70,6 +68,7 @@ export class Viewer extends Module<HTMLDivElement> {
                 return
             }
         }
+        this.openDocument = kwargs.view;
         // Keep master the prefered view until we know we can actually load the file
         (<MasterDetailView>this.parent!.parent!).setPreferedView("master")
         this.htmlElement.innerHTML = ""
@@ -83,7 +82,6 @@ export class Viewer extends Module<HTMLDivElement> {
             alert(STRINGS.VIEWER_READ_FILE_ERROR)
             return
         }
-        this.openDocument = kwargs.view;
         
         // We know we can display the file, so do it!
         (<MasterDetailView>this.parent!.parent!).setPreferedView("detail")
@@ -299,6 +297,7 @@ export class Viewer extends Module<HTMLDivElement> {
                     popup.dispose()
                 }
                 popup.onCancel = () => {
+                    this.isDirty = false
                     PageManager.update({view: ""})
                 }
             }

@@ -62,6 +62,7 @@ export class English {
     public static VIEWER_LOAD_HERE_FILE = "Open (here)"
     public static VIEWER_UPLOAD_HEADING = "Update File"
     public static VIEWER_UPLOAD_BTN = "Upload"
+    public static VIEWER_UNSAVED_CHANGES = "You cannot open a new file while having a file with unsaved changes open!"
 
     public static MD_EMPTY_CELL = "Empty, click to add text!"
 }

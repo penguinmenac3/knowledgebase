@@ -52,11 +52,24 @@ class FileMetaData {
 
 
 export class Viewer extends Module<HTMLDivElement> {
+    private openDocument: string = ""
+    private isDirty: boolean = false
+
     public constructor() {
         super("div", "", "editPage")
     }
 
     public async update(kwargs: KWARGS, _changedPage: boolean): Promise<void> {
+        console.log(this.openDocument, kwargs.view)
+        if (kwargs.view == this.openDocument) {
+            console.log("Viewer already open")
+            return
+        } else {
+            if (this.isDirty) {
+                alert(STRINGS.VIEWER_UNSAVED_CHANGES)
+                return
+            }
+        }
         // Keep master the prefered view until we know we can actually load the file
         (<MasterDetailView>this.parent!.parent!).setPreferedView("master")
         this.htmlElement.innerHTML = ""
@@ -70,6 +83,7 @@ export class Viewer extends Module<HTMLDivElement> {
             alert(STRINGS.VIEWER_READ_FILE_ERROR)
             return
         }
+        this.openDocument = kwargs.view;
         
         // We know we can display the file, so do it!
         (<MasterDetailView>this.parent!.parent!).setPreferedView("detail")
@@ -138,6 +152,7 @@ export class Viewer extends Module<HTMLDivElement> {
         simpleMD.load(text)
         simpleMD.onDirty = () => {
             save.show()
+            this.isDirty = true
         }
         save.onClick = async () => {
             simpleMD.save()
@@ -178,8 +193,10 @@ export class Viewer extends Module<HTMLDivElement> {
         textEditor.htmlElement.oninput = () => {
             if (textEditor.htmlElement.value.replaceAll("\r\n", "\n") == text) {
                 save.hide()
+                this.isDirty = false
             } else {
                 save.show()
+                this.isDirty = true
             }
         }
         this.add(textEditor)
@@ -248,6 +265,7 @@ export class Viewer extends Module<HTMLDivElement> {
             // the user can edit the file while we waited for the server to respond
             if (checkText() == newText) {
                 save.hide()
+                this.isDirty = false
             }
             // update the md5 so we can save the file again later
             let newMD5 = await fileMetaData.instance.md5(fileMetaData.filepath)

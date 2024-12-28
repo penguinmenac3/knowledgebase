@@ -95,7 +95,6 @@ export class FileTree extends Module<HTMLDivElement> {
         let files: Entry[] = []
         for (let [sessionName, filetree] of this.fileTrees) {
             let tmp = this.flatten(sessionName, filetree)
-            console.log(sessionName + ": " + tmp.length)
             files = files.concat(tmp)
         }
 

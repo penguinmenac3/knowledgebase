@@ -76,41 +76,6 @@
     border-radius: var(--radius);
 }
 
-.editNavbar {
-    display: flex;
-    height: 2.5em;
-    background-color: var(--color-brand);
-    color: var(--color-brand-c);
-    fill: var(--color-brand-c);
-    font-size: 1.2em;
-    text-align: center;
-}
-
-.editNavbar a {
-    display: inline-block;
-    font-size: 1.5em;
-    margin-top: 0.1em;
-    margin-left: 0.1em;
-    margin-right: 0.1em;
-    padding-top: 0.2em;
-    padding-left: 0.2em;
-    padding-right: 0.2em;
-    border-radius: var(--radius);
-}
-
-.editNavbar a:hover {
-    background-color: var(--color-brand-hover);
-}
-
-.editNavbar div {
-    height: 2.5em;
-    overflow: hidden;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .editUnsupportedDocument {
     overflow: auto;
     display: flexbox;

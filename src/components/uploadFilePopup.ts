@@ -46,8 +46,8 @@ export class UploadNewFilePopup extends ExitablePopup {
             let sessionName = serverInput.value()
             let instance = WebFS.connections.get(sessionName)
             if (instance == null) return
-            sendBtn.htmlElement.disabled = true
-            emptyFile.htmlElement.disabled = true
+            sendBtn.disable()
+            emptyFile.disable()
             let folder = folderInput.value()
             if (folder.endsWith("/")) {
                 folder = folder.slice(0, folder.length - 1)
@@ -55,8 +55,8 @@ export class UploadNewFilePopup extends ExitablePopup {
             let filename = filenameInput.value()
             let path = folder + "/" + filename
             let result = await instance.putTxt(path, "", "")
-            sendBtn.htmlElement.disabled = false
-            emptyFile.htmlElement.disabled = false
+            sendBtn.enable()
+            emptyFile.enable()
             if (result) {
                 this.dispose()
                 triggerFullUpdate()
@@ -79,8 +79,8 @@ export class UploadNewFilePopup extends ExitablePopup {
             let sessionName = serverInput.value()
             let instance = WebFS.connections.get(sessionName)
             if (instance == null) return
-            sendBtn.htmlElement.disabled = true
-            emptyFile.htmlElement.disabled = true
+            sendBtn.disable()
+            emptyFile.disable()
             let file = fileInput.htmlElement.files![0]
             let folder = folderInput.value()
             if (folder.endsWith("/")) {
@@ -89,8 +89,8 @@ export class UploadNewFilePopup extends ExitablePopup {
             let filename = filenameInput.value()
             let path = folder + "/" + filename
             let result = await instance.putFile(path, file, "")
-            sendBtn.htmlElement.disabled = false
-            emptyFile.htmlElement.disabled = false
+            sendBtn.enable()
+            emptyFile.enable()
             if (result) {
                 this.dispose()
                 triggerFullUpdate()
@@ -116,11 +116,11 @@ export class UploadFilePopup extends ExitablePopup {
         let sendBtn = new Button(STRINGS.UPLOAD_SEND, "buttonWide")
         sendBtn.onClick = async () => {
             if (webfsInstance == null) return
-            sendBtn.htmlElement.disabled = true
+            sendBtn.disable()
             let file = fileInput.htmlElement.files![0]
             // TODO check if a file is selected
             let result = await webfsInstance.putFile(filepath, file, md5)
-            sendBtn.htmlElement.disabled = false
+            sendBtn.enable()
             if (result) {
                 this.dispose()
                 triggerFullUpdate()

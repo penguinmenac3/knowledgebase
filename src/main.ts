@@ -15,7 +15,7 @@ async function main() {
   document.getElementsByTagName("title")[0].innerHTML = STRINGS.APPNAME
   reconnectAllSessions()
   new PageManager(
-    "main&search=%2F&view=",
+    "main&search=&view=",
     {
       main: new MasterDetailView(new FileTree(), new Viewer(), new AIChat()),
     }

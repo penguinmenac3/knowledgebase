@@ -1,4 +1,6 @@
 .filetree {
+    display: flex;
+    flex-direction: column;
     width: 100%;
     height: 100%;
 }
@@ -66,7 +68,7 @@
     margin-right: 0.2em;
 }
 
-ul {
+.filetreeRoot, .filetreeRoot ul {
     list-style-type: none;
     margin-left: 0.5em;
     padding-left: 0.5em;
@@ -86,12 +88,13 @@ ul {
     display: block;
     padding: 0.3em;
     cursor: pointer;
+    color: var(--color-base-c);
 }
 
 @media (max-width: 768px) {
     .fileTreeElementTitle {
         font-size: large;
-        padding: 0.4em;
+        padding: 0.6em;
     }
 }
 
@@ -102,18 +105,20 @@ ul {
 
 .fileTreeElementSettings {
     cursor: pointer;
-    padding-left: 0.8em;
-    padding-right: 0.8em;
-    padding-top: 0.4em;
+    padding-left: 0.7em;
+    padding-right: 0.7em;
+    padding-top: 0.3em;
     padding-bottom: 0.1em;
     border-radius: var(--radius);
     fill: var(--color-base-transparent-2);
 }
 @media (max-width: 768px) {
     .fileTreeElementSettings {
+        padding-left: 1em;
+        padding-right: 1em;
         margin-right: 0.4em;
-        padding-top: 0.6em;
-        padding-bottom: 0.3em;
+        padding-top: 0.8em;
+        padding-bottom: 0.5em;
     }
 }
 

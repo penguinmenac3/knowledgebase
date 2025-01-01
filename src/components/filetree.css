@@ -45,16 +45,3 @@
     height: 1em;
     padding: 0.2em;
 }
-
-.searchResult {
-    display: block;
-    text-align: left;
-    padding: 0.4em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-radius: var(--radius);
-}
-
-.searchResult:hover {
-    background-color: var(--color-base-hover);
-}

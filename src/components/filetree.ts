@@ -207,7 +207,12 @@ class FileTreeElement extends Module<HTMLLIElement> {
     }
 
     public async newFolder() {
-        alert("New Folder not implemented");
+        let uri = this.getURI()
+        let sessionName = uri.split(":")[0]
+        let path = uri.split(":")[1]
+        let session = WebFS.connections.get(sessionName)
+        session?.mkdir(path + "/New Folder")
+        location.reload()
     }
 
     public async rename() {
@@ -219,10 +224,13 @@ class FileTreeElement extends Module<HTMLLIElement> {
         let sessionName = uri.split(":")[0]
         let path = uri.split(":")[1]
         let session = WebFS.connections.get(sessionName)
-        let md5 = await session?.md5(path)
-        if (md5 == null) {
-            alert(STRINGS.VIEWER_READ_MD5_ERROR)
-            return
+        let md5 = ""
+        if (!this.isFolder) {
+            let md5 = await session?.md5(path)
+            if (md5 == null) {
+                alert(STRINGS.VIEWER_READ_MD5_ERROR)
+                return
+            }
         }
         let popup = new ConfirmCancelPopup(
             "popupContent", "popupContainer",

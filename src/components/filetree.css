@@ -70,11 +70,11 @@ ul {
 .fileTreeFolder ul {
     border-left-width: 1px;
     border-left-style: solid;
-    border-left-color: var(--color-base-2);
+    border-left-color: var(--color-base-hover);
 }
 
 .fileTreeFolder ul:hover {
-  border-left-color: var(--color-base-hover);
+  border-left-color: var(--color-base-hover-2);
 }
 
 .fileTreeElementTitle {

@@ -8,6 +8,8 @@ import { STRINGS } from "../language/default";
 import { iconBars, iconDots } from "../webui/icons";
 import { SettingsPopup } from "./settings";
 import { search, SearchResult } from "./filetreesearch";
+import { UploadNewFilePopup } from "./uploadFilePopup";
+import { ConfirmCancelPopup } from "../webui/components/popup";
 
 
 export class FileTree extends Module<HTMLDivElement> {
@@ -70,8 +72,10 @@ export class FileTree extends Module<HTMLDivElement> {
                 }
             }
         }
-        this.searchField.value(kwargs.search)
-        this.updateEntriesView()
+        if (this.searchField.value() != kwargs.search || changedPage) {
+            this.searchField.value(kwargs.search)
+            this.updateEntriesView()
+        }
     }
 
     private async updateEntriesView(showMax: number = 50) {
@@ -134,29 +138,90 @@ export class FileTree extends Module<HTMLDivElement> {
 }
 
 class FileTreeElement extends Module<HTMLLIElement> {
-    constructor(name: string, isFolder: boolean) {
-        super("li", "", isFolder ? "fileTreeFolder" : "fileTreeFile")
-        
-        let elementSettings  = new Button(iconDots, "fileTreeElementSettings")
-        elementSettings.setClass("right")
-        elementSettings.onClick = () => {this.showMenu()}
-        this.add(elementSettings)
-        
-        let element = new Button("", "fileTreeElementTitle")
-        element.onClick = () => {this.onClick()}
-        element.htmlElement.innerHTML += `<span class="${isFolder ? 'filetreeFolderIcon' : 'filetreeFileIcon'}"></span> ${name.replaceAll("_", " ")}`
-        this.add(element)
+    private elementSettings: Button
+
+    constructor(protected path: string, protected name: string, private isFolder: boolean, private hasChildren: boolean) {
+        super("li", "", isFolder ? "fileTreeFolder" : "fileTreeFile");
+
+        this.elementSettings = new Button(iconDots, "fileTreeElementSettings");
+        this.elementSettings.setClass("right");
+        this.elementSettings.onClick = () => { this.showMenu(); };
+        this.add(this.elementSettings);
+
+        let element = new Button("", "fileTreeElementTitle");
+        element.onClick = () => { this.onClick(); };
+        element.htmlElement.innerHTML += `<span class="${isFolder ? 'filetreeFolderIcon' : 'filetreeFileIcon'}"></span> ${name.replaceAll("_", " ")}`;
+        this.add(element);
     }
 
     protected onClick() {}
-    protected showMenu() {}
+
+    protected showMenu() {
+        let menu = new FileTreeElementMenu(this, this.isFolder, this.hasChildren);
+        const rect = this.elementSettings.htmlElement.getBoundingClientRect();
+        let W = window.innerWidth;
+        let H = window.innerHeight;
+        // TODO ensure the menu popup is within the window bounds and does not extend beyond bottom or right edge
+        menu.htmlElement.style.left = `${rect.left}px`;
+        menu.htmlElement.style.top = `${rect.bottom}px`;
+        menu.htmlElement.style.display = "block";
+        menu.htmlElement.style.position = "absolute";
+    }
+
+    protected getURI(): string {
+        let uri = this.path + "/" + this.name
+        uri = uri.replace("/", "").replace("/", ":./")
+        if (!uri.includes(":./")) {
+            uri = uri + ":./"
+        }
+        return uri
+    }
+
+    public async newFile() {
+        new UploadNewFilePopup(this.getURI(), "", () => location.reload())
+    }
+
+    public async newFolder() {
+        alert("New Folder not implemented");
+    }
+
+    public async rename() {
+        alert("Rename not implemented");
+    }
+
+    public async delete() {
+        let uri = this.getURI()
+        let sessionName = uri.split(":")[0]
+        let path = uri.split(":")[1]
+        let session = WebFS.connections.get(sessionName)
+        let md5 = await session?.md5(path)
+        if (md5 == null) {
+            alert(STRINGS.VIEWER_READ_MD5_ERROR)
+            return
+        }
+        let popup = new ConfirmCancelPopup(
+            "popupContent", "popupContainer",
+            STRINGS.FILETREE_DELETE_QUESTION + " " + this.path + "/" + this.name,
+            STRINGS.FILETREE_DELETE_CANCEL,
+            STRINGS.FILETREE_DELETE_CONFIRM,
+        )
+        popup.onConfirm = () => {}
+        popup.onCancel = () => {
+            if (this.isFolder) {
+                session?.rmdir(path)
+            } else {
+                session?.rm(path, md5)
+            }
+            location.reload()
+        }
+    }
 }
 
 class FileTreeFolder extends FileTreeElement {
     private folderContent: Module<HTMLUListElement>
 
-    constructor(private path: string, private name: string, private children: WebFSFileTree) {
-        super(name, true)
+    constructor(path: string, name: string, private children: WebFSFileTree) {
+        super(path, name, true, Object.keys(children).length > 0)
         
         this.folderContent = new Module<HTMLUListElement>("ul")
         this.folderContent.htmlElement.style.display = "none";
@@ -195,22 +260,53 @@ class FileTreeFolder extends FileTreeElement {
             this.folderContent.htmlElement.style.display = "none";
         }
     }
-
-    protected showMenu(): void {
-        alert("Add File/Rename/Delete not implemented")
-    }
 }
 
 class FileTreeFile extends FileTreeElement {
-    constructor(private path: string, private name: string) {
-        super(name, false)
+    constructor(path: string, name: string) {
+        super(path, name, false, false)
     }
 
     protected onClick(): void {
-        alert("OPEN: " + this.path + "/" + this.name);
+        PageManager.update({view: this.getURI()})
+    }
+}
+
+
+class FileTreeElementMenu extends Module<HTMLDivElement> {
+    private background: Module<HTMLDivElement>
+
+    constructor(parent: FileTreeElement, isFolder: boolean, hasChildren: boolean) {
+        super("div", "", "filetreeElementMenu");
+
+        if (isFolder) {
+            let newFileAction = new Button("New File", "filetreeElementMenuButton")
+            newFileAction.onClick = () => { this.close(); parent.newFile(); }
+            this.add(newFileAction)
+            let newFolderAction = new Button("New Folder", "filetreeElementMenuButton")
+            newFolderAction.onClick = () => { this.close(); parent.newFolder(); }
+            this.add(newFolderAction)
+        }
+        let renameAction = new Button("Move", "filetreeElementMenuButton")
+        renameAction.onClick = () => { this.close(); parent.rename(); }
+        this.add(renameAction)
+        if (!hasChildren) {
+            let deleteAction = new Button("Delete", "filetreeElementMenuButton")
+            deleteAction.onClick = () => { this.close(); parent.delete(); }
+            this.add(deleteAction)
+        }
+
+        this.background = new Module<HTMLDivElement>("div", "", "popupContainer")
+        this.background.htmlElement.style.backgroundColor = "transparent"
+        this.background.htmlElement.onclick = () => {
+            this.close()
+        }
+        document.body.appendChild(this.background.htmlElement)
+        document.body.appendChild(this.htmlElement)
     }
 
-    protected showMenu(): void {
-        alert("Rename/Delete not implemented")
+    private close() {
+        document.body.removeChild(this.background.htmlElement)
+        document.body.removeChild(this.htmlElement)
     }
 }

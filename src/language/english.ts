@@ -33,6 +33,9 @@ export class English {
     public static FILETREE_SEARCH_PLACEHOLDER = "Search (Keyword, Keyword)"
     public static FILETREE_OFFLINE = "Offline:"
     public static FILETREE_MORE_RESULTS = "Show more results!"
+    public static FILETREE_DELETE_QUESTION = "Are you sure you want to delete this file?"
+    public static FILETREE_DELETE_CONFIRM = "Delete"
+    public static FILETREE_DELETE_CANCEL = "Keep File"
 
     public static SETTINGS_TITLE = "Settings"
     public static SETTINGS_GENERAL = "General"
@@ -46,6 +49,7 @@ export class English {
     public static UPLOAD_TITLE = "Upload File"
     public static UPLOAD_SERVER = "Server"
     public static UPLOAD_FOLDERNAME = "Foldername"
+    public static UPLOAD_LOCATION = "Location: "
     public static UPLOAD_FILENAME = "Filename"
     public static UPLOAD_FILE = "File"
     public static UPLOAD_FILE_OPTIONAL = "File (optional)"

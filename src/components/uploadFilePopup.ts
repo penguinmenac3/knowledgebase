@@ -1,54 +1,31 @@
 import "./uploadFilePopup.css"
 import { WebFS } from "../webfs/client/webfs";
-import { Button, FormDropdown, FormInput, FormLabel } from "../webui/components/form";
+import { Button, FormInput, FormLabel } from "../webui/components/form";
 import { Module } from "../webui/module";
 import { ExitablePopup } from "../webui/components/popup";
 import { STRINGS } from "../language/default";
 
-// Example Usage:
-//
-// let upload = new Button(iconPlus, "searchUploadButton")
-// upload.onClick = () => {
-//     let currentFolder = "/"
-//     let keywords = this.searchField.value().split(",").map((x: string) => x.trim());
-//     for (let keyword of keywords) {
-//         if (keyword.startsWith("/")) {
-//             currentFolder = keyword
-//             break
-//         }
-//     }
-//     new UploadPopup(currentFolder, "", this.triggerFullUpdate.bind(this))
-// }
-// this.add(upload)
 
 export class UploadNewFilePopup extends ExitablePopup {
     public constructor(currentFolder: string, currentFile: string, triggerFullUpdate: CallableFunction) {
         super("popupContent-fullscreen", "popupContainer", "popupExitBtn")
         this.setClass("upload")
+        let sessionName = currentFolder.split(":")[0]
+        let folder = currentFolder.split(":")[1]
+
         this.add(new Module("div", STRINGS.UPLOAD_TITLE, "popupTitle"))
-        this.add(new FormLabel(STRINGS.UPLOAD_SERVER))
-        let sessions: string[] = []
-        for(let sessionName of WebFS.connections.keys()) {
-            sessions.push(sessionName)
-        }
-        let serverInput = new FormDropdown("sessionName", sessions, "")
-        this.add(serverInput)
-        this.add(new FormLabel(STRINGS.UPLOAD_FOLDERNAME))
-        let folderInput = new FormInput("foldername", currentFolder, "text")
-        folderInput.value(currentFolder)
-        this.add(folderInput)
+        this.add(new FormLabel(STRINGS.UPLOAD_SERVER + ": " + sessionName))
+        this.add(new FormLabel(STRINGS.UPLOAD_FOLDERNAME + ": " + folder))
         this.add(new FormLabel(STRINGS.UPLOAD_FILENAME))
         let filenameInput = new FormInput("filename", currentFile, "text")
         filenameInput.value(currentFile)
         this.add(filenameInput)
         let emptyFile = new Button(STRINGS.UPLOAD_MARKDOWN, "buttonWide")
         emptyFile.onClick = async () => {
-            let sessionName = serverInput.value()
             let instance = WebFS.connections.get(sessionName)
             if (instance == null) return
             sendBtn.disable()
             emptyFile.disable()
-            let folder = folderInput.value()
             if (folder.endsWith("/")) {
                 folder = folder.slice(0, folder.length - 1)
             }
@@ -76,13 +53,11 @@ export class UploadNewFilePopup extends ExitablePopup {
         this.add(fileInput)
         let sendBtn = new Button(STRINGS.UPLOAD_SEND, "buttonWide")
         sendBtn.onClick = async () => {
-            let sessionName = serverInput.value()
             let instance = WebFS.connections.get(sessionName)
             if (instance == null) return
             sendBtn.disable()
             emptyFile.disable()
             let file = fileInput.htmlElement.files![0]
-            let folder = folderInput.value()
             if (folder.endsWith("/")) {
                 folder = folder.slice(0, folder.length - 1)
             }

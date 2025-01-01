@@ -54,9 +54,20 @@ class FileMetaData {
 export class Viewer extends Module<HTMLDivElement> {
     private openDocument: string = ""
     private isDirty: boolean = false
+    private saveCallback: CallableFunction | null = null
 
     public constructor() {
         super("div", "", "editPage")
+
+        // CTRL + S triggers a save action
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault()
+                if (this.saveCallback != null) {
+                    this.saveCallback()
+                }
+            }
+        })
     }
 
     public async update(kwargs: KWARGS, _changedPage: boolean): Promise<void> {
@@ -72,6 +83,7 @@ export class Viewer extends Module<HTMLDivElement> {
         // Keep master the prefered view until we know we can actually load the file
         (<MasterDetailView>this.parent!.parent!).setPreferedView("master")
         this.htmlElement.innerHTML = ""
+        this.saveCallback = null
         
         // Extract info from uri in kwargs
         if (kwargs.view == "") {
@@ -146,15 +158,21 @@ export class Viewer extends Module<HTMLDivElement> {
         // Create markdown editor
         let simpleMD = new MDEdit(mdEditor.htmlElement, async (newText: string) => {
             return this.onSave(fileMetaData, newText, save, () => simpleMD.getText())
-        })
+        }, false)  // Do not bind save action, as it would be bound multiple times
         simpleMD.load(text)
         simpleMD.onDirty = () => {
-            save.show()
-            this.isDirty = true
+            if (simpleMD.isSaved()) {
+                save.hide()
+                this.isDirty = false
+            } else {
+                save.show()
+                this.isDirty = true
+            }
         }
         save.onClick = async () => {
             simpleMD.save()
         }
+        this.saveCallback = save.onClick
     }
 
     private async handleTextFile(fileMetaData: FileMetaData) {
@@ -205,6 +223,7 @@ export class Viewer extends Module<HTMLDivElement> {
             this.onSave(fileMetaData, newText, save, () => textEditor.htmlElement.value.replaceAll("\r\n", "\n"))
             text = newText
         }
+        this.saveCallback = save.onClick
 
         // Handle switching between edit and view modes
         edit.onClick = () => {

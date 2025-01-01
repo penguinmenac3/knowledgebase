@@ -124,6 +124,80 @@ export class FileTree extends Module<HTMLDivElement> {
     }
 
     private async renderFiletreeView() {
-        this.entriesView.htmlElement.innerHTML = "Filetree: Not yet implemented.";
+        this.entriesView.htmlElement.innerHTML = "";
+        let filetreeList = new Module<HTMLUListElement>("ul", "", "filetreeRoot");
+        for (let [sessionName, fileTree] of this.fileTrees) {    
+            filetreeList.add(new FileTreeFolder("", sessionName, fileTree))
+        }
+        this.entriesView.add(filetreeList);
+    }
+}
+
+class FileTreeElement extends Module<HTMLLIElement> {
+    constructor(name: string, isFolder: boolean) {
+        super("li", "", isFolder ? "fileTreeFolder" : "fileTreeFile")
+        let element = new Module<HTMLDivElement>("div", `<span class="${isFolder ? 'filetreeFolderIcon' : 'filetreeFileIcon'}"></span> ${name}`, "fileTreeElementTitle")
+        
+        element.htmlElement.addEventListener("click", () => {
+            this.onClick()
+        })
+        this.add(element)
+    }
+
+    protected onClick() {}
+}
+
+class FileTreeFolder extends FileTreeElement {
+    private folderContent: Module<HTMLUListElement>
+
+    constructor(private path: string, private name: string, private children: WebFSFileTree) {
+        super(name, true)
+        
+        this.folderContent = new Module<HTMLUListElement>("ul")
+        this.folderContent.htmlElement.style.display = "none";
+        this.add(this.folderContent)
+
+    }
+
+    protected onClick() {
+        if (this.folderContent.htmlElement.style.display === "none") {
+            this.folderContent.htmlElement.style.display = "";
+            if (this.folderContent.htmlElement.children.length == 0) {
+                let path = this.path + "/" + this.name
+                let folders = []
+                let files = []
+                let filenames = []
+                for (const filename in this.children) {
+                    filenames.push(filename)
+                }
+                filenames = filenames.sort((a: string, b: string) => a.toLowerCase().localeCompare(b.toLowerCase()))
+                for (const filename of filenames) {
+                    let value = this.children[filename]
+                    if (!(typeof value === 'string')) {
+                        folders.push(new FileTreeFolder(path, filename, value))
+                    } else {
+                        files.push(new FileTreeFile(path, filename))
+                    }
+                }
+                for (const entry of folders) {
+                    this.folderContent.add(entry)
+                }
+                for (const entry of files) {
+                    this.folderContent.add(entry)
+                }
+            }
+        } else {
+            this.folderContent.htmlElement.style.display = "none";
+        }
+    }
+}
+
+class FileTreeFile extends FileTreeElement {
+    constructor(private path: string, private name: string) {
+        super(name, false)
+    }
+
+    protected onClick(): void {
+        alert("OPEN: " + this.path + "/" + this.name);
     }
 }

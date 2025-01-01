@@ -45,3 +45,44 @@
     height: 1em;
     padding: 0.2em;
 }
+
+.filetreeRoot {
+    display: block;
+    text-align: left;
+}
+
+.filetreeFolderIcon::before {
+    content: "📁";
+    margin-right: 5px;
+}
+
+.filetreeFileIcon::before {
+    content: "📄";
+    margin-right: 5px;
+}
+
+ul {
+    list-style-type: none;
+    margin-left: 0.5em;
+    padding-left: 0.5em;
+}
+
+.fileTreeFolder ul {
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-left-color: var(--color-base-2);
+}
+
+.fileTreeFolder ul:hover {
+  border-left-color: var(--color-base-hover);
+}
+
+.fileTreeElementTitle {
+    padding: 0.4em;
+    cursor: pointer;
+}
+
+.fileTreeElementTitle:hover {
+    border-radius: var(--radius);
+    background-color: var(--color-base-hover);
+}

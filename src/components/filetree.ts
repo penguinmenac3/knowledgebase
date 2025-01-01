@@ -150,7 +150,11 @@ class FileTreeElement extends Module<HTMLLIElement> {
 
         let element = new Button("", "fileTreeElementTitle");
         element.onClick = () => { this.onClick(); };
-        element.htmlElement.innerHTML += `<span class="${isFolder ? 'filetreeFolderIcon' : 'filetreeFileIcon'}"></span> ${name.replaceAll("_", " ")}`;
+        let iconClass = isFolder ? 'filetreeFolderIcon' : 'filetreeFileIcon'
+        if (path == "") {
+            iconClass = 'filetreeServerIcon'
+        }
+        element.htmlElement.innerHTML += `<span class="${iconClass}"></span> ${name.replaceAll("_", " ")}`;
         this.add(element);
     }
 

@@ -51,6 +51,11 @@
     text-align: left;
 }
 
+.filetreeServerIcon::before {
+    content: "☁️";
+    margin-right: 5px;
+}
+
 .filetreeFolderIcon::before {
     content: "📁";
     margin-right: 5px;

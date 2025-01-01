@@ -1,6 +1,6 @@
 import "./filetree.css"
 import { FileTree as WebFSFileTree, WebFS } from "../webfs/client/webfs";
-import { Button,  FormInput } from "../webui/components/form";
+import { Button,  FormInput, FormLabel } from "../webui/components/form";
 import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";
 import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
@@ -9,7 +9,7 @@ import { iconBars, iconDots } from "../webui/icons";
 import { SettingsPopup } from "./settings";
 import { search, SearchResult } from "./filetreesearch";
 import { UploadNewFilePopup } from "./uploadFilePopup";
-import { ConfirmCancelPopup } from "../webui/components/popup";
+import { ConfirmCancelPopup, ExitablePopup } from "../webui/components/popup";
 
 
 export class FileTree extends Module<HTMLDivElement> {
@@ -211,12 +211,46 @@ class FileTreeElement extends Module<HTMLLIElement> {
         let sessionName = uri.split(":")[0]
         let path = uri.split(":")[1]
         let session = WebFS.connections.get(sessionName)
-        session?.mkdir(path + "/New Folder")
+        if (session == null) {
+            alert(STRINGS.FILETREE_INVALID_SESSION)
+            return
+        }
+        session.mkdir(path + "/New Folder")
         location.reload()
     }
 
     public async rename() {
-        alert("Rename not implemented");
+        let uri = this.getURI()
+        let sessionName = uri.split(":")[0]
+        let path = uri.split(":")[1]
+        let session = WebFS.connections.get(sessionName)
+        if (session == null) {
+            alert(STRINGS.FILETREE_INVALID_SESSION)
+            return
+        }
+
+        let renamePopup = new ExitablePopup()
+        renamePopup.htmlElement.style.width = "87%"
+        renamePopup.htmlElement.style.maxWidth = "40em"
+
+        renamePopup.add(new FormLabel(STRINGS.FILETREE_RENAME_CURRENT_PATH))
+        let current_path = new FormInput("current_path", "", "text")
+        current_path.value(path)
+        current_path.htmlElement.disabled = true
+        renamePopup.add(current_path)
+
+        renamePopup.add(new FormLabel(STRINGS.FILETREE_RENAME_NEW_PATH))
+        let new_path = new FormInput("current_path", "", "text")
+        new_path.value(path)
+        renamePopup.add(new_path)
+
+        let confirmButton = new Button(STRINGS.FILETREE_RENAME_CONFIRM, "buttonWide")
+        confirmButton.setClass("good")
+        confirmButton.onClick = () => {
+            session.mv(path, new_path.value())
+            location.reload()
+        }
+        renamePopup.add(confirmButton)
     }
 
     public async delete() {
@@ -224,9 +258,13 @@ class FileTreeElement extends Module<HTMLLIElement> {
         let sessionName = uri.split(":")[0]
         let path = uri.split(":")[1]
         let session = WebFS.connections.get(sessionName)
+        if (session == null) {
+            alert(STRINGS.FILETREE_INVALID_SESSION)
+            return
+        }
         let md5 = ""
         if (!this.isFolder) {
-            let md5 = await session?.md5(path)
+            let md5 = await session.md5(path)
             if (md5 == null) {
                 alert(STRINGS.VIEWER_READ_MD5_ERROR)
                 return
@@ -241,9 +279,9 @@ class FileTreeElement extends Module<HTMLLIElement> {
         popup.onConfirm = () => {}
         popup.onCancel = () => {
             if (this.isFolder) {
-                session?.rmdir(path)
+                session.rmdir(path)
             } else {
-                session?.rm(path, md5)
+                session.rm(path, md5)
             }
             location.reload()
         }

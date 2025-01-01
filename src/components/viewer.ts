@@ -259,7 +259,7 @@ export class Viewer extends Module<HTMLDivElement> {
         // Show a button to display the file in an iframe (only if user wants to)
         let container = new Module<HTMLDivElement>("div", "", "centerChildren");
         let showButton = new Button(STRINGS.VIEWER_LOAD_HERE_FILE, "buttonLarge")
-        showButton.htmlElement.style.backgroundColor = "var(--color-good)"
+        showButton.setClass("good")
         showButton.onClick = () => {
             let iframe = new Module<HTMLIFrameElement>("iframe", "", "editIFrame");
             iframe.htmlElement.name = "editIFrame";

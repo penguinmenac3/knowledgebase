@@ -36,6 +36,10 @@ export class English {
     public static FILETREE_DELETE_QUESTION = "Are you sure you want to delete this file?"
     public static FILETREE_DELETE_CONFIRM = "Delete"
     public static FILETREE_DELETE_CANCEL = "Keep File"
+    public static FILETREE_RENAME_CURRENT_PATH = "Current Path"
+    public static FILETREE_RENAME_NEW_PATH = "New Path"
+    public static FILETREE_RENAME_CONFIRM = "Rename"
+    public static FILETREE_INVALID_SESSION = "You appear to have a broken session. Try to remove it and add it again."
 
     public static SETTINGS_TITLE = "Settings"
     public static SETTINGS_GENERAL = "General"

@@ -16,26 +16,3 @@
     font-size: small;
     color: var(--color-contrast-gray);
 }
-
-.filetreeElementMenu {
-    display: none; /* Hidden by default */
-    position: absolute;
-    background-color: var(--color-base-hover);
-    border-radius: var(--radius);
-    box-shadow: 0 4px 8px var(--color-shadow-color);
-    z-index: 1000; /* Ensure it stays above other elements */
-    list-style-type: none;
-    padding: 0.1em;
-    margin: 0;
-}
-
-.filetreeElementMenuButton {
-    display: block;
-    padding: 0.45em 0.6em;
-    cursor: pointer;
-    border-radius: var(--radius);
-}
-
-.filetreeElementMenuButton:hover {
-    background-color: var(--color-base-transparent-2);
-}

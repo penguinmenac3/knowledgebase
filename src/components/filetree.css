@@ -53,17 +53,17 @@
 
 .filetreeServerIcon::before {
     content: "☁️";
-    margin-right: 5px;
+    margin-right: 0.2em;
 }
 
 .filetreeFolderIcon::before {
     content: "📁";
-    margin-right: 5px;
+    margin-right: 0.2em;
 }
 
 .filetreeFileIcon::before {
     content: "📄";
-    margin-right: 5px;
+    margin-right: 0.2em;
 }
 
 ul {
@@ -84,8 +84,15 @@ ul {
 
 .fileTreeElementTitle {
     display: block;
-    padding: 0.4em;
+    padding: 0.3em;
     cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .fileTreeElementTitle {
+        font-size: large;
+        padding: 0.4em;
+    }
 }
 
 .fileTreeElementTitle:hover {
@@ -95,16 +102,45 @@ ul {
 
 .fileTreeElementSettings {
     cursor: pointer;
-    height: 1em;
     padding-left: 0.8em;
     padding-right: 0.8em;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
+    padding-top: 0.4em;
+    padding-bottom: 0.1em;
     border-radius: var(--radius);
     fill: var(--color-base-transparent-2);
+}
+@media (max-width: 768px) {
+    .fileTreeElementSettings {
+        margin-right: 0.4em;
+        padding-top: 0.6em;
+        padding-bottom: 0.3em;
+    }
 }
 
 .fileTreeElementSettings:hover {
     border-radius: var(--radius);
+    background-color: var(--color-base-transparent-2);
+}
+
+.filetreeElementMenu {
+    display: none; /* Hidden by default */
+    position: absolute;
+    background-color: var(--color-base-hover);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 8px var(--color-shadow-color);
+    z-index: 1000; /* Ensure it stays above other elements */
+    list-style-type: none;
+    padding: 0.1em;
+    margin: 0;
+}
+
+.filetreeElementMenuButton {
+    display: block;
+    padding: 0.45em 0.6em;
+    cursor: pointer;
+    border-radius: var(--radius);
+}
+
+.filetreeElementMenuButton:hover {
     background-color: var(--color-base-transparent-2);
 }

@@ -157,7 +157,7 @@ class FileTreeElement extends Module<HTMLLIElement> {
     protected onClick() {}
 
     protected showMenu() {
-        let menu = new FileTreeElementMenu(this, this.isFolder, this.hasChildren);
+        let menu = new FileTreeElementMenu(this, this.isFolder, this.path != "", !this.hasChildren && this.path != "");
         const rect = this.elementSettings.htmlElement.getBoundingClientRect();
         let W = window.innerWidth;
         let H = window.innerHeight;
@@ -276,7 +276,7 @@ class FileTreeFile extends FileTreeElement {
 class FileTreeElementMenu extends Module<HTMLDivElement> {
     private background: Module<HTMLDivElement>
 
-    constructor(parent: FileTreeElement, isFolder: boolean, hasChildren: boolean) {
+    constructor(parent: FileTreeElement, isFolder: boolean, isMovable: boolean, isDeletable: boolean) {
         super("div", "", "filetreeElementMenu");
 
         if (isFolder) {
@@ -287,10 +287,12 @@ class FileTreeElementMenu extends Module<HTMLDivElement> {
             newFolderAction.onClick = () => { this.close(); parent.newFolder(); }
             this.add(newFolderAction)
         }
-        let renameAction = new Button("Move", "filetreeElementMenuButton")
-        renameAction.onClick = () => { this.close(); parent.rename(); }
-        this.add(renameAction)
-        if (!hasChildren) {
+        if (isMovable) {
+            let renameAction = new Button("Move", "filetreeElementMenuButton")
+            renameAction.onClick = () => { this.close(); parent.rename(); }
+            this.add(renameAction)
+        }
+        if (isDeletable) {
             let deleteAction = new Button("Delete", "filetreeElementMenuButton")
             deleteAction.onClick = () => { this.close(); parent.delete(); }
             this.add(deleteAction)

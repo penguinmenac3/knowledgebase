@@ -78,6 +78,7 @@ ul {
 }
 
 .fileTreeElementTitle {
+    display: block;
     padding: 0.4em;
     cursor: pointer;
 }
@@ -85,4 +86,20 @@ ul {
 .fileTreeElementTitle:hover {
     border-radius: var(--radius);
     background-color: var(--color-base-hover);
+}
+
+.fileTreeElementSettings {
+    cursor: pointer;
+    height: 1em;
+    padding-left: 0.8em;
+    padding-right: 0.8em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    border-radius: var(--radius);
+    fill: var(--color-base-transparent-2);
+}
+
+.fileTreeElementSettings:hover {
+    border-radius: var(--radius);
+    background-color: var(--color-base-transparent-2);
 }

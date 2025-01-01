@@ -5,7 +5,7 @@ import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";
 import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
 import { STRINGS } from "../language/default";
-import { iconBars } from "../webui/icons";
+import { iconBars, iconDots } from "../webui/icons";
 import { SettingsPopup } from "./settings";
 import { search, SearchResult } from "./filetreesearch";
 
@@ -136,15 +136,20 @@ export class FileTree extends Module<HTMLDivElement> {
 class FileTreeElement extends Module<HTMLLIElement> {
     constructor(name: string, isFolder: boolean) {
         super("li", "", isFolder ? "fileTreeFolder" : "fileTreeFile")
-        let element = new Module<HTMLDivElement>("div", `<span class="${isFolder ? 'filetreeFolderIcon' : 'filetreeFileIcon'}"></span> ${name}`, "fileTreeElementTitle")
         
-        element.htmlElement.addEventListener("click", () => {
-            this.onClick()
-        })
+        let elementSettings  = new Button(iconDots, "fileTreeElementSettings")
+        elementSettings.setClass("right")
+        elementSettings.onClick = () => {this.showMenu()}
+        this.add(elementSettings)
+        
+        let element = new Button("", "fileTreeElementTitle")
+        element.onClick = () => {this.onClick()}
+        element.htmlElement.innerHTML += `<span class="${isFolder ? 'filetreeFolderIcon' : 'filetreeFileIcon'}"></span> ${name.replaceAll("_", " ")}`
         this.add(element)
     }
 
     protected onClick() {}
+    protected showMenu() {}
 }
 
 class FileTreeFolder extends FileTreeElement {
@@ -190,6 +195,10 @@ class FileTreeFolder extends FileTreeElement {
             this.folderContent.htmlElement.style.display = "none";
         }
     }
+
+    protected showMenu(): void {
+        alert("Add File/Rename/Delete not implemented")
+    }
 }
 
 class FileTreeFile extends FileTreeElement {
@@ -199,5 +208,9 @@ class FileTreeFile extends FileTreeElement {
 
     protected onClick(): void {
         alert("OPEN: " + this.path + "/" + this.name);
+    }
+
+    protected showMenu(): void {
+        alert("Rename/Delete not implemented")
     }
 }

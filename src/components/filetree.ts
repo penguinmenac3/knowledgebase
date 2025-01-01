@@ -158,14 +158,35 @@ class FileTreeElement extends Module<HTMLLIElement> {
 
     protected showMenu() {
         let menu = new FileTreeElementMenu(this, this.isFolder, this.path != "", !this.hasChildren && this.path != "");
-        const rect = this.elementSettings.htmlElement.getBoundingClientRect();
-        let W = window.innerWidth;
-        let H = window.innerHeight;
-        // TODO ensure the menu popup is within the window bounds and does not extend beyond bottom or right edge
-        menu.htmlElement.style.left = `${rect.left}px`;
-        menu.htmlElement.style.top = `${rect.bottom}px`;
         menu.htmlElement.style.display = "block";
         menu.htmlElement.style.position = "absolute";
+        const rect = this.elementSettings.htmlElement.getBoundingClientRect();
+        let cx = (rect.left + rect.right) / 2
+        let cy = (rect.top + rect.bottom) / 2
+        let W = window.innerWidth;
+        let H = window.innerHeight;
+        let availableSpaceRight = W - cx;
+        let availableSpaceBelow = H - cy;
+        console.log(menu.htmlElement.getBoundingClientRect())
+        console.log(availableSpaceBelow, menu.htmlElement.clientHeight)
+        console.log(availableSpaceRight, menu.htmlElement.clientWidth)
+
+        // Adjust menu position based on available space
+        if (availableSpaceBelow < menu.htmlElement.clientHeight) {
+            // If not enough space below, place it above the button
+            menu.htmlElement.style.top = `${cy - menu.htmlElement.clientHeight}px`;
+        } else {
+            // Otherwise, place it below the button
+            menu.htmlElement.style.top = `${cy}px`;
+        }
+    
+        if (availableSpaceRight < menu.htmlElement.clientWidth) {
+            // If not enough space to the right, place it to the left of the button
+            menu.htmlElement.style.left = `${cx - menu.htmlElement.clientWidth}px`;
+        } else {
+            // Otherwise, place it to the right of the button
+            menu.htmlElement.style.left = `${cx}px`;
+        }
     }
 
     protected getURI(): string {

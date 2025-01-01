@@ -312,9 +312,7 @@ export class Viewer extends Module<HTMLDivElement> {
                     STRINGS.VIEWER_EXIT_WITHOUT_SAVE_CONTINUE_EDITING,
                     STRINGS.VIEWER_EXIT_WITHOUT_SAVE_EXIT,
                 )
-                popup.onConfirm = () => {
-                    popup.dispose()
-                }
+                popup.onConfirm = () => {}
                 popup.onCancel = () => {
                     this.isDirty = false
                     PageManager.update({view: ""})

@@ -307,9 +307,11 @@ export class Viewer extends Module<HTMLDivElement> {
 
         // Setup divs
         let content = text
-        let spfStart = content.indexOf("<!--\n")
-        let spfEnd = content.indexOf("\n-->")
-        content = content.slice(spfStart + 5, spfEnd)
+        if (content != "") {
+            let spfStart = content.indexOf("<!--\n")
+            let spfEnd = content.indexOf("\n-->")
+            content = content.slice(spfStart + 5, spfEnd)
+        }
         let notepad = new Notepad(content, "notepad-container", true)
         notepad.onSave = (newText: string) => {
             return this.onSave(fileMetaData, notepad.getSVG(), save, () => notepad.getSVG())

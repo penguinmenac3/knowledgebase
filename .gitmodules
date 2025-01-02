@@ -7,3 +7,6 @@
 [submodule "src/mdedit"]
 	path = src/mdedit
 	url = git@github.com:penguinmenac3/mdedit-lib.git
+[submodule "src/scratchpad"]
+	path = src/scratchpad
+	url = git@github.com:penguinmenac3/scratchpad-lib.git

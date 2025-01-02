@@ -297,12 +297,40 @@ class FileTreeFolder extends FileTreeElement {
         this.folderContent = new Module<HTMLUListElement>("ul")
         this.folderContent.htmlElement.style.display = "none";
         this.add(this.folderContent)
+        if (this.isExpandedFolder()) {
+            this.onClick()
+        }
+    }
 
+    private isExpandedFolder(): boolean {
+        if (!localStorage.kb_filetree_expanded_folders) {
+            localStorage.kb_filetree_expanded_folders = "[]"
+        }
+        let folders: string[] = JSON.parse(localStorage.kb_filetree_expanded_folders)
+        return folders.includes(this.getURI())
+    }
+
+    private setExpandedFolder(): void {
+        if (!this.isExpandedFolder()) {
+            let folders: string[] = JSON.parse(localStorage.kb_filetree_expanded_folders)
+            folders.push(this.getURI())
+            localStorage.kb_filetree_expanded_folders = JSON.stringify(folders)
+        }
+    }
+
+    private unsetExpandedFolder(): void {
+        if (this.isExpandedFolder()) {
+            let folders: string[] = JSON.parse(localStorage.kb_filetree_expanded_folders)
+            let uri = this.getURI()
+            folders = folders.filter((ele, _) => ele != uri)
+            localStorage.kb_filetree_expanded_folders = JSON.stringify(folders)
+        }
     }
 
     protected onClick() {
         if (this.folderContent.htmlElement.style.display === "none") {
             this.folderContent.htmlElement.style.display = "";
+            this.setExpandedFolder()
             if (this.folderContent.htmlElement.children.length == 0) {
                 let path = this.path + "/" + this.name
                 let folders = []
@@ -329,6 +357,7 @@ class FileTreeFolder extends FileTreeElement {
             }
         } else {
             this.folderContent.htmlElement.style.display = "none";
+            this.unsetExpandedFolder()
         }
     }
 }

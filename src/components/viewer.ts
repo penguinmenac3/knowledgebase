@@ -15,7 +15,7 @@ import { UploadFilePopup } from "./uploadFilePopup";
 
 
 const TEXT_FILETYPES = [
-    "txt", "csv", "json", "yaml",
+    "txt", "json", "yaml",
     "py", "ts", "js", "rs", "c", "h", "hpp", "cpp", "sh", "bat"
 ]
 
@@ -99,7 +99,7 @@ export class Viewer extends Module<HTMLDivElement> {
         (<MasterDetailView>this.parent!.parent!).setPreferedView("detail")
         if (["png", "jpg", "jpeg", "tiff", "tif"].includes(fileMetaData.ext)) {
             await this.handleImageFile(fileMetaData)
-        } else if (["md"].includes(fileMetaData.ext)) {
+        } else if (["md", "csv"].includes(fileMetaData.ext)) {
             await this.handleMDFile(fileMetaData)
         } else if (TEXT_FILETYPES.includes(fileMetaData.ext)) {
             await this.handleTextFile(fileMetaData)
@@ -159,6 +159,33 @@ export class Viewer extends Module<HTMLDivElement> {
         let simpleMD = new MDEdit(mdEditor.htmlElement, async (newText: string) => {
             return this.onSave(fileMetaData, newText, save, () => simpleMD.getText())
         }, false)  // Do not bind save action, as it would be bound multiple times
+        simpleMD.pluginCreateChunk = (text) => {
+            const isCSV = (text: string): boolean => {
+                return /\s*;\s*/.test(text);
+            };
+        
+            // Helper function to convert CSV to Markdown table
+            const csvToMarkdownTable = (csvText: string): string => {
+                const rows = csvText.split('\n');
+                const headers = rows[0].split(';').map(header => header.trim());
+                const markdownRows = [headers.join(' | '), headers.map(() => '---').join(' | ')];
+        
+                for (let i = 1; i < rows.length; i++) {
+                    const cells = rows[i].split(';').map(cell => cell.trim());
+                    markdownRows.push(cells.join(' | '));
+                }
+        
+                return markdownRows.join('\n');
+            };
+        
+            // If the text is CSV, convert it to a Markdown table
+            if (isCSV(text)) {
+                return csvToMarkdownTable(text);
+            }
+        
+            // Otherwise, return the original text
+            return text;
+        }
         simpleMD.load(text)
         simpleMD.onDirty = () => {
             if (simpleMD.isSaved()) {

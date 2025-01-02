@@ -130,7 +130,7 @@
 .filetreeElementMenu {
     display: none; /* Hidden by default */
     position: absolute;
-    background-color: var(--color-base-hover);
+    background-color: var(--color-base);
     border-radius: var(--radius);
     box-shadow: 0 4px 8px var(--color-shadow-color);
     z-index: 1000; /* Ensure it stays above other elements */
@@ -144,8 +144,10 @@
     padding: 0.45em 0.6em;
     cursor: pointer;
     border-radius: var(--radius);
+    fill: var(--color-base-c);
+    color: var(--color-base-c);
 }
 
 .filetreeElementMenuButton:hover {
-    background-color: var(--color-base-transparent-2);
+    background-color: var(--color-base-hover);
 }

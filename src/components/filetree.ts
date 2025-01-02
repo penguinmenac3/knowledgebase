@@ -398,8 +398,7 @@ class FileTreeElementMenu extends Module<HTMLDivElement> {
             this.add(deleteAction)
         }
 
-        this.background = new Module<HTMLDivElement>("div", "", "popupContainer")
-        this.background.htmlElement.style.backgroundColor = "transparent"
+        this.background = new Module<HTMLDivElement>("div", "", "toolPopupGrayout")
         this.background.htmlElement.onclick = () => {
             this.close()
         }

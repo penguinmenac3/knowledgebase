@@ -12,6 +12,7 @@ import { ConfirmCancelPopup } from "../webui/components/popup";
 import { MasterDetailView } from "../webui/components/master-detail-view";
 import { Navbar, NavbarButton, NavbarHeader } from "../webui/components/navbar";
 import { UploadFilePopup } from "./uploadFilePopup";
+import { Notepad } from "../scratchpad/notepad";
 
 
 const TEXT_FILETYPES = [
@@ -97,14 +98,16 @@ export class Viewer extends Module<HTMLDivElement> {
         
         // We know we can display the file, so do it!
         (<MasterDetailView>this.parent!.parent!).setPreferedView("detail")
-        if (["png", "jpg", "jpeg", "tiff", "tif"].includes(fileMetaData.ext)) {
-            await this.handleImageFile(fileMetaData)
-        } else if (["md", "csv"].includes(fileMetaData.ext)) {
+        if (["md", "csv"].includes(fileMetaData.ext)) {
             await this.handleMDFile(fileMetaData)
         } else if (TEXT_FILETYPES.includes(fileMetaData.ext)) {
             await this.handleTextFile(fileMetaData)
         } else if (["pdf"].includes(fileMetaData.ext)) {
             await this.handlePDFFile(fileMetaData)
+        } else if (fileMetaData.filename.endsWith(".spf.svg")) {
+            await this.handleSPFFile(fileMetaData)
+        } else if (["png", "svg", "jpg", "jpeg", "tiff", "tif"].includes(fileMetaData.ext)) {
+            await this.handleImageFile(fileMetaData)
         } else {
             await this.handleUnknownFile(fileMetaData)
         }
@@ -289,6 +292,31 @@ export class Viewer extends Module<HTMLDivElement> {
                 textEditor.hide()
             }
         }
+    }
+
+    private async handleSPFFile(fileMetaData: FileMetaData) {
+        // Setup navbar
+        let save = new NavbarButton(iconSave)
+
+        // Get file content
+        let text = await fileMetaData.instance.readTxt(fileMetaData.filepath)
+        if (text == null || fileMetaData.md5 == null) {
+            alert(STRINGS.VIEWER_READ_FILE_ERROR)
+            return
+        }
+
+        // Setup divs
+        let content = text
+        let spfStart = content.indexOf("<!--\n")
+        let spfEnd = content.indexOf("\n-->")
+        content = content.slice(spfStart + 5, spfEnd)
+        let notepad = new Notepad(content, "notepad-container", true)
+        notepad.onSave = (newText: string) => {
+            return this.onSave(fileMetaData, notepad.getSVG(), save, () => notepad.getSVG())
+        }
+        notepad.onBack = () => {PageManager.update({view: ""})}
+        this.add(notepad)
+        this.saveCallback = notepad.save
     }
 
     private async handlePDFFile(fileMetaData: FileMetaData) {

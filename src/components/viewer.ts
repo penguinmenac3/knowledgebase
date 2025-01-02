@@ -161,7 +161,19 @@ export class Viewer extends Module<HTMLDivElement> {
         }, false)  // Do not bind save action, as it would be bound multiple times
         simpleMD.pluginCreateChunk = (text) => {
             const isCSV = (text: string): boolean => {
-                return /\s*;\s*/.test(text);
+                const rows = text.split('\n');
+                if (rows.length <= 1) return false
+
+                let numElements = (rows[0].match(/;/g) || []).length
+                if (numElements == 0) return false
+
+                for (const row of rows) {
+                    if (row == "") continue
+                    if (numElements != (row.match(/;/g) || []).length) {
+                        return false
+                    }
+                }
+                return true
             };
         
             // Helper function to convert CSV to Markdown table
@@ -172,7 +184,18 @@ export class Viewer extends Module<HTMLDivElement> {
         
                 for (let i = 1; i < rows.length; i++) {
                     const cells = rows[i].split(';').map(cell => cell.trim());
+                    for (let j = 0; j < cells.length; j++) {
+                        if (cells[j].startsWith("#")) {
+                            while (cells[j].startsWith("#")) {
+                                cells[j] = cells[j].substring(1)
+                            }
+                            cells[j] = "**" + cells[j].trim() + "**"
+                        }
+                    }
                     markdownRows.push(cells.join(' | '));
+                }
+                for (let i = 1; i < markdownRows.length; i++) {
+                    markdownRows[i] = "| " + markdownRows[i] + " |"
                 }
         
                 return markdownRows.join('\n');

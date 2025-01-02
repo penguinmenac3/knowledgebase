@@ -1,6 +1,7 @@
   .mdOutput {
     max-width: 800px;
     margin: auto;
+    padding: 0.2em;
     /*margin-top: 1em;
     margin-bottom: 1em;
     padding-top: 0em;
@@ -21,11 +22,13 @@
   }
   .editorChunk {
     border-left: 2px solid var(--color-contrast-gray);
+    border-right: 2px solid var(--color-contrast-gray);
     padding-left: 1em;
     padding-right: 1em;
   }
   .editorChunk:hover {
     border-left: 2px solid var(--color-brand);
+    border-right: 2px solid var(--color-brand);
   }
   
   textarea {

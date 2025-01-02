@@ -313,7 +313,7 @@ export class Viewer extends Module<HTMLDivElement> {
             content = content.slice(spfStart + 5, spfEnd)
         }
         let notepad = new Notepad(content, "notepad-container", true)
-        notepad.onSave = (newText: string) => {
+        notepad.onSave = (_newText: string) => {
             return this.onSave(fileMetaData, notepad.getSVG(), save, () => notepad.getSVG())
         }
         notepad.onBack = () => {PageManager.update({view: ""})}

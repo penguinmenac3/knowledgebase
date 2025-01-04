@@ -45,7 +45,6 @@ export class FileTree extends Module<HTMLDivElement> {
 
     public async update(kwargs: KWARGS, changedPage: boolean): Promise<void> {
         if (WebFS.connections.size < 1) {
-            this.fileTrees.clear()
             this.entriesView.htmlElement.innerHTML = STRINGS.FILETREE_MISSING_CONNECTIONS
             return
         }
@@ -53,29 +52,33 @@ export class FileTree extends Module<HTMLDivElement> {
         if (changedPage) {
             this.offlineConnections = []
             this.fileTrees.clear()
-            for (let [sessionName, webFS] of WebFS.connections) {
-                console.log("Gathering filetrees for: " + sessionName)
-                let fileTree = await webFS.walk(".")
-                if (fileTree == null) {
-                    console.log("Session offline: " + sessionName)
-                    let jsonFiletree = localStorage["kb_filetree_cache_" + sessionName]
-                    if (jsonFiletree) {
-                        fileTree = JSON.parse(jsonFiletree)
-                    }
-                    this.offlineConnections.push(sessionName)
-                } else {
-                    let jsonFiletree = JSON.stringify(fileTree)
-                    localStorage["kb_filetree_cache_" + sessionName] = jsonFiletree
-                }
-                if (fileTree != null) {
-                    this.fileTrees.set(sessionName, fileTree)
-                }
-            }
         }
         if (this.searchField.value() != kwargs.search || changedPage) {
             this.searchField.value(kwargs.search)
             this.updateEntriesView()
         }
+    }
+
+    private async getFileTree(sessionName: string): Promise<WebFSFileTree | null> {
+        console.log("Gathering filetrees for: " + sessionName)
+        let webFS = WebFS.connections.get(sessionName)
+        if (!webFS) return null;
+        let fileTree = await webFS.walk(".");
+        if (fileTree == null) {
+            console.log("Session offline: " + sessionName);
+            let jsonFiletree = localStorage["kb_filetree_cache_" + sessionName];
+            if (jsonFiletree) {
+                fileTree = JSON.parse(jsonFiletree);
+            }
+            this.offlineConnections.push(sessionName);
+        } else {
+            let jsonFiletree = JSON.stringify(fileTree);
+            localStorage["kb_filetree_cache_" + sessionName] = jsonFiletree;
+        }
+        if (fileTree != null) {
+            this.fileTrees.set(sessionName, fileTree);
+        }
+        return fileTree
     }
 
     private async updateEntriesView(showMax: number = 50) {
@@ -130,8 +133,9 @@ export class FileTree extends Module<HTMLDivElement> {
     private async renderFiletreeView() {
         this.entriesView.htmlElement.innerHTML = "";
         let filetreeList = new Module<HTMLUListElement>("ul", "", "filetreeRoot");
-        for (let [sessionName, fileTree] of this.fileTrees) {    
-            filetreeList.add(new FileTreeFolder("", sessionName, fileTree))
+        
+        for (let sessionName of WebFS.connections.keys()) {
+            filetreeList.add(new FileTreeFolder("", sessionName, null, async () => await this.getFileTree(sessionName)))
         }
         this.entriesView.add(filetreeList);
     }
@@ -291,8 +295,8 @@ class FileTreeElement extends Module<HTMLLIElement> {
 class FileTreeFolder extends FileTreeElement {
     private folderContent: Module<HTMLUListElement>
 
-    constructor(path: string, name: string, private children: WebFSFileTree) {
-        super(path, name, true, Object.keys(children).length > 0)
+    constructor(path: string, name: string, private children: WebFSFileTree | null, private getChildren: CallableFunction | null = null) {
+        super(path, name, true, children == null || Object.keys(children).length > 0)
         
         this.folderContent = new Module<HTMLUListElement>("ul")
         this.folderContent.htmlElement.style.display = "none";
@@ -327,7 +331,7 @@ class FileTreeFolder extends FileTreeElement {
         }
     }
 
-    protected onClick() {
+    protected async onClick() {
         if (this.folderContent.htmlElement.style.display === "none") {
             this.folderContent.htmlElement.style.display = "";
             this.setExpandedFolder()
@@ -336,12 +340,16 @@ class FileTreeFolder extends FileTreeElement {
                 let folders = []
                 let files = []
                 let filenames = []
+                if (this.children == null) {
+                    if (this.getChildren == null) return
+                    this.children = await this.getChildren()
+                }
                 for (const filename in this.children) {
                     filenames.push(filename)
                 }
                 filenames = filenames.sort((a: string, b: string) => a.toLowerCase().localeCompare(b.toLowerCase()))
                 for (const filename of filenames) {
-                    let value = this.children[filename]
+                    let value = this.children![filename]
                     if (!(typeof value === 'string')) {
                         folders.push(new FileTreeFolder(path, filename, value))
                     } else {

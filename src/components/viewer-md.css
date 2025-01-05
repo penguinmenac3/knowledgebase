@@ -137,6 +137,11 @@
     color: #ffffff;
     text-align: left;
   }
+  thead tr:hover {
+    background-color: var(--color-brand-hover);
+    color: #ffffff;
+    text-align: left;
+  }
   th,
   td {
     padding: 12px 15px;
@@ -151,6 +156,13 @@
   
   tbody tr:last-of-type {
     border-bottom: 2px solid var(--color-brand);
+  }
+  
+  tbody tr:hover {
+    background-color: var(--color-base-hover-2);
+  }
+  tbody tr:nth-of-type(even):hover {
+    background-color: var(--color-base-hover-2);
   }
   
   a {

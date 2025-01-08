@@ -43,41 +43,6 @@
     border: 0px solid;
 }
 
-.editTextOutput h1 {
-    border-bottom: 1px solid var(--color-base-c);
-}
-
-.editTextOutput h2 {
-    border-bottom: 1px solid var(--color-base-2);
-}
-
-.editTextOutput img {
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: var(--radius-large);
-}
-
-.editTextOutput blockquote {
-    display: block;
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-top: 0.2em;
-    padding-bottom: 0.2em;
-    margin: 0.2em;
-    background-color: var(--color-base-2);
-    border-left: 4px solid var(--color-brand);
-    border-radius: var(--radius);
-}
-
-.editTextOutput pre {
-    display: block;
-    padding: 1em;
-    margin: 0.2em;
-    overflow-x: auto;
-    background-color: var(--color-base-2);
-    border-radius: var(--radius);
-}
-
 .editUnsupportedDocument {
     overflow: auto;
     display: flexbox;

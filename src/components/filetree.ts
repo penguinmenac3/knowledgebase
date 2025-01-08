@@ -143,6 +143,7 @@ export class FileTree extends Module<HTMLDivElement> {
 
 class FileTreeElement extends Module<HTMLLIElement> {
     private elementSettings: Button
+    protected elementButton: Button
 
     constructor(protected path: string, protected name: string, private isFolder: boolean, private hasChildren: boolean) {
         super("li", "", isFolder ? "fileTreeFolder" : "fileTreeFile");
@@ -152,14 +153,14 @@ class FileTreeElement extends Module<HTMLLIElement> {
         this.elementSettings.onClick = () => { this.showMenu(); };
         this.add(this.elementSettings);
 
-        let element = new Button("", "fileTreeElementTitle");
-        element.onClick = () => { this.onClick(); };
+        this.elementButton = new Button("", "fileTreeElementTitle");
+        this.elementButton.onClick = () => { this.onClick(); };
         let iconClass = isFolder ? 'filetreeFolderIcon' : 'filetreeFileIcon'
         if (path == "") {
             iconClass = 'filetreeServerIcon'
         }
-        element.htmlElement.innerHTML += `<span class="${iconClass}"></span> ${name.replaceAll("_", " ")}`;
-        this.add(element);
+        this.elementButton.htmlElement.innerHTML += `<span class="${iconClass}"></span> ${name.replaceAll("_", " ")}`;
+        this.add(this.elementButton);
     }
 
     protected onClick() {}
@@ -320,6 +321,11 @@ class FileTreeFolder extends FileTreeElement {
             folders.push(this.getURI())
             localStorage.kb_filetree_expanded_folders = JSON.stringify(folders)
         }
+        let span = this.elementButton.htmlElement.getElementsByTagName("span")[0]
+        if (span && this.getChildren == null) {
+            span.classList.remove("filetreeFolderIcon")
+            span.classList.add("filetreeFolderIconOpen")
+        }
     }
 
     private unsetExpandedFolder(): void {
@@ -328,6 +334,11 @@ class FileTreeFolder extends FileTreeElement {
             let uri = this.getURI()
             folders = folders.filter((ele, _) => ele != uri)
             localStorage.kb_filetree_expanded_folders = JSON.stringify(folders)
+        }
+        let span = this.elementButton.htmlElement.getElementsByTagName("span")[0]
+        if (span && this.getChildren == null) {
+            span.classList.remove("filetreeFolderIconOpen")
+            span.classList.add("filetreeFolderIcon")
         }
     }
 
@@ -343,6 +354,10 @@ class FileTreeFolder extends FileTreeElement {
                 if (this.children == null) {
                     if (this.getChildren == null) return
                     this.children = await this.getChildren()
+                    let span = this.elementButton.htmlElement.getElementsByTagName("span")[0]
+                    if (span) {
+                        span.classList.add("filetreeServerIconLoaded")
+                    }
                 }
                 for (const filename in this.children) {
                     filenames.push(filename)

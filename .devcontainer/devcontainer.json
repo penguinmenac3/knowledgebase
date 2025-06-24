@@ -17,13 +17,14 @@
 		"vscode": {
 			"extensions": [
 				//"antfu.vite",
-				"antfu.browse-lite",
-				"harehare.portable-kanban",
 				"ms-azuretools.vscode-docker",
 				"donjayamanne.githistory",
 				"ms-python.python",
-				"ms-python.isort",
 				"commitollama.commitollama",
+				"eamodio.gitlens",
+				"esbenp.prettier-vscode",
+				"meta.pyrefly",
+				"charliermarsh.ruff"
 			]
 		}
 	}

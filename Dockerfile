@@ -1,7 +1,8 @@
-FROM node:22-bookworm
+FROM node:24-bookworm
 
-RUN apt update && apt upgrade
-RUN apt install -y git openssh-client python3 python3-pip python3-flask python3-requests python3-pil
+RUN apt update && apt upgrade -y
+RUN apt install -y git openssh-client python3 python3-pip python3-fastapi python3-multipart \
+    python3-requests python3-pil python3-uvicorn python3-pytest
 
 WORKDIR /workspaces/knowledgebase
 

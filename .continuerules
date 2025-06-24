@@ -77,7 +77,7 @@ The project has only very few external dependencies, so that it is unlikely to b
 * vite (build-system)
 * vanilla typescript/html/css (for rendering)
 * marked (typescript)
-* flask (python)
+* fastapi (python)
 * ollama (llm-endpoint)
 
 

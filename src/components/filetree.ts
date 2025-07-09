@@ -289,7 +289,7 @@ class FileTreeElement extends Module<HTMLLIElement> {
                 result = await session.rm(path, md5)
             }
             if (result)
-            location.reload()
+                location.reload()
         }
     }
 }
@@ -297,8 +297,8 @@ class FileTreeElement extends Module<HTMLLIElement> {
 class FileTreeFolder extends FileTreeElement {
     private folderContent: Module<HTMLUListElement>
 
-    constructor(path: string, name: string, private children: WebFSFileTree | null, private getChildren: CallableFunction | null = null) {
-        super(path, name, true, children == null || Object.keys(children).length > 0)
+    constructor(path: string, name: string, private childElements: WebFSFileTree | null, private getChildElements: CallableFunction | null = null) {
+        super(path, name, true, childElements == null || Object.keys(childElements).length > 0)
         
         this.folderContent = new Module<HTMLUListElement>("ul")
         this.folderContent.htmlElement.style.display = "none";
@@ -323,7 +323,7 @@ class FileTreeFolder extends FileTreeElement {
             localStorage.kb_filetree_expanded_folders = JSON.stringify(folders)
         }
         let span = this.elementButton.htmlElement.getElementsByTagName("span")[0]
-        if (span && this.getChildren == null) {
+        if (span && this.getChildElements == null) {
             span.classList.remove("filetreeFolderIcon")
             span.classList.add("filetreeFolderIconOpen")
         }
@@ -337,7 +337,7 @@ class FileTreeFolder extends FileTreeElement {
             localStorage.kb_filetree_expanded_folders = JSON.stringify(folders)
         }
         let span = this.elementButton.htmlElement.getElementsByTagName("span")[0]
-        if (span && this.getChildren == null) {
+        if (span && this.getChildElements == null) {
             span.classList.remove("filetreeFolderIconOpen")
             span.classList.add("filetreeFolderIcon")
         }
@@ -352,20 +352,20 @@ class FileTreeFolder extends FileTreeElement {
                 let folders = []
                 let files = []
                 let filenames = []
-                if (this.children == null) {
-                    if (this.getChildren == null) return
-                    this.children = await this.getChildren()
+                if (this.childElements == null) {
+                    if (this.getChildElements == null) return
+                    this.childElements = await this.getChildElements()
                     let span = this.elementButton.htmlElement.getElementsByTagName("span")[0]
                     if (span) {
                         span.classList.add("filetreeServerIconLoaded")
                     }
                 }
-                for (const filename in this.children) {
+                for (const filename in this.childElements) {
                     filenames.push(filename)
                 }
                 filenames = filenames.sort((a: string, b: string) => a.toLowerCase().localeCompare(b.toLowerCase()))
                 for (const filename of filenames) {
-                    let value = this.children![filename]
+                    let value = this.childElements![filename]
                     if (!(typeof value === 'string')) {
                         folders.push(new FileTreeFolder(path, filename, value))
                     } else {

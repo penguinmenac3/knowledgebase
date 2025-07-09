@@ -267,27 +267,28 @@ class FileTreeElement extends Module<HTMLLIElement> {
             alert(STRINGS.FILETREE_INVALID_SESSION)
             return
         }
-        let md5 = ""
+        let md5: string | null = ""
         if (!this.isFolder) {
-            let md5 = await session.md5(path)
-            if (md5 == null) {
+            md5 = await session.md5(path)
+            if (md5 == null || md5 == "") {
                 alert(STRINGS.VIEWER_READ_MD5_ERROR)
                 return
             }
         }
         let popup = new ConfirmCancelPopup(
-            "popupContent", "popupContainer",
             STRINGS.FILETREE_DELETE_QUESTION + " " + this.path + "/" + this.name,
             STRINGS.FILETREE_DELETE_CANCEL,
             STRINGS.FILETREE_DELETE_CONFIRM,
         )
         popup.onConfirm = () => {}
-        popup.onCancel = () => {
+        popup.onCancel = async () => {
+            let result = false
             if (this.isFolder) {
-                session.rmdir(path)
+                result = await session.rmdir(path)
             } else {
-                session.rm(path, md5)
+                result = await session.rm(path, md5)
             }
+            if (result)
             location.reload()
         }
     }

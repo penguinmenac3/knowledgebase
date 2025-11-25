@@ -10,11 +10,11 @@
   },
   "devDependencies": {
     "typescript": "^5.5.3",
-    "vite": "^6.0.6"
+    "vite": "^7.2.4"
   },
   "dependencies": {
-    "marked": "^15.0.4",
     "@types/uuid": "^9.0.0",
+    "marked": "^15.0.4",
     "uuid": "^9.0.0"
   }
 }

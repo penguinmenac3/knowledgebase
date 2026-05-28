@@ -5,8 +5,7 @@ import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";
 import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
 import { STRINGS } from "../language/default";
-import { iconBars, iconDots } from "../webui/icons";
-import { SettingsPopup } from "./settings";
+import { iconDots } from "../webui/icons";
 import { search, SearchResult } from "./filetreesearch";
 import { UploadNewFilePopup } from "./uploadFilePopup";
 import { ConfirmCancelPopup, ExitablePopup } from "../webui/components/popup";
@@ -33,10 +32,6 @@ export class FileTree extends Module<HTMLDivElement> {
         this.entriesView = new Module("div")
         this.entriesView.setClass("filetreeEntries")
         this.add(this.entriesView)
-
-        let settingsBtn = new Button(iconBars, "filetreeSettingsButton")
-        settingsBtn.onClick = () => {new SettingsPopup()}
-        this.add(settingsBtn)
     }
 
     private triggerFullUpdate() {

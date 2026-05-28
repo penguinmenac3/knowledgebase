@@ -25,7 +25,6 @@
     font-size: large;
     width: -webkit-fill-available;
     padding: 0.45em;
-    padding-left: 2.1em;
     margin: 0.5em;
     border: 2px solid var(--color-base-c);
     border-radius: var(--radius);

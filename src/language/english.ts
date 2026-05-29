@@ -49,6 +49,27 @@ export class English {
     public static SETTINGS_REMOVE_CONNECTION_QUESTION = "Are you sure you want to delete this connection?"
     public static SETTINGS_REMOVE_CONNECTION_CONFIRM = "Yes, delete this connection."
     public static SETTINGS_REMOVE_CONNECTION_CANCEL = "No, keep this connection."
+    public static SETTINGS_BULK_IMPORT = "Import Session(s)"
+    public static SETTINGS_BULK_IMPORT_PLACEHOLDER = `[
+  {
+    "sessionName": "myserver",
+    "apiEndpoint": "https://myserver/webfs/v1",
+    "apiToken": "your-api-token-here"
+  },
+  {
+    "sessionName": "otherserver",
+    "apiEndpoint": "https://otherserver/webfs/v1",
+    "apiToken": "your-api-token-here"
+  }
+]`
+    public static SETTINGS_BULK_IMPORT_SUBMIT = "Import Sessions"
+    public static SETTINGS_BULK_IMPORT_INVALID_JSON = "Invalid JSON format. Please check your configuration."
+    public static SETTINGS_BULK_IMPORT_MISSING_FIELDS = "Each session must have sessionName, apiEndpoint, and apiToken fields."
+    public static SETTINGS_BULK_IMPORT_SUCCESS = "Successfully imported {count} session(s)."
+    public static SETTINGS_BULK_IMPORT_FAILED = "Failed to import {count} session(s). Check your credentials and try again."
+    public static SETTINGS_BULK_IMPORT_CONFIRM = "Import {count} session(s)?"
+    public static SETTINGS_BULK_IMPORT_CONFIRM_YES = "Yes, import"
+    public static SETTINGS_BULK_IMPORT_CONFIRM_NO = "Cancel"
 
     public static UPLOAD_TITLE = "Upload File"
     public static UPLOAD_SERVER = "Server"

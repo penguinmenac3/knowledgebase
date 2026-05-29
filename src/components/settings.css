@@ -2,3 +2,14 @@
     display: inline-block;
     padding-right: 1em;
 }
+
+.popupDescription {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.formTextAreaLarge {
+    height: 200px;
+    font-family: monospace;
+}

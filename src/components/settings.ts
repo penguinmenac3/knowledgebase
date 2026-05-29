@@ -3,7 +3,7 @@ import { WebFS } from "../webfs/client/webfs";
 import { Module } from "../webui/module";
 import { ConfirmCancelPopup, ExitablePopup } from "../webui/components/popup";
 import { STRINGS } from "../language/default";
-import { createNewSessionForm } from "../webfs/client/login/login";
+import { createBulkImportForm } from "../webfs/client/login/bulk-import";
 import { Button } from "../webui/components/form";
 
 
@@ -30,11 +30,15 @@ export class SettingsPopup extends ExitablePopup {
             let deleteBtn = new Button(STRINGS.SETTINGS_REMOVE_CONNECTION)
             deleteBtn.setClass("buttonBad")
             deleteBtn.onClick = () => {
-                let confirmCancelPopup = new ConfirmCancelPopup("popupContent", "popupContainer", STRINGS.SETTINGS_REMOVE_CONNECTION_QUESTION, STRINGS.SETTINGS_REMOVE_CONNECTION_CONFIRM, STRINGS.SETTINGS_REMOVE_CONNECTION_CANCEL)
+                let confirmCancelPopup = new ConfirmCancelPopup(STRINGS.SETTINGS_REMOVE_CONNECTION_QUESTION, STRINGS.SETTINGS_REMOVE_CONNECTION_CONFIRM, STRINGS.SETTINGS_REMOVE_CONNECTION_CANCEL)
                 confirmCancelPopup.onConfirm = () => {
-                    let sessions = JSON.parse(localStorage.kb_sessions) as string[]
-                    sessions = sessions.filter(session => session !== sessionName)
-                    localStorage.kb_sessions = JSON.stringify(sessions)
+                    // Delete from kb_sessions (session names array)
+                    if (localStorage.kb_sessions) {
+                        let sessions = JSON.parse(localStorage.kb_sessions) as string[]
+                        sessions = sessions.filter(session => session !== sessionName)
+                        localStorage.kb_sessions = JSON.stringify(sessions)
+                    }
+                    // Delete from webfs_sessions (session details object - handled by removeSession)
                     session.removeSession()
                     location.reload()
                 }
@@ -46,8 +50,11 @@ export class SettingsPopup extends ExitablePopup {
             this.add(serverName)
         })
 
-        this.add(new Module("div", STRINGS.SETTINGS_ADD_CONNECTION, "popupSubtitle"))
-        this.add(createNewSessionForm())
+        /*this.add(new Module("div", STRINGS.SETTINGS_ADD_CONNECTION, "popupSubtitle"))
+        this.add(createNewSessionForm())*/
+
+        this.add(new Module("div", STRINGS.SETTINGS_BULK_IMPORT, "popupSubtitle"))
+        this.add(createBulkImportForm())
     }
 
     public update(): void {}

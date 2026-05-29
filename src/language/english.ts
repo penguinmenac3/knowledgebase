@@ -70,6 +70,10 @@ export class English {
     public static SETTINGS_BULK_IMPORT_CONFIRM = "Import {count} session(s)?"
     public static SETTINGS_BULK_IMPORT_CONFIRM_YES = "Yes, import"
     public static SETTINGS_BULK_IMPORT_CONFIRM_NO = "Cancel"
+    public static SETTINGS_HARD_RESET = "HARD RESET"
+    public static SETTINGS_HARD_RESET_QUESTION = "Are you sure you want to perform a hard reset? This will clear all local data including all sessions and settings."
+    public static SETTINGS_HARD_RESET_CONFIRM = "Yes, perform hard reset"
+    public static SETTINGS_HARD_RESET_CANCEL = "Cancel"
 
     public static UPLOAD_TITLE = "Upload File"
     public static UPLOAD_SERVER = "Server"

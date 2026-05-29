@@ -55,6 +55,19 @@ export class SettingsPopup extends ExitablePopup {
 
         this.add(new Module("div", STRINGS.SETTINGS_BULK_IMPORT, "popupSubtitle"))
         this.add(createBulkImportForm())
+
+        this.add(new Module("div", STRINGS.SETTINGS_HARD_RESET, "popupSubtitle"))
+        let hardResetBtn = new Button(STRINGS.SETTINGS_HARD_RESET, "buttonWide")
+        hardResetBtn.setClass("buttonBad")
+        hardResetBtn.onClick = () => {
+            let confirmPopup = new ConfirmCancelPopup(STRINGS.SETTINGS_HARD_RESET_QUESTION, STRINGS.SETTINGS_HARD_RESET_CONFIRM, STRINGS.SETTINGS_HARD_RESET_CANCEL)
+            confirmPopup.onConfirm = () => {
+                localStorage.clear()
+                location.reload()
+            }
+            confirmPopup.show()
+        }
+        this.add(hardResetBtn)
     }
 
     public update(): void {}

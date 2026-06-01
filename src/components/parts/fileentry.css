@@ -1,0 +1,53 @@
+.fileEntry {
+    display: flex;
+    align-items: center;
+}
+
+.fileEntryMain {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 0.5em;
+}
+
+.fileIcon {
+    display: inline-flex;
+    align-items: center;
+    height: 1em;
+    width: 1em;
+    flex-shrink: 0;
+}
+
+.fileIcon svg {
+    height: 1em;
+    width: 1em;
+}
+
+.fileEntryDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+    flex: 1;
+    min-width: 0;
+}
+
+.fileEntryFilename {
+    font-weight: bold;
+}
+
+.fileEntryModified {
+    color: var(--color-contrast-gray);
+    font-size: small;
+}
+
+.fileEntryInfo {
+    font-size: small;
+    color: var(--color-contrast-gray);
+    font-style: italic;
+}
+
+.fileEntryMissing {
+    color: var(--color-bad-font);
+    font-size: small;
+    font-weight: bold;
+}

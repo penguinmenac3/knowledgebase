@@ -9,10 +9,8 @@ import { FileTree } from './components/filetree'
 import { Viewer } from './components/viewer'
 import { AIChat } from './components/ai'
 import { LastModified } from './components/lastmodified'
-import { Favourites } from './components/favourites'
 import { SettingsPopup } from './components/settings'
 import { iconFolder, iconChat, iconHistory } from './icons'
-import { iconStar } from './webui/icons'
 
 
 async function main() {
@@ -26,9 +24,6 @@ async function main() {
   let fileTree = new FileTree()
   masterContentMap.set(
     {id: "filetree", hint: "File Tree", icon: iconFolder}, fileTree
-  )
-  masterContentMap.set(
-    {id: "starred", hint: "Starred", icon: iconStar}, new Favourites()
   )
   masterContentMap.set(
     {id: "lastmodified", hint: "Last Modified", icon: iconHistory}, new LastModified()

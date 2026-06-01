@@ -75,6 +75,16 @@ class FileTreeManager {
   public isOffline(sessionName: string): boolean {
     return this.offlineConnections.includes(sessionName);
   }
+
+  public getConnectivityStatus(sessionName: string): 'connected' | 'offline' | 'undefined' {
+    if (!this.fileTrees.has(sessionName)) {
+      return 'undefined';
+    }
+    if (this.isOffline(sessionName)) {
+      return 'offline';
+    }
+    return 'connected';
+  }
   
   // Starred files methods
   public getStarredFiles(): Array<{sessionName: string, path: string}> {
@@ -126,15 +136,43 @@ class FileTreeManager {
     this.notifySubscribers();
   }
   
+  // Expanded folders methods
+  public getExpandedFolders(): string[] {
+    if (!localStorage.kb_filetree_expanded_folders) {
+      localStorage.kb_filetree_expanded_folders = "[]";
+    }
+    return JSON.parse(localStorage.kb_filetree_expanded_folders);
+  }
+
+  public setExpandedFolder(uri: string): void {
+    const folders = this.getExpandedFolders();
+    if (!folders.includes(uri)) {
+      folders.push(uri);
+      localStorage.kb_filetree_expanded_folders = JSON.stringify(folders);
+      this.notifySubscribers();
+    }
+  }
+
+  public unsetExpandedFolder(uri: string): void {
+    const folders = this.getExpandedFolders();
+    const filtered = folders.filter((ele) => ele !== uri);
+    localStorage.kb_filetree_expanded_folders = JSON.stringify(filtered);
+    this.notifySubscribers();
+  }
+
+  public isFolderExpanded(uri: string): boolean {
+    return this.getExpandedFolders().includes(uri);
+  }
+
   // Subscription
   public subscribe(callback: () => void): void {
     this.subscribers.add(callback);
   }
-  
+
   public unsubscribe(callback: () => void): void {
     this.subscribers.delete(callback);
   }
-  
+
   private notifySubscribers(): void {
     this.subscribers.forEach(callback => callback());
   }

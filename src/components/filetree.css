@@ -22,10 +22,10 @@
 }
 
 .filetreeSearch {
-    font-size: large;
+    font-size: medium;
     width: -webkit-fill-available;
-    padding: 0.45em;
-    margin: 0.5em;
+    padding: 0.35em;
+    margin: 0.25em;
     border: 2px solid var(--color-base-c);
     border-radius: var(--radius);
     color: var(--color-base-c);
@@ -37,7 +37,6 @@
     height: -webkit-fill-available;
     display: block;
     overflow-y: auto;
-    text-align: center;
 }
 
 .filetreeOfflineStatus {
@@ -50,34 +49,15 @@
 .filetreeRoot {
     display: block;
     text-align: left;
-}
-
-.filetreeServerIcon::before {
-    content: "☁️";
-    margin-right: 0.2em;
-}
-.filetreeServerIconLoaded {
-    filter: invert(100%) sepia(100%) saturate(4619%) hue-rotate(270deg) invert(100%);
-}
-
-.filetreeFolderIcon::before {
-    content: "📁";
-    margin-right: 0.2em;
-}
-.filetreeFolderIconOpen::before {
-    content: "📂";
-    margin-right: 0.2em;
-}
-
-.filetreeFileIcon::before {
-    content: "📄";
-    margin-right: 0.2em;
+    margin-block-start: 0.25em !important;
+    margin-block-end: 0.5em !important;
 }
 
 .filetreeRoot, .filetreeRoot ul {
     list-style-type: none;
-    margin-left: 0.5em;
     padding-left: 0.5em;
+    margin-block-start: 0.0em;
+    margin-block-end: 0.1em;
 }
 
 .fileTreeFolder ul {
@@ -131,29 +111,4 @@
 .fileTreeElementSettings:hover {
     border-radius: var(--radius);
     background-color: var(--color-base-transparent-2);
-}
-
-.filetreeElementMenu {
-    display: none; /* Hidden by default */
-    position: absolute;
-    background-color: var(--color-base);
-    border-radius: var(--radius);
-    box-shadow: 0 4px 8px var(--color-shadow-color);
-    z-index: 1000; /* Ensure it stays above other elements */
-    list-style-type: none;
-    padding: 0.1em;
-    margin: 0;
-}
-
-.filetreeElementMenuButton {
-    display: block;
-    padding: 0.45em 0.6em;
-    cursor: pointer;
-    border-radius: var(--radius);
-    fill: var(--color-base-c);
-    color: var(--color-base-c);
-}
-
-.filetreeElementMenuButton:hover {
-    background-color: var(--color-base-hover);
 }

@@ -10,48 +10,78 @@
     border-bottom: 1px solid var(--color-border);
 }
 
-.lastModifiedEntries {
-    flex: 1;
-    overflow-y: auto;
-}
-
-.lastModifiedEntry {
-    display: flex;
-    align-items: center;
-    padding: 0.5em 1em;
-    cursor: pointer;
+.lastModifiedSearchRow {
     border-bottom: 1px solid var(--color-border);
 }
 
-.lastModifiedEntry:hover {
-    background-color: var(--color-hover);
+.lastModifiedSearch {
+    font-size: medium;
+    width: -webkit-fill-available;
+    padding: 0.35em;
+    margin: 0.25em;
+    border: 2px solid var(--color-base-c);
+    border-radius: var(--radius);
+    color: var(--color-base-c);
+    background-color: var(--color-base-2);
 }
 
-.lastModifiedIcon {
-    margin-right: 0.5em;
+.lastModifiedFilterRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.5em 1em;
+    border-bottom: 1px solid var(--color-border);
 }
 
-.lastModifiedName {
-    font-weight: bold;
-    margin-right: 0.5em;
+.lastModifiedStarButton {
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 0.25em 0.5em;
+    border-radius: var(--radius);
+    transition: background-color 0.2s;
 }
 
-.lastModifiedPath {
-    color: var(--color-dim);
-    margin-right: 0.5em;
+.lastModifiedStarButton:hover {
+    background-color: var(--color-base-hover);
+}
+
+.lastModifiedStarButton.active {
+    color: var(--color-accent);
+    background-color: var(--color-base-hover-2);
+}
+
+.lastModifiedFiletreeButtons {
+    display: flex;
+    gap: 0.25em;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.lastModifiedFilterButton {
+    padding: 0.25em 0.75em;
     font-size: 0.9em;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-.lastModifiedSession {
-    color: var(--color-dim);
-    margin-right: 0.5em;
-    font-size: 0.9em;
+.lastModifiedFilterButton:hover {
+    background-color: var(--color-base-hover);
 }
 
-.lastModifiedDate {
-    color: var(--color-dim);
-    margin-left: auto;
-    font-size: 0.9em;
+.lastModifiedFilterButton.active {
+    background-color: var(--color-brand);
+    color: white;
+}
+
+.lastModifiedFilterButton.offline {
+    opacity: 0.7;
+    font-style: italic;
+}
+
+.lastModifiedEntries {
+    flex: 1;
+    overflow-y: auto;
 }
 
 .lastModifiedEmpty {

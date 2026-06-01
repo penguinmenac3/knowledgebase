@@ -1,16 +1,13 @@
 import "./filetree.css"
 import { FileTree as WebFSFileTree, WebFS } from "../webfs/client/webfs";
-import { Button,  FormInput, FormLabel } from "../webui/components/form";
-import { humanFriendlyDate } from "../webui/utils/humanFriendlyDates";
+import { FormInput } from "../webui/components/form";
 import { KWARGS, Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
 import { STRINGS } from "../language/default";
-import { iconDots } from "../webui/icons";
 import { search, SearchResult } from "./filetreesearch";
-import { UploadNewFilePopup } from "./uploadFilePopup";
-import { ConfirmCancelPopup, ExitablePopup } from "../webui/components/popup";
 import { fileTreeManager } from "./filetreemanager";
-
+import { FileTreeEntry, TreeNode } from "./parts/filetreeentry";
+import { buildFileContextMenu, buildFolderContextMenu } from "./parts/fileContextMenus";
 
 export class FileTree extends Module<HTMLDivElement> {
     private searchField: FormInput
@@ -85,7 +82,7 @@ export class FileTree extends Module<HTMLDivElement> {
             this.entriesView.add(new SearchResult(
                 entry.filepath,
                 entry.sessionName,  
-                entry.modified != null ? humanFriendlyDate(entry.modified) : "",
+                entry.modified,
                 entry.isFolder,
                 this.searchField,
                 this.triggerFullUpdate.bind(this)
@@ -104,320 +101,201 @@ export class FileTree extends Module<HTMLDivElement> {
     private async renderFiletreeView() {
         this.entriesView.htmlElement.innerHTML = "";
         let filetreeList = new Module<HTMLUListElement>("ul", "", "filetreeRoot");
-        
+
         for (let sessionName of WebFS.connections.keys()) {
-            filetreeList.add(new FileTreeFolder("", sessionName, null, async () => await fileTreeManager.getFileTree(sessionName)))
+            let node = new FileTreeFolderNode("", sessionName, null, async () => await fileTreeManager.getFileTree(sessionName));
+            filetreeList.add(node);
         }
         this.entriesView.add(filetreeList);
     }
 }
 
-class FileTreeElement extends Module<HTMLLIElement> {
-    private elementSettings: Button
-    protected elementButton: Button
+/**
+ * New tree node implementation using FileTreeEntry and shared menu builders
+ */
+class FileTreeFolderNode extends Module<HTMLDivElement> {
+    private entry: FileTreeEntry;
+    private folderContent: Module<HTMLUListElement>;
+    private childElements: WebFSFileTree | null;
+    private getChildElements: CallableFunction | null;
+    private sessionName: string;
+    private fullPath: string;
 
-    constructor(public path: string, protected name: string, private isFolder: boolean, private hasChildren: boolean) {
-        super("li", "", isFolder ? "fileTreeFolder" : "fileTreeFile");
+    constructor(
+        path: string,
+        private name: string,
+        childElements: WebFSFileTree | null,
+        getChildElements: CallableFunction | null = null,
+    ) {
+        super("div", "", "filetreeNodeWrapper");
+        this.childElements = childElements;
+        this.getChildElements = getChildElements;
+        this.sessionName = path === "" ? name : path.split("/")[0];
+        this.fullPath = path === "" ? "" : path + "/" + name;
 
-        this.elementSettings = new Button(iconDots, "fileTreeElementSettings");
-        this.elementSettings.setClass("right");
-        this.elementSettings.onClick = () => { this.showMenu(); };
-        this.add(this.elementSettings);
+        // Determine if this is a root server node or a folder
+        const isRoot = path === "";
+        const hasChildren = childElements == null || Object.keys(childElements).length > 0;
 
-        this.elementButton = new Button("", "fileTreeElementTitle");
-        this.elementButton.onClick = () => { this.onClick(); };
-        let iconClass = isFolder ? 'filetreeFolderIcon' : 'filetreeFileIcon'
-        if (path == "") {
-            iconClass = 'filetreeServerIcon'
+        // Create TreeNode for FileTreeEntry
+        const node: TreeNode = {
+            name: name,
+            path: this.fullPath,
+            isFolder: true,
+            hasChildren: hasChildren,
+            isExpanded: this.isExpandedFolder()
+        };
+
+        // Build menu actions using shared builder
+        const actions = buildFolderContextMenu(this.sessionName, this.fullPath);
+
+        // Create FileTreeEntry with connection status for top-level folders
+        let connectionStatus: 'connected' | 'offline' | 'undefined' = "undefined"
+        if (isRoot) {
+            connectionStatus = fileTreeManager.getConnectivityStatus(this.sessionName);
         }
-        this.elementButton.htmlElement.innerHTML += `<span class="${iconClass}"></span> ${name.replaceAll("_", " ")}`;
-        this.add(this.elementButton);
+        this.entry = new FileTreeEntry(node, actions, connectionStatus);
+
+        // Set up click handler for navigation
+        this.entry.getButton().onClick = () => {
+            this.toggleExpand();
+        };
+
+        // Set up expand callback
+        this.entry.setOnExpand(() => {
+            this.toggleExpand();
+        });
+
+        // Create folder content container
+        this.folderContent = new Module<HTMLUListElement>("ul");
+        this.folderContent.htmlElement.style.display = node.isExpanded ? "" : "none";
+
+        this.add(this.entry);
+        this.add(this.folderContent);
+
+        // Auto-expand if it was previously expanded
+        if (node.isExpanded) {
+            this.loadChildren();
+        }
+
     }
 
-    protected onClick() {}
-
-    protected showMenu() {
-        let menu = new FileTreeElementMenu(this, this.isFolder, this.path != "", !this.hasChildren && this.path != "");
-        menu.htmlElement.style.display = "block";
-        menu.htmlElement.style.position = "absolute";
-        const rect = this.elementSettings.htmlElement.getBoundingClientRect();
-        let cx = (rect.left + rect.right) / 2
-        let cy = (rect.top + rect.bottom) / 2
-        let W = window.innerWidth;
-        let H = window.innerHeight;
-        let availableSpaceRight = W - cx;
-        let availableSpaceBelow = H - cy;
-        console.log(menu.htmlElement.getBoundingClientRect())
-        console.log(availableSpaceBelow, menu.htmlElement.clientHeight)
-        console.log(availableSpaceRight, menu.htmlElement.clientWidth)
-
-        // Adjust menu position based on available space
-        if (availableSpaceBelow < menu.htmlElement.clientHeight) {
-            // If not enough space below, place it above the button
-            menu.htmlElement.style.top = `${cy - menu.htmlElement.clientHeight}px`;
-        } else {
-            // Otherwise, place it below the button
-            menu.htmlElement.style.top = `${cy}px`;
-        }
-    
-        if (availableSpaceRight < menu.htmlElement.clientWidth) {
-            // If not enough space to the right, place it to the left of the button
-            menu.htmlElement.style.left = `${cx - menu.htmlElement.clientWidth}px`;
-        } else {
-            // Otherwise, place it to the right of the button
-            menu.htmlElement.style.left = `${cx}px`;
-        }
-    }
-
-    public getURI(): string {
-        let uri = this.path + "/" + this.name
-        uri = uri.replace("/", "").replace("/", ":./")
-        if (!uri.includes(":./")) {
-            uri = uri + ":./"
-        }
-        return uri
-    }
-
-    public async newFile() {
-        new UploadNewFilePopup(this.getURI(), "", () => location.reload())
-    }
-
-    public async newFolder() {
-        let uri = this.getURI()
-        let sessionName = uri.split(":")[0]
-        let path = uri.split(":")[1]
-        let session = WebFS.connections.get(sessionName)
-        if (session == null) {
-            alert(STRINGS.FILETREE_INVALID_SESSION)
-            return
-        }
-        session.mkdir(path + "/New Folder")
-        location.reload()
-    }
-
-    public async rename() {
-        let uri = this.getURI()
-        let sessionName = uri.split(":")[0]
-        let path = uri.split(":")[1]
-        let session = WebFS.connections.get(sessionName)
-        if (session == null) {
-            alert(STRINGS.FILETREE_INVALID_SESSION)
-            return
-        }
-
-        let renamePopup = new ExitablePopup()
-        renamePopup.htmlElement.style.width = "87%"
-        renamePopup.htmlElement.style.maxWidth = "40em"
-
-        renamePopup.add(new FormLabel(STRINGS.FILETREE_RENAME_CURRENT_PATH))
-        let current_path = new FormInput("current_path", "", "text")
-        current_path.value(path)
-        current_path.htmlElement.disabled = true
-        renamePopup.add(current_path)
-
-        renamePopup.add(new FormLabel(STRINGS.FILETREE_RENAME_NEW_PATH))
-        let new_path = new FormInput("current_path", "", "text")
-        new_path.value(path)
-        renamePopup.add(new_path)
-
-        let confirmButton = new Button(STRINGS.FILETREE_RENAME_CONFIRM, "buttonWide")
-        confirmButton.setClass("good")
-        confirmButton.onClick = () => {
-            session.mv(path, new_path.value())
-            location.reload()
-        }
-        renamePopup.add(confirmButton)
-    }
-
-    public async delete() {
-        let uri = this.getURI()
-        let sessionName = uri.split(":")[0]
-        let path = uri.split(":")[1]
-        let session = WebFS.connections.get(sessionName)
-        if (session == null) {
-            alert(STRINGS.FILETREE_INVALID_SESSION)
-            return
-        }
-        let md5: string | null = ""
-        if (!this.isFolder) {
-            md5 = await session.md5(path)
-            if (md5 == null || md5 == "") {
-                alert(STRINGS.VIEWER_READ_MD5_ERROR)
-                return
-            }
-        }
-        let popup = new ConfirmCancelPopup(
-            STRINGS.FILETREE_DELETE_QUESTION + " " + this.path + "/" + this.name,
-            STRINGS.FILETREE_DELETE_CANCEL,
-            STRINGS.FILETREE_DELETE_CONFIRM,
-        )
-        popup.onConfirm = () => {}
-        popup.onCancel = async () => {
-            let result = false
-            if (this.isFolder) {
-                result = await session.rmdir(path)
-            } else {
-                result = await session.rm(path, md5)
-            }
-            if (result)
-                location.reload()
-        }
-    }
-}
-
-class FileTreeFolder extends FileTreeElement {
-    private folderContent: Module<HTMLUListElement>
-
-    constructor(path: string, name: string, private childElements: WebFSFileTree | null, private getChildElements: CallableFunction | null = null) {
-        super(path, name, true, childElements == null || Object.keys(childElements).length > 0)
-        
-        this.folderContent = new Module<HTMLUListElement>("ul")
-        this.folderContent.htmlElement.style.display = "none";
-        this.add(this.folderContent)
-        if (this.isExpandedFolder()) {
-            this.onClick()
-        }
-    }
 
     private isExpandedFolder(): boolean {
-        if (!localStorage.kb_filetree_expanded_folders) {
-            localStorage.kb_filetree_expanded_folders = "[]"
-        }
-        let folders: string[] = JSON.parse(localStorage.kb_filetree_expanded_folders)
-        return folders.includes(this.getURI())
+        return fileTreeManager.isFolderExpanded(this.getURI());
     }
 
     private setExpandedFolder(): void {
-        if (!this.isExpandedFolder()) {
-            let folders: string[] = JSON.parse(localStorage.kb_filetree_expanded_folders)
-            folders.push(this.getURI())
-            localStorage.kb_filetree_expanded_folders = JSON.stringify(folders)
-        }
-        let span = this.elementButton.htmlElement.getElementsByTagName("span")[0]
-        if (span && this.getChildElements == null) {
-            span.classList.remove("filetreeFolderIcon")
-            span.classList.add("filetreeFolderIconOpen")
-        }
+        fileTreeManager.setExpandedFolder(this.getURI());
     }
 
     private unsetExpandedFolder(): void {
-        if (this.isExpandedFolder()) {
-            let folders: string[] = JSON.parse(localStorage.kb_filetree_expanded_folders)
-            let uri = this.getURI()
-            folders = folders.filter((ele, _) => ele != uri)
-            localStorage.kb_filetree_expanded_folders = JSON.stringify(folders)
-        }
-        let span = this.elementButton.htmlElement.getElementsByTagName("span")[0]
-        if (span && this.getChildElements == null) {
-            span.classList.remove("filetreeFolderIconOpen")
-            span.classList.add("filetreeFolderIcon")
-        }
+        fileTreeManager.unsetExpandedFolder(this.getURI());
     }
 
-    protected async onClick() {
-        if (this.folderContent.htmlElement.style.display === "none") {
-            this.folderContent.htmlElement.style.display = "";
-            this.setExpandedFolder()
-            if (this.folderContent.htmlElement.children.length == 0) {
-                let path = this.path + "/" + this.name
-                let folders = []
-                let files = []
-                let filenames = []
-                if (this.childElements == null) {
-                    if (this.getChildElements == null) return
-                    this.childElements = await this.getChildElements()
-                    let span = this.elementButton.htmlElement.getElementsByTagName("span")[0]
-                    if (span) {
-                        span.classList.add("filetreeServerIconLoaded")
-                    }
-                }
-                for (const filename in this.childElements) {
-                    filenames.push(filename)
-                }
-                filenames = filenames.sort((a: string, b: string) => a.toLowerCase().localeCompare(b.toLowerCase()))
-                for (const filename of filenames) {
-                    let value = this.childElements![filename]
-                    if (!(typeof value === 'string')) {
-                        folders.push(new FileTreeFolder(path, filename, value))
-                    } else {
-                        files.push(new FileTreeFile(path, filename))
-                    }
-                }
-                for (const entry of folders) {
-                    this.folderContent.add(entry)
-                }
-                for (const entry of files) {
-                    this.folderContent.add(entry)
-                }
-            }
-        } else {
+    private getURI(): string {
+        if (this.fullPath === "") {
+            return this.sessionName + ":./";
+        }
+        let uri = this.sessionName + ":" + this.fullPath.replaceAll(this.sessionName + "/", "")
+        return uri
+    }
+
+    private async toggleExpand() {
+        const isCurrentlyExpanded = this.folderContent.htmlElement.style.display !== "none";
+        
+        if (isCurrentlyExpanded) {
             this.folderContent.htmlElement.style.display = "none";
-            this.unsetExpandedFolder()
+            this.entry.setIsExpanded(false);
+            this.unsetExpandedFolder();
+        } else {
+            this.folderContent.htmlElement.style.display = "";
+            this.entry.setIsExpanded(true);
+            this.setExpandedFolder();
+            await this.loadChildren();
         }
     }
-}
 
-class FileTreeFile extends FileTreeElement {
-    constructor(path: string, name: string) {
-        super(path, name, false, false)
-    }
+    private async loadChildren() {
+        if (this.folderContent.htmlElement.children.length > 0) {
+            return; // Already loaded
+        }
 
-    protected onClick(): void {
-        PageManager.update({view: this.getURI()})
-    }
-}
+        let path = this.fullPath;
+        let isRoot = false;
+        if (path === "") {
+            isRoot = true
+            path = this.name;
+        }
+        if (this.childElements == null) {
+            if (this.getChildElements == null) return;
+            this.childElements = await this.getChildElements();
+        }
+        if (isRoot) {
+            this.entry.setConnectionStatus(fileTreeManager.getConnectivityStatus(this.sessionName));
+        }
 
+        const folders: FileTreeFolderNode[] = [];
+        const files: FileTreeFileNode[] = [];
+        const filenames: string[] = [];
 
-class FileTreeElementMenu extends Module<HTMLDivElement> {
-    private background: Module<HTMLDivElement>
+        for (const filename in this.childElements) {
+            filenames.push(filename);
+        }
 
-    constructor(parent: FileTreeElement, isFolder: boolean, isMovable: boolean, isDeletable: boolean) {
-        super("div", "", "filetreeElementMenu");
+        filenames.sort((a: string, b: string) => a.toLowerCase().localeCompare(b.toLowerCase()));
 
-        // Add star/unstar option for files (not folders, not root)
-        if (!isFolder && parent.path != "") {
-            let uri = parent.getURI();
-            let sessionName = uri.split(":")[0];
-            let path = uri.split(":")[1];
-            let isStarred = fileTreeManager.isStarred(sessionName, path);
-            
-            let starAction = new Button(isStarred ? "Unstar" : "Star", "filetreeElementMenuButton")
-            starAction.onClick = () => { 
-                this.close(); 
-                fileTreeManager.toggleStar(sessionName, path);
+        for (const filename of filenames) {
+            const value = this.childElements![filename];
+            if (!(typeof value === 'string')) {
+                folders.push(new FileTreeFolderNode(path, filename, value));
+            } else {
+                files.push(new FileTreeFileNode(path, filename, value, this.sessionName));
             }
-            this.add(starAction)
         }
 
-        if (isFolder) {
-            let newFileAction = new Button("New File", "filetreeElementMenuButton")
-            newFileAction.onClick = () => { this.close(); parent.newFile(); }
-            this.add(newFileAction)
-            let newFolderAction = new Button("New Folder", "filetreeElementMenuButton")
-            newFolderAction.onClick = () => { this.close(); parent.newFolder(); }
-            this.add(newFolderAction)
+        for (const entry of folders) {
+            this.folderContent.add(entry);
         }
-        if (isMovable) {
-            let renameAction = new Button("Move", "filetreeElementMenuButton")
-            renameAction.onClick = () => { this.close(); parent.rename(); }
-            this.add(renameAction)
+        for (const entry of files) {
+            this.folderContent.add(entry);
         }
-        if (isDeletable) {
-            let deleteAction = new Button("Delete", "filetreeElementMenuButton")
-            deleteAction.onClick = () => { this.close(); parent.delete(); }
-            this.add(deleteAction)
-        }
+    }
+}
 
-        this.background = new Module<HTMLDivElement>("div", "", "toolPopupGrayout")
-        this.background.htmlElement.onclick = () => {
-            this.close()
-        }
-        document.body.appendChild(this.background.htmlElement)
-        document.body.appendChild(this.htmlElement)
+class FileTreeFileNode extends Module<HTMLLIElement> {
+    private entry: FileTreeEntry;
+    private sessionName: string;
+    private fullPath: string;
+
+    constructor(parentPath: string, name: string, _modified: string, parentSessionName: string) {
+        super("li", "", "fileTreeFile");
+        this.sessionName = parentSessionName;
+        this.fullPath = (parentPath + "/" + name).replaceAll(this.sessionName + "/", "");
+
+        const node: TreeNode = {
+            name: name,
+            path: this.fullPath,
+            isFolder: false,
+            hasChildren: false
+        };
+
+        // Build menu actions using shared builder
+        const isStarred = fileTreeManager.isStarred(this.sessionName, this.fullPath);
+        const actions = buildFileContextMenu(this.sessionName, this.fullPath, isStarred);
+
+        this.entry = new FileTreeEntry(node, actions);
+
+        // Set up click handler for navigation
+        this.entry.getButton().onClick = () => {
+            PageManager.update({view: this.getURI()});
+        };
+
+        this.add(this.entry);
     }
 
-    private close() {
-        document.body.removeChild(this.background.htmlElement)
-        document.body.removeChild(this.htmlElement)
+
+    private getURI(): string {
+        return this.sessionName + ":" + this.fullPath;
     }
 }

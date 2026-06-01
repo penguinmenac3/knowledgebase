@@ -1,9 +1,11 @@
 import "./filetreesearch.css"
 import { FileTree as WebFSFileTree } from "../webfs/client/webfs";
 import {  FormInput } from "../webui/components/form";
-import { Module } from "../webui/module";
 import { PageManager } from "../webui/pagemanager";
 import { splitFilepath } from "../webui/utils/path";
+import { FileEntry } from "./parts/fileentry";
+import { buildFileContextMenu, buildFolderContextMenu } from "./parts/fileContextMenus";
+import { fileTreeManager } from "./filetreemanager";
 
 
 export interface Entry {
@@ -14,29 +16,36 @@ export interface Entry {
     score?: number
 }
 
-export class SearchResult extends Module<HTMLDivElement> {
-    constructor(filepath: string, sessionName: string, _modified: string, isFolder: boolean, searchField: FormInput, _triggerFullUpdate: CallableFunction) {
-        super("div", "", "searchResult")
+export class SearchResult extends FileEntry {
+    constructor(filepath: string, sessionName: string, modified: Date | null, isFolder: boolean, searchField: FormInput, _triggerFullUpdate: CallableFunction) {
         let { filename, folder } = splitFilepath(filepath);
         let displayFolder = folder
         if (displayFolder == ".") {
             displayFolder = ""
         }
-        this.htmlElement.innerHTML = filename + "<BR><span class='searchResultInfo'>" + sessionName + "/" + displayFolder + "</span>"
-
-        let filename_parts = filename.split(".")
-        if (isFolder) filename_parts.push("DIR")
         
-        this.htmlElement.onclick = () => {
-            if (isFolder) {
-                searchField.htmlElement.value = "/" + filepath
-                searchField.onChange(searchField.htmlElement.value)
-                searchField.onChangeDone(searchField.htmlElement.value)
-            } else {
-                let uri = sessionName + ":" + folder + "/" + filename
-                PageManager.update({view: uri})
-            }
-        }
+        // Use shared menu builder based on file/folder type
+        const actions = isFolder 
+            ? buildFolderContextMenu(sessionName, filepath)
+            : buildFileContextMenu(sessionName, filepath, fileTreeManager.isStarred(sessionName, filepath));
+        
+        super(
+            sessionName,
+            filepath,
+            modified,
+            isFolder,
+            () => {
+                if (isFolder) {
+                    searchField.htmlElement.value = "/" + filepath
+                    searchField.onChange(searchField.htmlElement.value)
+                    searchField.onChangeDone(searchField.htmlElement.value)
+                } else {
+                    let uri = sessionName + ":" + folder + "/" + filename
+                    PageManager.update({view: uri})
+                }
+            },
+            actions
+        );
     }
 }
 

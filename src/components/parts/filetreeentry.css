@@ -1,0 +1,45 @@
+.filetreeEntry {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.filetreeEntryContent {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.filetreeExpandButton {
+    min-width: 1em;
+    padding: 0;
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-weight: bold;
+}
+
+.filetreeExpandButton:hover {
+    color: var(--color-text-primary);
+}
+
+.filetreeExpandButton svg {
+    height: 1em;
+    width: 1em;
+}
+
+.fileIcon {
+    display: inline-flex;
+    align-items: center;
+    height: 1em;
+    width: 1em;
+}
+
+.fileIcon svg {
+    height: 1em;
+    width: 1em;
+}

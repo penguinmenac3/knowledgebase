@@ -9,15 +9,12 @@ import { iconDots } from "../webui/icons";
 import { search, SearchResult } from "./filetreesearch";
 import { UploadNewFilePopup } from "./uploadFilePopup";
 import { ConfirmCancelPopup, ExitablePopup } from "../webui/components/popup";
+import { fileTreeManager } from "./filetreemanager";
 
 
 export class FileTree extends Module<HTMLDivElement> {
     private searchField: FormInput
     private entriesView: Module<HTMLDivElement>
-
-    //private currentSearch: string | undefined = undefined
-    private fileTrees: Map<string, WebFSFileTree> = new Map<string, WebFSFileTree>()
-    private offlineConnections: string[] = []
 
     public constructor() {
         super("div", "", "filetree")
@@ -32,6 +29,9 @@ export class FileTree extends Module<HTMLDivElement> {
         this.entriesView = new Module("div")
         this.entriesView.setClass("filetreeEntries")
         this.add(this.entriesView)
+        
+        // Subscribe to manager updates
+        fileTreeManager.subscribe(() => this.triggerFullUpdate());
     }
 
     private triggerFullUpdate() {
@@ -44,36 +44,10 @@ export class FileTree extends Module<HTMLDivElement> {
             return
         }
 
-        if (changedPage) {
-            this.offlineConnections = []
-            this.fileTrees.clear()
-        }
         if (this.searchField.value() != kwargs.search || changedPage) {
             this.searchField.value(kwargs.search)
             this.updateEntriesView()
         }
-    }
-
-    private async getFileTree(sessionName: string): Promise<WebFSFileTree | null> {
-        console.log("Gathering filetrees for: " + sessionName)
-        let webFS = WebFS.connections.get(sessionName)
-        if (!webFS) return null;
-        let fileTree = await webFS.walk(".");
-        if (fileTree == null) {
-            console.log("Session offline: " + sessionName);
-            let jsonFiletree = localStorage["kb_filetree_cache_" + sessionName];
-            if (jsonFiletree) {
-                fileTree = JSON.parse(jsonFiletree);
-            }
-            this.offlineConnections.push(sessionName);
-        } else {
-            let jsonFiletree = JSON.stringify(fileTree);
-            localStorage["kb_filetree_cache_" + sessionName] = jsonFiletree;
-        }
-        if (fileTree != null) {
-            this.fileTrees.set(sessionName, fileTree);
-        }
-        return fileTree
     }
 
     private async updateEntriesView(showMax: number = 50) {
@@ -89,11 +63,13 @@ export class FileTree extends Module<HTMLDivElement> {
 
     private showOfflineStatus() {
         let offline = ""
-        for (let sessionName of this.offlineConnections) {
-            if (offline == "") {
-                offline =  STRINGS.FILETREE_OFFLINE
+        for (let sessionName of WebFS.connections.keys()) {
+            if (fileTreeManager.isOffline(sessionName)) {
+                if (offline == "") {
+                    offline = STRINGS.FILETREE_OFFLINE
+                }
+                offline += " " + sessionName
             }
-            offline +=  " " + sessionName
         }
         if (offline != "") {
             let module = new Module("div", offline, "filetreeOfflineStatus");
@@ -102,7 +78,7 @@ export class FileTree extends Module<HTMLDivElement> {
     }
 
     private async renderSearchResults(searchText: string, showMax: number) {
-        let files = search(this.fileTrees, searchText)
+        let files = search(fileTreeManager.getAllFileTrees(), searchText)
         let numResults = files.length;
         files = files.slice(0, showMax); // Only take first 50 results
         for (let entry of files) {
@@ -130,7 +106,7 @@ export class FileTree extends Module<HTMLDivElement> {
         let filetreeList = new Module<HTMLUListElement>("ul", "", "filetreeRoot");
         
         for (let sessionName of WebFS.connections.keys()) {
-            filetreeList.add(new FileTreeFolder("", sessionName, null, async () => await this.getFileTree(sessionName)))
+            filetreeList.add(new FileTreeFolder("", sessionName, null, async () => await fileTreeManager.getFileTree(sessionName)))
         }
         this.entriesView.add(filetreeList);
     }
@@ -140,7 +116,7 @@ class FileTreeElement extends Module<HTMLLIElement> {
     private elementSettings: Button
     protected elementButton: Button
 
-    constructor(protected path: string, protected name: string, private isFolder: boolean, private hasChildren: boolean) {
+    constructor(public path: string, protected name: string, private isFolder: boolean, private hasChildren: boolean) {
         super("li", "", isFolder ? "fileTreeFolder" : "fileTreeFile");
 
         this.elementSettings = new Button(iconDots, "fileTreeElementSettings");
@@ -193,7 +169,7 @@ class FileTreeElement extends Module<HTMLLIElement> {
         }
     }
 
-    protected getURI(): string {
+    public getURI(): string {
         let uri = this.path + "/" + this.name
         uri = uri.replace("/", "").replace("/", ":./")
         if (!uri.includes(":./")) {
@@ -397,6 +373,21 @@ class FileTreeElementMenu extends Module<HTMLDivElement> {
 
     constructor(parent: FileTreeElement, isFolder: boolean, isMovable: boolean, isDeletable: boolean) {
         super("div", "", "filetreeElementMenu");
+
+        // Add star/unstar option for files (not folders, not root)
+        if (!isFolder && parent.path != "") {
+            let uri = parent.getURI();
+            let sessionName = uri.split(":")[0];
+            let path = uri.split(":")[1];
+            let isStarred = fileTreeManager.isStarred(sessionName, path);
+            
+            let starAction = new Button(isStarred ? "Unstar" : "Star", "filetreeElementMenuButton")
+            starAction.onClick = () => { 
+                this.close(); 
+                fileTreeManager.toggleStar(sessionName, path);
+            }
+            this.add(starAction)
+        }
 
         if (isFolder) {
             let newFileAction = new Button("New File", "filetreeElementMenuButton")

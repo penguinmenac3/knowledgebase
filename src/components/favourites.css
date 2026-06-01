@@ -1,0 +1,68 @@
+.favourites {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.favouritesHeader {
+    padding: 1em;
+    font-weight: bold;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.favouritesEntries {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.favouriteEntry {
+    display: flex;
+    align-items: center;
+    padding: 0.5em 1em;
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.favouriteEntry:hover {
+    background-color: var(--color-hover);
+}
+
+.favouriteIcon {
+    margin-right: 0.5em;
+}
+
+.favouriteName {
+    font-weight: bold;
+    margin-right: 0.5em;
+}
+
+.favouritePath {
+    color: var(--color-dim);
+    margin-right: 0.5em;
+    font-size: 0.9em;
+}
+
+.favouriteSession {
+    color: var(--color-dim);
+    margin-right: 0.5em;
+    font-size: 0.9em;
+}
+
+.favouriteModified {
+    color: var(--color-dim);
+    margin-left: auto;
+    font-size: 0.9em;
+}
+
+.favouriteMenuButton {
+    margin-left: 0.5em;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.favouritesEmpty {
+    padding: 2em;
+    text-align: center;
+    color: var(--color-dim);
+}

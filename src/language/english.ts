@@ -41,6 +41,13 @@ export class English {
     public static FILETREE_RENAME_CONFIRM = "Rename"
     public static FILETREE_INVALID_SESSION = "You appear to have a broken session. Try to remove it and add it again."
 
+    public static FAVOURITES_TITLE = "Favourites"
+    public static FAVOURITES_EMPTY = "No starred files yet. Right-click on any file to star it."
+
+    public static LASTMODIFIED_TITLE = "Recently Modified"
+    public static LASTMODIFIED_EMPTY = "No files found."
+    public static LASTMODIFIED_SHOW_MORE = "Show more"
+
     public static SETTINGS_TITLE = "Settings"
     public static SETTINGS_GENERAL = "General"
     public static SETTINGS_LIST_CONNECTIONS = "Connections"
